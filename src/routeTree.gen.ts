@@ -13,6 +13,7 @@ import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedPostRouteImport } from './routes/_authenticated/post'
+import { Route as AuthenticatedMyAdsRouteImport } from './routes/_authenticated/my-ads'
 import { Route as StateCityRouteImport } from './routes/$state.$city'
 import { Route as StateCityCategoryRouteImport } from './routes/$state.$city.$category'
 import { Route as StateCityCategorySlugRouteImport } from './routes/$state.$city.$category.$slug'
@@ -36,6 +37,11 @@ const AuthenticatedPostRoute = AuthenticatedPostRouteImport.update({
   path: '/post',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedMyAdsRoute = AuthenticatedMyAdsRouteImport.update({
+  id: '/my-ads',
+  path: '/my-ads',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const StateCityRoute = StateCityRouteImport.update({
   id: '/$state/$city',
   path: '/$state/$city',
@@ -56,6 +62,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/$state/$city': typeof StateCityRouteWithChildren
+  '/my-ads': typeof AuthenticatedMyAdsRoute
   '/post': typeof AuthenticatedPostRoute
   '/$state/$city/$category': typeof StateCityCategoryRouteWithChildren
   '/$state/$city/$category/$slug': typeof StateCityCategorySlugRoute
@@ -64,6 +71,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/$state/$city': typeof StateCityRouteWithChildren
+  '/my-ads': typeof AuthenticatedMyAdsRoute
   '/post': typeof AuthenticatedPostRoute
   '/$state/$city/$category': typeof StateCityCategoryRouteWithChildren
   '/$state/$city/$category/$slug': typeof StateCityCategorySlugRoute
@@ -74,6 +82,7 @@ export interface FileRoutesById {
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/auth': typeof AuthRoute
   '/$state/$city': typeof StateCityRouteWithChildren
+  '/_authenticated/my-ads': typeof AuthenticatedMyAdsRoute
   '/_authenticated/post': typeof AuthenticatedPostRoute
   '/$state/$city/$category': typeof StateCityCategoryRouteWithChildren
   '/$state/$city/$category/$slug': typeof StateCityCategorySlugRoute
@@ -84,6 +93,7 @@ export interface FileRouteTypes {
     | '/'
     | '/auth'
     | '/$state/$city'
+    | '/my-ads'
     | '/post'
     | '/$state/$city/$category'
     | '/$state/$city/$category/$slug'
@@ -92,6 +102,7 @@ export interface FileRouteTypes {
     | '/'
     | '/auth'
     | '/$state/$city'
+    | '/my-ads'
     | '/post'
     | '/$state/$city/$category'
     | '/$state/$city/$category/$slug'
@@ -101,6 +112,7 @@ export interface FileRouteTypes {
     | '/_authenticated'
     | '/auth'
     | '/$state/$city'
+    | '/_authenticated/my-ads'
     | '/_authenticated/post'
     | '/$state/$city/$category'
     | '/$state/$city/$category/$slug'
@@ -143,6 +155,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedPostRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/my-ads': {
+      id: '/_authenticated/my-ads'
+      path: '/my-ads'
+      fullPath: '/my-ads'
+      preLoaderRoute: typeof AuthenticatedMyAdsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/$state/$city': {
       id: '/$state/$city'
       path: '/$state/$city'
@@ -168,10 +187,12 @@ declare module '@tanstack/react-router' {
 }
 
 interface AuthenticatedRouteRouteChildren {
+  AuthenticatedMyAdsRoute: typeof AuthenticatedMyAdsRoute
   AuthenticatedPostRoute: typeof AuthenticatedPostRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
+  AuthenticatedMyAdsRoute: AuthenticatedMyAdsRoute,
   AuthenticatedPostRoute: AuthenticatedPostRoute,
 }
 
