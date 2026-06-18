@@ -20,6 +20,7 @@ import { Route as AuthenticatedPostRouteImport } from './routes/_authenticated/p
 import { Route as AuthenticatedMyAdsRouteImport } from './routes/_authenticated/my-ads'
 import { Route as StateCityRouteImport } from './routes/$state.$city'
 import { Route as ApiPublicSitemapDotxmlRouteImport } from './routes/api/public/sitemap[.]xml'
+import { Route as ApiPublicRobotsDottxtRouteImport } from './routes/api/public/robots[.]txt'
 import { Route as StateCityCategoryRouteImport } from './routes/$state.$city.$category'
 import { Route as StateCityCategorySlugRouteImport } from './routes/$state.$city.$category.$slug'
 
@@ -77,6 +78,11 @@ const ApiPublicSitemapDotxmlRoute = ApiPublicSitemapDotxmlRouteImport.update({
   path: '/api/public/sitemap.xml',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiPublicRobotsDottxtRoute = ApiPublicRobotsDottxtRouteImport.update({
+  id: '/api/public/robots.txt',
+  path: '/api/public/robots.txt',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const StateCityCategoryRoute = StateCityCategoryRouteImport.update({
   id: '/$category',
   path: '/$category',
@@ -99,6 +105,7 @@ export interface FileRoutesByFullPath {
   '/my-ads': typeof AuthenticatedMyAdsRoute
   '/post': typeof AuthenticatedPostRoute
   '/$state/$city/$category': typeof StateCityCategoryRouteWithChildren
+  '/api/public/robots.txt': typeof ApiPublicRobotsDottxtRoute
   '/api/public/sitemap.xml': typeof ApiPublicSitemapDotxmlRoute
   '/$state/$city/$category/$slug': typeof StateCityCategorySlugRoute
 }
@@ -113,6 +120,7 @@ export interface FileRoutesByTo {
   '/my-ads': typeof AuthenticatedMyAdsRoute
   '/post': typeof AuthenticatedPostRoute
   '/$state/$city/$category': typeof StateCityCategoryRouteWithChildren
+  '/api/public/robots.txt': typeof ApiPublicRobotsDottxtRoute
   '/api/public/sitemap.xml': typeof ApiPublicSitemapDotxmlRoute
   '/$state/$city/$category/$slug': typeof StateCityCategorySlugRoute
 }
@@ -129,6 +137,7 @@ export interface FileRoutesById {
   '/_authenticated/my-ads': typeof AuthenticatedMyAdsRoute
   '/_authenticated/post': typeof AuthenticatedPostRoute
   '/$state/$city/$category': typeof StateCityCategoryRouteWithChildren
+  '/api/public/robots.txt': typeof ApiPublicRobotsDottxtRoute
   '/api/public/sitemap.xml': typeof ApiPublicSitemapDotxmlRoute
   '/$state/$city/$category/$slug': typeof StateCityCategorySlugRoute
 }
@@ -145,6 +154,7 @@ export interface FileRouteTypes {
     | '/my-ads'
     | '/post'
     | '/$state/$city/$category'
+    | '/api/public/robots.txt'
     | '/api/public/sitemap.xml'
     | '/$state/$city/$category/$slug'
   fileRoutesByTo: FileRoutesByTo
@@ -159,6 +169,7 @@ export interface FileRouteTypes {
     | '/my-ads'
     | '/post'
     | '/$state/$city/$category'
+    | '/api/public/robots.txt'
     | '/api/public/sitemap.xml'
     | '/$state/$city/$category/$slug'
   id:
@@ -174,6 +185,7 @@ export interface FileRouteTypes {
     | '/_authenticated/my-ads'
     | '/_authenticated/post'
     | '/$state/$city/$category'
+    | '/api/public/robots.txt'
     | '/api/public/sitemap.xml'
     | '/$state/$city/$category/$slug'
   fileRoutesById: FileRoutesById
@@ -187,6 +199,7 @@ export interface RootRouteChildren {
   SearchRoute: typeof SearchRoute
   TermsRoute: typeof TermsRoute
   StateCityRoute: typeof StateCityRouteWithChildren
+  ApiPublicRobotsDottxtRoute: typeof ApiPublicRobotsDottxtRoute
   ApiPublicSitemapDotxmlRoute: typeof ApiPublicSitemapDotxmlRoute
 }
 
@@ -269,6 +282,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicSitemapDotxmlRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/robots.txt': {
+      id: '/api/public/robots.txt'
+      path: '/api/public/robots.txt'
+      fullPath: '/api/public/robots.txt'
+      preLoaderRoute: typeof ApiPublicRobotsDottxtRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/$state/$city/$category': {
       id: '/$state/$city/$category'
       path: '/$category'
@@ -331,6 +351,7 @@ const rootRouteChildren: RootRouteChildren = {
   SearchRoute: SearchRoute,
   TermsRoute: TermsRoute,
   StateCityRoute: StateCityRouteWithChildren,
+  ApiPublicRobotsDottxtRoute: ApiPublicRobotsDottxtRoute,
   ApiPublicSitemapDotxmlRoute: ApiPublicSitemapDotxmlRoute,
 }
 export const routeTree = rootRouteImport
