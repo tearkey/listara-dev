@@ -9,6 +9,7 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as TermsRouteImport } from './routes/terms'
 import { Route as SearchRouteImport } from './routes/search'
 import { Route as SafetyRouteImport } from './routes/safety'
 import { Route as AuthRouteImport } from './routes/auth'
@@ -20,6 +21,11 @@ import { Route as StateCityRouteImport } from './routes/$state.$city'
 import { Route as StateCityCategoryRouteImport } from './routes/$state.$city.$category'
 import { Route as StateCityCategorySlugRouteImport } from './routes/$state.$city.$category.$slug'
 
+const TermsRoute = TermsRouteImport.update({
+  id: '/terms',
+  path: '/terms',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const SearchRoute = SearchRouteImport.update({
   id: '/search',
   path: '/search',
@@ -75,6 +81,7 @@ export interface FileRoutesByFullPath {
   '/auth': typeof AuthRoute
   '/safety': typeof SafetyRoute
   '/search': typeof SearchRoute
+  '/terms': typeof TermsRoute
   '/$state/$city': typeof StateCityRouteWithChildren
   '/my-ads': typeof AuthenticatedMyAdsRoute
   '/post': typeof AuthenticatedPostRoute
@@ -86,6 +93,7 @@ export interface FileRoutesByTo {
   '/auth': typeof AuthRoute
   '/safety': typeof SafetyRoute
   '/search': typeof SearchRoute
+  '/terms': typeof TermsRoute
   '/$state/$city': typeof StateCityRouteWithChildren
   '/my-ads': typeof AuthenticatedMyAdsRoute
   '/post': typeof AuthenticatedPostRoute
@@ -99,6 +107,7 @@ export interface FileRoutesById {
   '/auth': typeof AuthRoute
   '/safety': typeof SafetyRoute
   '/search': typeof SearchRoute
+  '/terms': typeof TermsRoute
   '/$state/$city': typeof StateCityRouteWithChildren
   '/_authenticated/my-ads': typeof AuthenticatedMyAdsRoute
   '/_authenticated/post': typeof AuthenticatedPostRoute
@@ -112,6 +121,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/safety'
     | '/search'
+    | '/terms'
     | '/$state/$city'
     | '/my-ads'
     | '/post'
@@ -123,6 +133,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/safety'
     | '/search'
+    | '/terms'
     | '/$state/$city'
     | '/my-ads'
     | '/post'
@@ -135,6 +146,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/safety'
     | '/search'
+    | '/terms'
     | '/$state/$city'
     | '/_authenticated/my-ads'
     | '/_authenticated/post'
@@ -148,11 +160,19 @@ export interface RootRouteChildren {
   AuthRoute: typeof AuthRoute
   SafetyRoute: typeof SafetyRoute
   SearchRoute: typeof SearchRoute
+  TermsRoute: typeof TermsRoute
   StateCityRoute: typeof StateCityRouteWithChildren
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/terms': {
+      id: '/terms'
+      path: '/terms'
+      fullPath: '/terms'
+      preLoaderRoute: typeof TermsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/search': {
       id: '/search'
       path: '/search'
@@ -268,6 +288,7 @@ const rootRouteChildren: RootRouteChildren = {
   AuthRoute: AuthRoute,
   SafetyRoute: SafetyRoute,
   SearchRoute: SearchRoute,
+  TermsRoute: TermsRoute,
   StateCityRoute: StateCityRouteWithChildren,
 }
 export const routeTree = rootRouteImport
