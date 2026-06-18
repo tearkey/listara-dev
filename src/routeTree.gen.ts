@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as SearchRouteImport } from './routes/search'
+import { Route as SafetyRouteImport } from './routes/safety'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as IndexRouteImport } from './routes/index'
@@ -22,6 +23,11 @@ import { Route as StateCityCategorySlugRouteImport } from './routes/$state.$city
 const SearchRoute = SearchRouteImport.update({
   id: '/search',
   path: '/search',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SafetyRoute = SafetyRouteImport.update({
+  id: '/safety',
+  path: '/safety',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthRoute = AuthRouteImport.update({
@@ -67,6 +73,7 @@ const StateCityCategorySlugRoute = StateCityCategorySlugRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
+  '/safety': typeof SafetyRoute
   '/search': typeof SearchRoute
   '/$state/$city': typeof StateCityRouteWithChildren
   '/my-ads': typeof AuthenticatedMyAdsRoute
@@ -77,6 +84,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
+  '/safety': typeof SafetyRoute
   '/search': typeof SearchRoute
   '/$state/$city': typeof StateCityRouteWithChildren
   '/my-ads': typeof AuthenticatedMyAdsRoute
@@ -89,6 +97,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/auth': typeof AuthRoute
+  '/safety': typeof SafetyRoute
   '/search': typeof SearchRoute
   '/$state/$city': typeof StateCityRouteWithChildren
   '/_authenticated/my-ads': typeof AuthenticatedMyAdsRoute
@@ -101,6 +110,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/auth'
+    | '/safety'
     | '/search'
     | '/$state/$city'
     | '/my-ads'
@@ -111,6 +121,7 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/auth'
+    | '/safety'
     | '/search'
     | '/$state/$city'
     | '/my-ads'
@@ -122,6 +133,7 @@ export interface FileRouteTypes {
     | '/'
     | '/_authenticated'
     | '/auth'
+    | '/safety'
     | '/search'
     | '/$state/$city'
     | '/_authenticated/my-ads'
@@ -134,6 +146,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   AuthRoute: typeof AuthRoute
+  SafetyRoute: typeof SafetyRoute
   SearchRoute: typeof SearchRoute
   StateCityRoute: typeof StateCityRouteWithChildren
 }
@@ -145,6 +158,13 @@ declare module '@tanstack/react-router' {
       path: '/search'
       fullPath: '/search'
       preLoaderRoute: typeof SearchRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/safety': {
+      id: '/safety'
+      path: '/safety'
+      fullPath: '/safety'
+      preLoaderRoute: typeof SafetyRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/auth': {
@@ -246,6 +266,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   AuthRoute: AuthRoute,
+  SafetyRoute: SafetyRoute,
   SearchRoute: SearchRoute,
   StateCityRoute: StateCityRouteWithChildren,
 }
