@@ -19,6 +19,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedPostRouteImport } from './routes/_authenticated/post'
 import { Route as AuthenticatedMyAdsRouteImport } from './routes/_authenticated/my-ads'
 import { Route as StateCityRouteImport } from './routes/$state.$city'
+import { Route as ApiPublicSitemapDotxmlRouteImport } from './routes/api/public/sitemap[.]xml'
 import { Route as StateCityCategoryRouteImport } from './routes/$state.$city.$category'
 import { Route as StateCityCategorySlugRouteImport } from './routes/$state.$city.$category.$slug'
 
@@ -71,6 +72,11 @@ const StateCityRoute = StateCityRouteImport.update({
   path: '/$state/$city',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiPublicSitemapDotxmlRoute = ApiPublicSitemapDotxmlRouteImport.update({
+  id: '/api/public/sitemap.xml',
+  path: '/api/public/sitemap.xml',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const StateCityCategoryRoute = StateCityCategoryRouteImport.update({
   id: '/$category',
   path: '/$category',
@@ -93,6 +99,7 @@ export interface FileRoutesByFullPath {
   '/my-ads': typeof AuthenticatedMyAdsRoute
   '/post': typeof AuthenticatedPostRoute
   '/$state/$city/$category': typeof StateCityCategoryRouteWithChildren
+  '/api/public/sitemap.xml': typeof ApiPublicSitemapDotxmlRoute
   '/$state/$city/$category/$slug': typeof StateCityCategorySlugRoute
 }
 export interface FileRoutesByTo {
@@ -106,6 +113,7 @@ export interface FileRoutesByTo {
   '/my-ads': typeof AuthenticatedMyAdsRoute
   '/post': typeof AuthenticatedPostRoute
   '/$state/$city/$category': typeof StateCityCategoryRouteWithChildren
+  '/api/public/sitemap.xml': typeof ApiPublicSitemapDotxmlRoute
   '/$state/$city/$category/$slug': typeof StateCityCategorySlugRoute
 }
 export interface FileRoutesById {
@@ -121,6 +129,7 @@ export interface FileRoutesById {
   '/_authenticated/my-ads': typeof AuthenticatedMyAdsRoute
   '/_authenticated/post': typeof AuthenticatedPostRoute
   '/$state/$city/$category': typeof StateCityCategoryRouteWithChildren
+  '/api/public/sitemap.xml': typeof ApiPublicSitemapDotxmlRoute
   '/$state/$city/$category/$slug': typeof StateCityCategorySlugRoute
 }
 export interface FileRouteTypes {
@@ -136,6 +145,7 @@ export interface FileRouteTypes {
     | '/my-ads'
     | '/post'
     | '/$state/$city/$category'
+    | '/api/public/sitemap.xml'
     | '/$state/$city/$category/$slug'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -149,6 +159,7 @@ export interface FileRouteTypes {
     | '/my-ads'
     | '/post'
     | '/$state/$city/$category'
+    | '/api/public/sitemap.xml'
     | '/$state/$city/$category/$slug'
   id:
     | '__root__'
@@ -163,6 +174,7 @@ export interface FileRouteTypes {
     | '/_authenticated/my-ads'
     | '/_authenticated/post'
     | '/$state/$city/$category'
+    | '/api/public/sitemap.xml'
     | '/$state/$city/$category/$slug'
   fileRoutesById: FileRoutesById
 }
@@ -175,6 +187,7 @@ export interface RootRouteChildren {
   SearchRoute: typeof SearchRoute
   TermsRoute: typeof TermsRoute
   StateCityRoute: typeof StateCityRouteWithChildren
+  ApiPublicSitemapDotxmlRoute: typeof ApiPublicSitemapDotxmlRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -249,6 +262,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof StateCityRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/sitemap.xml': {
+      id: '/api/public/sitemap.xml'
+      path: '/api/public/sitemap.xml'
+      fullPath: '/api/public/sitemap.xml'
+      preLoaderRoute: typeof ApiPublicSitemapDotxmlRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/$state/$city/$category': {
       id: '/$state/$city/$category'
       path: '/$category'
@@ -311,6 +331,7 @@ const rootRouteChildren: RootRouteChildren = {
   SearchRoute: SearchRoute,
   TermsRoute: TermsRoute,
   StateCityRoute: StateCityRouteWithChildren,
+  ApiPublicSitemapDotxmlRoute: ApiPublicSitemapDotxmlRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
