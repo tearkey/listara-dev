@@ -9,38 +9,244 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as TermsRouteImport } from './routes/terms'
+import { Route as SearchRouteImport } from './routes/search'
+import { Route as SafetyRouteImport } from './routes/safety'
+import { Route as PrivacyRouteImport } from './routes/privacy'
+import { Route as AuthRouteImport } from './routes/auth'
+import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AuthenticatedPostRouteImport } from './routes/_authenticated/post'
+import { Route as AuthenticatedMyAdsRouteImport } from './routes/_authenticated/my-ads'
+import { Route as StateCityRouteImport } from './routes/$state.$city'
+import { Route as ApiPublicSitemapDotxmlRouteImport } from './routes/api/public/sitemap[.]xml'
+import { Route as ApiPublicRobotsDottxtRouteImport } from './routes/api/public/robots[.]txt'
+import { Route as StateCityCategoryRouteImport } from './routes/$state.$city.$category'
+import { Route as StateCityCategorySlugRouteImport } from './routes/$state.$city.$category.$slug'
 
+const TermsRoute = TermsRouteImport.update({
+  id: '/terms',
+  path: '/terms',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SearchRoute = SearchRouteImport.update({
+  id: '/search',
+  path: '/search',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SafetyRoute = SafetyRouteImport.update({
+  id: '/safety',
+  path: '/safety',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PrivacyRoute = PrivacyRouteImport.update({
+  id: '/privacy',
+  path: '/privacy',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthRoute = AuthRouteImport.update({
+  id: '/auth',
+  path: '/auth',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
+  id: '/_authenticated',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthenticatedPostRoute = AuthenticatedPostRouteImport.update({
+  id: '/post',
+  path: '/post',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedMyAdsRoute = AuthenticatedMyAdsRouteImport.update({
+  id: '/my-ads',
+  path: '/my-ads',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const StateCityRoute = StateCityRouteImport.update({
+  id: '/$state/$city',
+  path: '/$state/$city',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiPublicSitemapDotxmlRoute = ApiPublicSitemapDotxmlRouteImport.update({
+  id: '/api/public/sitemap.xml',
+  path: '/api/public/sitemap.xml',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiPublicRobotsDottxtRoute = ApiPublicRobotsDottxtRouteImport.update({
+  id: '/api/public/robots.txt',
+  path: '/api/public/robots.txt',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const StateCityCategoryRoute = StateCityCategoryRouteImport.update({
+  id: '/$category',
+  path: '/$category',
+  getParentRoute: () => StateCityRoute,
+} as any)
+const StateCityCategorySlugRoute = StateCityCategorySlugRouteImport.update({
+  id: '/$slug',
+  path: '/$slug',
+  getParentRoute: () => StateCityCategoryRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/auth': typeof AuthRoute
+  '/privacy': typeof PrivacyRoute
+  '/safety': typeof SafetyRoute
+  '/search': typeof SearchRoute
+  '/terms': typeof TermsRoute
+  '/$state/$city': typeof StateCityRouteWithChildren
+  '/my-ads': typeof AuthenticatedMyAdsRoute
+  '/post': typeof AuthenticatedPostRoute
+  '/$state/$city/$category': typeof StateCityCategoryRouteWithChildren
+  '/api/public/robots.txt': typeof ApiPublicRobotsDottxtRoute
+  '/api/public/sitemap.xml': typeof ApiPublicSitemapDotxmlRoute
+  '/$state/$city/$category/$slug': typeof StateCityCategorySlugRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/auth': typeof AuthRoute
+  '/privacy': typeof PrivacyRoute
+  '/safety': typeof SafetyRoute
+  '/search': typeof SearchRoute
+  '/terms': typeof TermsRoute
+  '/$state/$city': typeof StateCityRouteWithChildren
+  '/my-ads': typeof AuthenticatedMyAdsRoute
+  '/post': typeof AuthenticatedPostRoute
+  '/$state/$city/$category': typeof StateCityCategoryRouteWithChildren
+  '/api/public/robots.txt': typeof ApiPublicRobotsDottxtRoute
+  '/api/public/sitemap.xml': typeof ApiPublicSitemapDotxmlRoute
+  '/$state/$city/$category/$slug': typeof StateCityCategorySlugRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
+  '/auth': typeof AuthRoute
+  '/privacy': typeof PrivacyRoute
+  '/safety': typeof SafetyRoute
+  '/search': typeof SearchRoute
+  '/terms': typeof TermsRoute
+  '/$state/$city': typeof StateCityRouteWithChildren
+  '/_authenticated/my-ads': typeof AuthenticatedMyAdsRoute
+  '/_authenticated/post': typeof AuthenticatedPostRoute
+  '/$state/$city/$category': typeof StateCityCategoryRouteWithChildren
+  '/api/public/robots.txt': typeof ApiPublicRobotsDottxtRoute
+  '/api/public/sitemap.xml': typeof ApiPublicSitemapDotxmlRoute
+  '/$state/$city/$category/$slug': typeof StateCityCategorySlugRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths:
+    | '/'
+    | '/auth'
+    | '/privacy'
+    | '/safety'
+    | '/search'
+    | '/terms'
+    | '/$state/$city'
+    | '/my-ads'
+    | '/post'
+    | '/$state/$city/$category'
+    | '/api/public/robots.txt'
+    | '/api/public/sitemap.xml'
+    | '/$state/$city/$category/$slug'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to:
+    | '/'
+    | '/auth'
+    | '/privacy'
+    | '/safety'
+    | '/search'
+    | '/terms'
+    | '/$state/$city'
+    | '/my-ads'
+    | '/post'
+    | '/$state/$city/$category'
+    | '/api/public/robots.txt'
+    | '/api/public/sitemap.xml'
+    | '/$state/$city/$category/$slug'
+  id:
+    | '__root__'
+    | '/'
+    | '/_authenticated'
+    | '/auth'
+    | '/privacy'
+    | '/safety'
+    | '/search'
+    | '/terms'
+    | '/$state/$city'
+    | '/_authenticated/my-ads'
+    | '/_authenticated/post'
+    | '/$state/$city/$category'
+    | '/api/public/robots.txt'
+    | '/api/public/sitemap.xml'
+    | '/$state/$city/$category/$slug'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
+  AuthRoute: typeof AuthRoute
+  PrivacyRoute: typeof PrivacyRoute
+  SafetyRoute: typeof SafetyRoute
+  SearchRoute: typeof SearchRoute
+  TermsRoute: typeof TermsRoute
+  StateCityRoute: typeof StateCityRouteWithChildren
+  ApiPublicRobotsDottxtRoute: typeof ApiPublicRobotsDottxtRoute
+  ApiPublicSitemapDotxmlRoute: typeof ApiPublicSitemapDotxmlRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/terms': {
+      id: '/terms'
+      path: '/terms'
+      fullPath: '/terms'
+      preLoaderRoute: typeof TermsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/search': {
+      id: '/search'
+      path: '/search'
+      fullPath: '/search'
+      preLoaderRoute: typeof SearchRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/safety': {
+      id: '/safety'
+      path: '/safety'
+      fullPath: '/safety'
+      preLoaderRoute: typeof SafetyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/privacy': {
+      id: '/privacy'
+      path: '/privacy'
+      fullPath: '/privacy'
+      preLoaderRoute: typeof PrivacyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/auth': {
+      id: '/auth'
+      path: '/auth'
+      fullPath: '/auth'
+      preLoaderRoute: typeof AuthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated': {
+      id: '/_authenticated'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof AuthenticatedRouteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -48,22 +254,106 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authenticated/post': {
+      id: '/_authenticated/post'
+      path: '/post'
+      fullPath: '/post'
+      preLoaderRoute: typeof AuthenticatedPostRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/my-ads': {
+      id: '/_authenticated/my-ads'
+      path: '/my-ads'
+      fullPath: '/my-ads'
+      preLoaderRoute: typeof AuthenticatedMyAdsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/$state/$city': {
+      id: '/$state/$city'
+      path: '/$state/$city'
+      fullPath: '/$state/$city'
+      preLoaderRoute: typeof StateCityRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/sitemap.xml': {
+      id: '/api/public/sitemap.xml'
+      path: '/api/public/sitemap.xml'
+      fullPath: '/api/public/sitemap.xml'
+      preLoaderRoute: typeof ApiPublicSitemapDotxmlRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/robots.txt': {
+      id: '/api/public/robots.txt'
+      path: '/api/public/robots.txt'
+      fullPath: '/api/public/robots.txt'
+      preLoaderRoute: typeof ApiPublicRobotsDottxtRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/$state/$city/$category': {
+      id: '/$state/$city/$category'
+      path: '/$category'
+      fullPath: '/$state/$city/$category'
+      preLoaderRoute: typeof StateCityCategoryRouteImport
+      parentRoute: typeof StateCityRoute
+    }
+    '/$state/$city/$category/$slug': {
+      id: '/$state/$city/$category/$slug'
+      path: '/$slug'
+      fullPath: '/$state/$city/$category/$slug'
+      preLoaderRoute: typeof StateCityCategorySlugRouteImport
+      parentRoute: typeof StateCityCategoryRoute
+    }
   }
 }
 
+interface AuthenticatedRouteRouteChildren {
+  AuthenticatedMyAdsRoute: typeof AuthenticatedMyAdsRoute
+  AuthenticatedPostRoute: typeof AuthenticatedPostRoute
+}
+
+const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
+  AuthenticatedMyAdsRoute: AuthenticatedMyAdsRoute,
+  AuthenticatedPostRoute: AuthenticatedPostRoute,
+}
+
+const AuthenticatedRouteRouteWithChildren =
+  AuthenticatedRouteRoute._addFileChildren(AuthenticatedRouteRouteChildren)
+
+interface StateCityCategoryRouteChildren {
+  StateCityCategorySlugRoute: typeof StateCityCategorySlugRoute
+}
+
+const StateCityCategoryRouteChildren: StateCityCategoryRouteChildren = {
+  StateCityCategorySlugRoute: StateCityCategorySlugRoute,
+}
+
+const StateCityCategoryRouteWithChildren =
+  StateCityCategoryRoute._addFileChildren(StateCityCategoryRouteChildren)
+
+interface StateCityRouteChildren {
+  StateCityCategoryRoute: typeof StateCityCategoryRouteWithChildren
+}
+
+const StateCityRouteChildren: StateCityRouteChildren = {
+  StateCityCategoryRoute: StateCityCategoryRouteWithChildren,
+}
+
+const StateCityRouteWithChildren = StateCityRoute._addFileChildren(
+  StateCityRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
+  AuthRoute: AuthRoute,
+  PrivacyRoute: PrivacyRoute,
+  SafetyRoute: SafetyRoute,
+  SearchRoute: SearchRoute,
+  TermsRoute: TermsRoute,
+  StateCityRoute: StateCityRouteWithChildren,
+  ApiPublicRobotsDottxtRoute: ApiPublicRobotsDottxtRoute,
+  ApiPublicSitemapDotxmlRoute: ApiPublicSitemapDotxmlRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
