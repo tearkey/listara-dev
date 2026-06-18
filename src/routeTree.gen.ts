@@ -9,38 +9,126 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as AuthRouteImport } from './routes/auth'
+import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AuthenticatedPostRouteImport } from './routes/_authenticated/post'
+import { Route as StateCityRouteImport } from './routes/$state.$city'
+import { Route as StateCityCategoryRouteImport } from './routes/$state.$city.$category'
+import { Route as StateCityCategorySlugRouteImport } from './routes/$state.$city.$category.$slug'
 
+const AuthRoute = AuthRouteImport.update({
+  id: '/auth',
+  path: '/auth',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
+  id: '/_authenticated',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthenticatedPostRoute = AuthenticatedPostRouteImport.update({
+  id: '/post',
+  path: '/post',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const StateCityRoute = StateCityRouteImport.update({
+  id: '/$state/$city',
+  path: '/$state/$city',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const StateCityCategoryRoute = StateCityCategoryRouteImport.update({
+  id: '/$category',
+  path: '/$category',
+  getParentRoute: () => StateCityRoute,
+} as any)
+const StateCityCategorySlugRoute = StateCityCategorySlugRouteImport.update({
+  id: '/$slug',
+  path: '/$slug',
+  getParentRoute: () => StateCityCategoryRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/auth': typeof AuthRoute
+  '/$state/$city': typeof StateCityRouteWithChildren
+  '/post': typeof AuthenticatedPostRoute
+  '/$state/$city/$category': typeof StateCityCategoryRouteWithChildren
+  '/$state/$city/$category/$slug': typeof StateCityCategorySlugRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/auth': typeof AuthRoute
+  '/$state/$city': typeof StateCityRouteWithChildren
+  '/post': typeof AuthenticatedPostRoute
+  '/$state/$city/$category': typeof StateCityCategoryRouteWithChildren
+  '/$state/$city/$category/$slug': typeof StateCityCategorySlugRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
+  '/auth': typeof AuthRoute
+  '/$state/$city': typeof StateCityRouteWithChildren
+  '/_authenticated/post': typeof AuthenticatedPostRoute
+  '/$state/$city/$category': typeof StateCityCategoryRouteWithChildren
+  '/$state/$city/$category/$slug': typeof StateCityCategorySlugRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths:
+    | '/'
+    | '/auth'
+    | '/$state/$city'
+    | '/post'
+    | '/$state/$city/$category'
+    | '/$state/$city/$category/$slug'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to:
+    | '/'
+    | '/auth'
+    | '/$state/$city'
+    | '/post'
+    | '/$state/$city/$category'
+    | '/$state/$city/$category/$slug'
+  id:
+    | '__root__'
+    | '/'
+    | '/_authenticated'
+    | '/auth'
+    | '/$state/$city'
+    | '/_authenticated/post'
+    | '/$state/$city/$category'
+    | '/$state/$city/$category/$slug'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
+  AuthRoute: typeof AuthRoute
+  StateCityRoute: typeof StateCityRouteWithChildren
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/auth': {
+      id: '/auth'
+      path: '/auth'
+      fullPath: '/auth'
+      preLoaderRoute: typeof AuthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated': {
+      id: '/_authenticated'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof AuthenticatedRouteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -48,22 +136,77 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authenticated/post': {
+      id: '/_authenticated/post'
+      path: '/post'
+      fullPath: '/post'
+      preLoaderRoute: typeof AuthenticatedPostRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/$state/$city': {
+      id: '/$state/$city'
+      path: '/$state/$city'
+      fullPath: '/$state/$city'
+      preLoaderRoute: typeof StateCityRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/$state/$city/$category': {
+      id: '/$state/$city/$category'
+      path: '/$category'
+      fullPath: '/$state/$city/$category'
+      preLoaderRoute: typeof StateCityCategoryRouteImport
+      parentRoute: typeof StateCityRoute
+    }
+    '/$state/$city/$category/$slug': {
+      id: '/$state/$city/$category/$slug'
+      path: '/$slug'
+      fullPath: '/$state/$city/$category/$slug'
+      preLoaderRoute: typeof StateCityCategorySlugRouteImport
+      parentRoute: typeof StateCityCategoryRoute
+    }
   }
 }
 
+interface AuthenticatedRouteRouteChildren {
+  AuthenticatedPostRoute: typeof AuthenticatedPostRoute
+}
+
+const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
+  AuthenticatedPostRoute: AuthenticatedPostRoute,
+}
+
+const AuthenticatedRouteRouteWithChildren =
+  AuthenticatedRouteRoute._addFileChildren(AuthenticatedRouteRouteChildren)
+
+interface StateCityCategoryRouteChildren {
+  StateCityCategorySlugRoute: typeof StateCityCategorySlugRoute
+}
+
+const StateCityCategoryRouteChildren: StateCityCategoryRouteChildren = {
+  StateCityCategorySlugRoute: StateCityCategorySlugRoute,
+}
+
+const StateCityCategoryRouteWithChildren =
+  StateCityCategoryRoute._addFileChildren(StateCityCategoryRouteChildren)
+
+interface StateCityRouteChildren {
+  StateCityCategoryRoute: typeof StateCityCategoryRouteWithChildren
+}
+
+const StateCityRouteChildren: StateCityRouteChildren = {
+  StateCityCategoryRoute: StateCityCategoryRouteWithChildren,
+}
+
+const StateCityRouteWithChildren = StateCityRoute._addFileChildren(
+  StateCityRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
+  AuthRoute: AuthRoute,
+  StateCityRoute: StateCityRouteWithChildren,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
