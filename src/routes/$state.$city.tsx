@@ -110,7 +110,6 @@ function CityPage() {
                               <Link
                                 to="/$state/$city/$category"
                                 params={{ state, city, category: cat.slug }}
-                                search={{ sub: s.slug }}
                                 className="text-xs text-muted-foreground hover:text-brand hover:underline"
                               >
                                 {s.name}
