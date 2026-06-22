@@ -1,11 +1,20 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { queryOptions, useSuspenseQuery } from "@tanstack/react-query";
-import { MapPin, ArrowRight } from "lucide-react";
+import { MapPin, ArrowRight, ChevronRight } from "lucide-react";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
-import { AdCard } from "@/components/ad-card";
 import { getCityBySlug, listCategories, listAdsInCity } from "@/lib/catalog.functions";
 import { BRAND } from "@/lib/brand";
+
+// Groups visible on the city index. Each group maps to one or more
+// category slugs from the DB.
+const CATEGORY_GROUPS: { label: string; slugs: string[] }[] = [
+  { label: "Services", slugs: ["services", "gigs"] },
+  { label: "Buy / Sell / Trade", slugs: ["for-sale", "vehicles"] },
+  { label: "Community", slugs: ["community", "housing"] },
+  { label: "Jobs", slugs: ["jobs"] },
+  { label: "Personals", slugs: ["personals"] },
+];
 
 export const Route = createFileRoute("/$state/$city")({
   loader: async ({ context, params }) => {
@@ -62,47 +71,67 @@ function CityPage() {
   return (
     <div className="min-h-screen bg-background">
       <SiteHeader />
-      <section className="border-b border-border bg-gradient-to-br from-secondary via-background to-accent/20">
-        <div className="mx-auto max-w-7xl px-4 py-10">
+      <section className="border-b border-border bg-secondary/40">
+        <div className="mx-auto max-w-7xl px-4 py-6">
           <nav className="text-xs text-muted-foreground"><Link to="/">Home</Link> / {c.states.name} / {c.name}</nav>
-          <h1 className="mt-2 font-display text-3xl font-bold md:text-4xl">
-            <MapPin className="inline h-7 w-7 text-brand" /> {c.name}, {c.states.code}
-          </h1>
-          <p className="mt-1 text-muted-foreground">Local classifieds in {c.name}. Pick a category or scroll the latest listings.</p>
-        </div>
-      </section>
-
-      <section className="mx-auto max-w-7xl px-4 py-8">
-        <h2 className="font-display text-xl font-bold">Categories in {c.name}</h2>
-        <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4">
-          {cats.map((cat: any) => (
-            <Link
-              key={cat.id}
-              to="/$state/$city/$category"
-              params={{ state, city, category: cat.slug }}
-              className="group rounded-2xl border border-border bg-card p-4 transition hover:border-brand hover:shadow-sm"
-            >
-              <div className="font-display text-base font-semibold group-hover:text-brand">{cat.name}</div>
-              <div className="mt-1 line-clamp-1 text-xs text-muted-foreground">{cat.description}</div>
-              <div className="mt-2 inline-flex items-center text-xs font-medium text-brand">
-                Browse <ArrowRight className="ml-1 h-3 w-3" />
-              </div>
+          <div className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1">
+            <h1 className="font-display text-xl font-bold md:text-2xl">
+              <MapPin className="inline h-5 w-5 text-brand" /> Current Location:{" "}
+              <span className="text-brand">{c.name}, {c.states.code}</span>
+            </h1>
+            <Link to="/" className="text-xs font-medium text-muted-foreground underline hover:text-brand">
+              Change Location
             </Link>
-          ))}
+          </div>
         </div>
       </section>
 
       <section className="mx-auto max-w-7xl px-4 py-8">
-        <h2 className="font-display text-xl font-bold">Latest in {c.name}</h2>
-        {recent.length === 0 ? (
-          <div className="mt-4 rounded-2xl border border-dashed border-border p-8 text-center text-muted-foreground">
-            No listings yet — <Link to="/post" className="text-brand font-semibold">be the first to post</Link>.
-          </div>
-        ) : (
-          <div className="mt-4 grid gap-3 md:grid-cols-2">
-            {recent.map((ad: any) => <AdCard key={ad.id} ad={ad} />)}
-          </div>
-        )}
+        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
+          {CATEGORY_GROUPS.map((group) => {
+            const groupCats = cats.filter((cat: any) => group.slugs.includes(cat.slug));
+            return (
+              <div key={group.label} className="rounded-2xl border border-border bg-card p-4">
+                <h2 className="font-display text-lg font-bold text-brand">{group.label}</h2>
+                <div className="mt-3 space-y-3">
+                  {groupCats.map((cat: any) => (
+                    <div key={cat.id}>
+                      <Link
+                        to="/$state/$city/$category"
+                        params={{ state, city, category: cat.slug }}
+                        className="inline-flex items-center gap-1 font-semibold hover:text-brand"
+                      >
+                        {cat.name} <ChevronRight className="h-3 w-3" />
+                      </Link>
+                      {cat.subcategories && cat.subcategories.length > 0 && (
+                        <ul className="mt-1 ml-1 space-y-0.5">
+                          {cat.subcategories.slice(0, 6).map((s: any) => (
+                            <li key={s.id}>
+                              <Link
+                                to="/$state/$city/$category"
+                                params={{ state, city, category: cat.slug }}
+                                search={{ sub: s.slug }}
+                                className="text-xs text-muted-foreground hover:text-brand hover:underline"
+                              >
+                                {s.name}
+                              </Link>
+                            </li>
+                          ))}
+                        </ul>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+        <div className="mt-6 text-sm text-muted-foreground">
+          {recent.length} recent listing{recent.length === 1 ? "" : "s"} in {c.name}.{" "}
+          <Link to="/post" className="font-semibold text-brand hover:underline inline-flex items-center gap-1">
+            Post one <ArrowRight className="h-3 w-3" />
+          </Link>
+        </div>
       </section>
 
       <SiteFooter />
