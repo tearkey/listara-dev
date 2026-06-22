@@ -1,11 +1,12 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
-import { queryOptions, useSuspenseQuery } from "@tanstack/react-query";
+import { queryOptions } from "@tanstack/react-query";
 import { useState } from "react";
-import { Flag, MapPin, MessageCircle, Phone, Mail, Pin, Star, ArrowUp } from "lucide-react";
+import { Flag, MapPin, MessageCircle, Phone, Mail, Pin, Star, ArrowUp, Eye, Calendar, Hash, ShieldCheck, Image as ImageIcon } from "lucide-react";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
+import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
 import { getAdByShortId } from "@/lib/catalog.functions";
 import { reportAd, sendMessage } from "@/lib/ads.functions";
 import { useServerFn } from "@tanstack/react-start";
@@ -68,7 +69,12 @@ function AdDetailPage() {
   const reportFn = useServerFn(reportAd);
   const sendFn = useServerFn(sendMessage);
   const [msg, setMsg] = useState("");
-  const images = (ad.ad_images ?? []).slice().sort((a: any, b: any) => a.sort_order - b.sort_order);
+  const [revealPhone, setRevealPhone] = useState(false);
+  const [revealEmail, setRevealEmail] = useState(false);
+  const images = (ad.ad_images ?? [])
+    .slice()
+    .sort((a: any, b: any) => a.sort_order - b.sort_order)
+    .slice(0, 5);
 
   async function handleReport() {
     const reason = window.prompt("Why are you reporting this ad?");
@@ -92,10 +98,27 @@ function AdDetailPage() {
 
   const price = ad.price_cents != null ? new Intl.NumberFormat("en-US", { style: "currency", currency: ad.currency ?? "USD" }).format(ad.price_cents / 100) : null;
 
+  const postedDate = ad.posted_at
+    ? new Date(ad.posted_at).toLocaleDateString("en-US", { year: "numeric", month: "short", day: "numeric" })
+    : "—";
+  const neighborhood = ad.cities?.name ?? "—";
+
+  function maskPhone(p: string) {
+    const digits = p.replace(/\D/g, "");
+    if (digits.length < 4) return "•••• ••••";
+    return `${"•".repeat(Math.max(0, digits.length - 4))} ${digits.slice(-4)}`;
+  }
+  function maskEmail(e: string) {
+    const [name, domain] = e.split("@");
+    if (!domain) return "••••@••••";
+    const shown = name.slice(0, 1);
+    return `${shown}${"•".repeat(Math.max(2, name.length - 1))}@${domain}`;
+  }
+
   return (
     <div className="min-h-screen bg-background">
       <SiteHeader />
-      <div className="mx-auto max-w-5xl px-4 py-8">
+      <div className="mx-auto max-w-6xl px-4 py-6">
         <nav className="text-xs text-muted-foreground">
           <Link to="/">Home</Link> /{" "}
           <Link to="/$state/$city" params={{ state: ad.cities!.states!.slug, city: ad.cities!.slug }}>
@@ -106,44 +129,242 @@ function AdDetailPage() {
           </Link>
         </nav>
 
-        <div className="mt-3 grid gap-6 md:grid-cols-3">
-          <div className="md:col-span-2 space-y-4">
+        <div className="mt-3 grid gap-6 lg:grid-cols-[1fr_340px]">
+          <div className="min-w-0 space-y-5">
+            {/* Carousel — up to 5 photos */}
+            <ImageCarousel images={images} title={ad.title} />
+
+            {/* Title + price */}
             <div className="flex flex-wrap items-start justify-between gap-3">
-              <div>
-                <h1 className="font-display text-3xl font-bold leading-tight">{ad.title}</h1>
-                <p className="mt-1 text-sm text-muted-foreground inline-flex items-center gap-1">
-                  <MapPin className="h-4 w-4" /> {ad.cities!.name}, {ad.cities!.states!.code} · {ad.categories!.name}
-                </p>
-              </div>
-              {price && <div className="rounded-xl bg-brand/15 px-4 py-2 text-2xl font-display font-bold text-foreground">{price}</div>}
+              <h1 className="font-display text-3xl font-bold leading-tight md:text-4xl">{ad.title}</h1>
+              {price && (
+                <div className="rounded-xl bg-brand/15 px-4 py-2 text-2xl font-display font-bold text-foreground">
+                  {price}
+                </div>
+              )}
             </div>
 
-            {ad.tier !== "free" && (
-              <span className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-semibold ${ad.tier === "sticky" ? "bg-accent text-accent-foreground" : ad.tier === "featured" ? "bg-brand text-brand-foreground" : "bg-secondary text-secondary-foreground"}`}>
-                {ad.tier === "sticky" ? <Pin className="h-3 w-3" /> : ad.tier === "featured" ? <Star className="h-3 w-3" /> : <ArrowUp className="h-3 w-3" />}
-                {ad.tier.charAt(0).toUpperCase() + ad.tier.slice(1)}
+            {/* Metadata row */}
+            <div className="flex flex-wrap items-center gap-x-5 gap-y-2 rounded-xl border border-border bg-secondary/40 px-4 py-3 text-sm text-muted-foreground">
+              <span className="inline-flex items-center gap-1.5">
+                <Hash className="h-4 w-4 text-brand" />
+                <span className="font-medium text-foreground">Post ID:</span>{" "}
+                <span className="font-mono uppercase">{ad.short_id}</span>
               </span>
-            )}
-
-            {images.length > 0 && (
-              <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
-                {images.map((img: any) => (
-                  <img key={img.public_url} src={img.public_url} alt="" className="aspect-square w-full rounded-xl object-cover" loading="lazy" />
-                ))}
-              </div>
-            )}
-
-            <div className="rounded-2xl border border-border bg-card p-5">
-              <h2 className="font-display text-lg font-semibold">Description</h2>
-              <p className="mt-2 whitespace-pre-wrap text-sm leading-relaxed text-foreground/90">{ad.body}</p>
+              <span className="inline-flex items-center gap-1.5">
+                <Calendar className="h-4 w-4 text-brand" />
+                <span className="font-medium text-foreground">Posted:</span> {postedDate}
+              </span>
+              <span className="inline-flex items-center gap-1.5">
+                <MapPin className="h-4 w-4 text-brand" />
+                <span className="font-medium text-foreground">Neighborhood:</span> {neighborhood},{" "}
+                {ad.cities!.states!.code}
+              </span>
+              <span className="inline-flex items-center gap-1.5">
+                <Eye className="h-4 w-4 text-brand" />
+                {ad.view_count ?? 0} views
+              </span>
+              {ad.tier !== "free" && (
+                <span
+                  className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-semibold ${
+                    ad.tier === "sticky"
+                      ? "bg-accent text-accent-foreground"
+                      : ad.tier === "featured"
+                        ? "bg-brand text-brand-foreground"
+                        : "bg-secondary text-secondary-foreground"
+                  }`}
+                >
+                  {ad.tier === "sticky" ? <Pin className="h-3 w-3" /> : ad.tier === "featured" ? <Star className="h-3 w-3" /> : <ArrowUp className="h-3 w-3" />}
+                  {ad.tier.charAt(0).toUpperCase() + ad.tier.slice(1)}
+                </span>
+              )}
             </div>
 
-            <button onClick={handleReport} className="inline-flex items-center gap-1 text-xs text-muted-foreground hover:text-destructive">
+            {/* Description */}
+            <article className="rounded-2xl border border-border bg-card p-6">
+              <h2 className="font-display text-lg font-semibold">Description</h2>
+              <p className="mt-3 whitespace-pre-wrap text-base leading-relaxed text-foreground/90">
+                {ad.body}
+              </p>
+            </article>
+
+            <button
+              onClick={handleReport}
+              className="inline-flex items-center gap-1 text-xs text-muted-foreground hover:text-destructive"
+            >
               <Flag className="h-3 w-3" /> Report this ad
             </button>
           </div>
 
-          <aside className="space-y-4">
+          {/* Sidebar */}
+          <aside className="space-y-4 lg:sticky lg:top-4 lg:self-start">
+            {/* Contact Advertiser card */}
+            <div className="rounded-2xl border border-border bg-card p-5 shadow-sm">
+              <h2 className="font-display text-lg font-bold">Contact Advertiser</h2>
+              <div className="mt-3 flex items-center gap-3">
+                {ad.profiles?.avatar_url ? (
+                  <img src={ad.profiles.avatar_url} alt="" className="h-12 w-12 rounded-full object-cover" />
+                ) : (
+                  <div className="h-12 w-12 rounded-full bg-secondary inline-flex items-center justify-center font-display font-bold text-muted-foreground">
+                    {(ad.profiles?.display_name ?? "U").charAt(0).toUpperCase()}
+                  </div>
+                )}
+                <div className="min-w-0">
+                  <div className="font-display font-semibold truncate">{ad.profiles?.display_name ?? "Poster"}</div>
+                  <div className="text-xs text-muted-foreground inline-flex items-center gap-1">
+                    <ShieldCheck className="h-3 w-3 text-brand" />
+                    Reputation: {ad.profiles?.reputation ?? 0}
+                  </div>
+                </div>
+              </div>
+
+              {/* Reveal-on-click contact */}
+              {(ad.contact_phone || ad.contact_email) ? (
+                <div className="mt-4 space-y-2">
+                  {ad.contact_phone && (
+                    revealPhone ? (
+                      <a
+                        href={`tel:${ad.contact_phone}`}
+                        className="flex w-full items-center justify-center gap-2 rounded-lg bg-brand px-4 py-3 text-base font-semibold text-brand-foreground hover:bg-brand/90"
+                      >
+                        <Phone className="h-5 w-5" /> {ad.contact_phone}
+                      </a>
+                    ) : (
+                      <Button
+                        type="button"
+                        onClick={() => setRevealPhone(true)}
+                        className="w-full bg-brand text-brand-foreground hover:bg-brand/90"
+                        size="lg"
+                      >
+                        <Phone className="h-5 w-5 mr-1" />
+                        Show phone · {maskPhone(ad.contact_phone)}
+                      </Button>
+                    )
+                  )}
+                  {ad.contact_email && (
+                    revealEmail ? (
+                      <a
+                        href={`mailto:${ad.contact_email}`}
+                        className="flex w-full items-center justify-center gap-2 rounded-lg border border-border bg-secondary/60 px-4 py-2.5 text-sm font-medium text-foreground hover:bg-secondary"
+                      >
+                        <Mail className="h-4 w-4" /> {ad.contact_email}
+                      </a>
+                    ) : (
+                      <Button
+                        type="button"
+                        variant="outline"
+                        onClick={() => setRevealEmail(true)}
+                        className="w-full"
+                      >
+                        <Mail className="h-4 w-4 mr-1" />
+                        Show email · {maskEmail(ad.contact_email)}
+                      </Button>
+                    )
+                  )}
+                  <p className="text-[11px] text-muted-foreground text-center">
+                    Click to reveal — protects the poster from bots.
+                  </p>
+                </div>
+              ) : (
+                <p className="mt-4 text-xs text-muted-foreground">No direct contact provided. Use the message form below.</p>
+              )}
+
+              {ad.allow_messages && (
+                <form onSubmit={handleSend} className="mt-5 space-y-2 border-t border-border pt-4">
+                  <label className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                    Or send a message
+                  </label>
+                  <Textarea
+                    value={msg}
+                    onChange={(e) => setMsg(e.target.value)}
+                    placeholder={user ? `Message about "${ad.title}"…` : "Sign in to message"}
+                    rows={3}
+                    disabled={!user}
+                  />
+                  <Button
+                    type="submit"
+                    disabled={!user || msg.trim().length === 0}
+                    variant="outline"
+                    className="w-full"
+                  >
+                    <MessageCircle className="h-4 w-4 mr-1" /> Send message
+                  </Button>
+                  {!user && (
+                    <p className="text-xs text-muted-foreground text-center">
+                      <Link to="/auth" className="text-brand font-medium">Sign in</Link> to message this poster
+                    </p>
+                  )}
+                </form>
+              )}
+            </div>
+
+            <div className="rounded-2xl border border-border bg-secondary/40 p-4 text-xs text-muted-foreground">
+              <strong className="text-foreground">Safety tip:</strong> Meet in public, inspect before paying, and never wire money to strangers.{" "}
+              <Link to="/safety" className="text-brand font-medium">More tips</Link>.
+            </div>
+          </aside>
+        </div>
+      </div>
+      <SiteFooter />
+    </div>
+  );
+}
+
+function ImageCarousel({ images, title }: { images: Array<{ public_url: string; sort_order: number }>; title: string }) {
+  const [active, setActive] = useState(0);
+  if (images.length === 0) {
+    return (
+      <div className="flex aspect-[16/10] w-full items-center justify-center rounded-2xl border border-dashed border-border bg-secondary/40 text-muted-foreground">
+        <ImageIcon className="h-10 w-10" />
+      </div>
+    );
+  }
+  if (images.length === 1) {
+    return (
+      <img
+        src={images[0].public_url}
+        alt={title}
+        className="aspect-[16/10] w-full rounded-2xl border border-border object-cover"
+      />
+    );
+  }
+  return (
+    <div>
+      <Carousel className="relative" opts={{ loop: true }}>
+        <CarouselContent>
+          {images.map((img, i) => (
+            <CarouselItem key={img.public_url}>
+              <img
+                src={img.public_url}
+                alt={`${title} — photo ${i + 1}`}
+                className="aspect-[16/10] w-full rounded-2xl border border-border object-cover"
+              />
+            </CarouselItem>
+          ))}
+        </CarouselContent>
+        <CarouselPrevious className="left-3" />
+        <CarouselNext className="right-3" />
+        <div className="absolute bottom-3 right-3 rounded-full bg-foreground/70 px-2.5 py-1 text-xs font-medium text-background">
+          {images.length} photos
+        </div>
+      </Carousel>
+      <div className="mt-2 flex gap-2 overflow-x-auto">
+        {images.map((img, i) => (
+          <button
+            key={img.public_url}
+            type="button"
+            onClick={() => setActive(i)}
+            className={`h-16 w-16 shrink-0 overflow-hidden rounded-lg border-2 transition ${
+              active === i ? "border-brand" : "border-transparent opacity-70 hover:opacity-100"
+            }`}
+          >
+            <img src={img.public_url} alt="" className="h-full w-full object-cover" />
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+}
             <div className="rounded-2xl border border-border bg-card p-5">
               <div className="flex items-center gap-3">
                 {ad.profiles?.avatar_url ? (
