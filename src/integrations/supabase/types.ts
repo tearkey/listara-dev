@@ -531,6 +531,27 @@ export type Database = {
           },
         ]
       }
+      rate_limits: {
+        Row: {
+          action: string
+          count: number
+          user_id: string
+          window_start: string
+        }
+        Insert: {
+          action: string
+          count?: number
+          user_id: string
+          window_start: string
+        }
+        Update: {
+          action?: string
+          count?: number
+          user_id?: string
+          window_start?: string
+        }
+        Relationships: []
+      }
       reports: {
         Row: {
           ad_id: string
@@ -672,6 +693,15 @@ export type Database = {
           _views: number
         }
         Returns: number
+      }
+      consume_rate_limit: {
+        Args: {
+          _action: string
+          _max: number
+          _user_id: string
+          _window_seconds: number
+        }
+        Returns: boolean
       }
       has_role: {
         Args: {
