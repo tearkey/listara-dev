@@ -30,6 +30,23 @@ export const createAd = createServerFn({ method: "POST" })
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
 
+    // Rate limit: 5 posted ads per hour per user (best-effort, per-user DB counter).
+    const { data: allowed, error: rlErr } = await supabase.rpc("consume_rate_limit", {
+      _action: "post_ad",
+      _max: 5,
+      _window_seconds: 60 * 60,
+    });
+    if (rlErr) throw new Error(rlErr.message);
+    if (!allowed) throw new Error("You're posting too quickly. Please try again later.");
+
+    // Reject banned profiles up-front so they can't continue to post.
+    const { data: profile } = await supabase
+      .from("profiles")
+      .select("is_banned")
+      .eq("id", userId)
+      .maybeSingle();
+    if (profile?.is_banned) throw new Error("Your account is suspended.");
+
     // Banned-keyword scan via admin (read-only list, but RLS blocks anon)
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { data: banned } = await supabaseAdmin
@@ -154,19 +171,39 @@ export const sendMessage = createServerFn({ method: "POST" })
     }).parse(d),
   )
   .handler(async ({ data, context }) => {
+    // Rate limit: 20 messages per hour per user.
+    const { data: allowed, error: rlErr } = await context.supabase.rpc("consume_rate_limit", {
+      _action: "send_message",
+      _max: 20,
+      _window_seconds: 60 * 60,
+    });
+    if (rlErr) throw new Error(rlErr.message);
+    if (!allowed) throw new Error("You're sending messages too quickly. Please slow down.");
+
+    // Reject banned senders.
+    const { data: senderProfile } = await context.supabase
+      .from("profiles")
+      .select("is_banned")
+      .eq("id", context.userId)
+      .maybeSingle();
+    if (senderProfile?.is_banned) throw new Error("Your account is suspended.");
+
+    // Recipient and city are derived server-side from the ad row — the client never
+    // supplies recipient_id, sender_id, ad city, or any other field that could be spoofed.
     const { data: ad, error: adErr } = await context.supabase
       .from("ads")
-      .select("user_id,allow_messages,status")
+      .select("user_id,allow_messages,status,city_id")
       .eq("id", data.ad_id)
       .maybeSingle();
     if (adErr) throw new Error(adErr.message);
     if (!ad || ad.status !== "live") throw new Error("Ad not available");
     if (!ad.allow_messages) throw new Error("This poster disabled messages");
     if (ad.user_id === context.userId) throw new Error("You can't message your own ad");
+    if (!ad.city_id) throw new Error("Ad is missing a city scope");
     const { error } = await context.supabase.from("messages").insert({
       ad_id: data.ad_id,
-      sender_id: context.userId,
-      recipient_id: ad.user_id,
+      sender_id: context.userId,        // from verified session, not from input
+      recipient_id: ad.user_id,         // derived from the ad row, not from input
       body: data.body,
     });
     if (error) throw new Error(error.message);
