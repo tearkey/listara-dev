@@ -695,12 +695,7 @@ export type Database = {
         Returns: number
       }
       consume_rate_limit: {
-        Args: {
-          _action: string
-          _max: number
-          _user_id: string
-          _window_seconds: number
-        }
+        Args: { _action: string; _max: number; _window_seconds: number }
         Returns: boolean
       }
       has_role: {
