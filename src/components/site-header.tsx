@@ -31,7 +31,7 @@ export function SiteHeader() {
     <header className="sticky top-0 z-40 w-full border-b border-border/60 bg-background/80 backdrop-blur-md">
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between gap-4 px-4">
         <Link to="/" className="flex items-center gap-2">
-          <span className="inline-flex h-9 w-9 items-center justify-center rounded-xl bg-brand text-brand-foreground font-display font-bold text-lg shadow-sm">
+          <span className="inline-flex h-9 w-9 items-center justify-center rounded-xl bg-primary text-primary-foreground font-display font-bold text-lg shadow-sm ring-2 ring-brand/40">
             L
           </span>
           <span className="font-display text-xl font-bold tracking-tight">{BRAND.name}</span>

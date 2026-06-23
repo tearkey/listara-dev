@@ -78,35 +78,36 @@
 
 :root {
   --radius: 0.75rem;
-  /* Sky & Peach palette: #e0f2fe #7dd3fc #fecaca #f9a8a8 */
-  --background: oklch(0.995 0.005 220);
-  --foreground: oklch(0.22 0.05 245);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.22 0.05 245);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.22 0.05 245);
-  /* Primary = sky 400 (#7dd3fc) */
-  --primary: oklch(0.82 0.10 235);
-  --primary-foreground: oklch(0.22 0.06 245);
-  /* Secondary = sky 100 (#e0f2fe) */
-  --secondary: oklch(0.97 0.025 230);
-  --secondary-foreground: oklch(0.30 0.06 245);
-  --muted: oklch(0.97 0.012 230);
-  --muted-foreground: oklch(0.52 0.04 245);
-  /* Accent = peach 300 (#fecaca) */
-  --accent: oklch(0.90 0.06 28);
-  --accent-foreground: oklch(0.30 0.08 25);
-  --destructive: oklch(0.62 0.22 25);
-  --destructive-foreground: oklch(0.99 0.01 220);
-  --border: oklch(0.92 0.02 230);
-  --input: oklch(0.94 0.015 230);
-  --ring: oklch(0.78 0.10 235);
-  /* Brand tokens */
-  --brand: oklch(0.72 0.12 235);
-  --brand-foreground: oklch(0.99 0.01 220);
-  --brand-soft: oklch(0.97 0.025 230);
-  --peach: oklch(0.90 0.06 28);
-  --peach-deep: oklch(0.80 0.11 25);
+  /* Graphite + Amber + Cream palette
+     primary #111827, accent #F59E0B, bg cream #FAF7F0 */
+  --background: oklch(0.975 0.012 85);
+  --foreground: oklch(0.20 0.02 260);
+  --card: oklch(0.995 0.004 85);
+  --card-foreground: oklch(0.20 0.02 260);
+  --popover: oklch(0.995 0.004 85);
+  --popover-foreground: oklch(0.20 0.02 260);
+  /* Primary = #111827 deep graphite */
+  --primary: oklch(0.22 0.025 260);
+  --primary-foreground: oklch(0.98 0.008 85);
+  /* Secondary = warm cream surface */
+  --secondary: oklch(0.955 0.018 85);
+  --secondary-foreground: oklch(0.25 0.025 260);
+  --muted: oklch(0.945 0.015 85);
+  --muted-foreground: oklch(0.48 0.02 260);
+  /* Accent = #F59E0B amber */
+  --accent: oklch(0.78 0.16 70);
+  --accent-foreground: oklch(0.20 0.04 260);
+  --destructive: oklch(0.58 0.22 28);
+  --destructive-foreground: oklch(0.99 0.01 85);
+  --border: oklch(0.90 0.012 85);
+  --input: oklch(0.93 0.012 85);
+  --ring: oklch(0.78 0.16 70);
+  /* Brand tokens — brand = amber accent, primary stays graphite */
+  --brand: oklch(0.78 0.16 70);
+  --brand-foreground: oklch(0.20 0.04 260);
+  --brand-soft: oklch(0.955 0.04 80);
+  --peach: oklch(0.85 0.10 70);
+  --peach-deep: oklch(0.70 0.17 60);
   --chart-1: oklch(0.646 0.222 41.116);
   --chart-2: oklch(0.6 0.118 184.704);
   --chart-3: oklch(0.398 0.07 227.392);
