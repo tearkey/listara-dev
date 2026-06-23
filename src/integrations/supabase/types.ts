@@ -494,8 +494,6 @@ export type Database = {
           email_verified: boolean
           id: string
           is_banned: boolean
-          phone: string | null
-          phone_verified: boolean
           reputation: number
           updated_at: string
         }
@@ -508,8 +506,6 @@ export type Database = {
           email_verified?: boolean
           id: string
           is_banned?: boolean
-          phone?: string | null
-          phone_verified?: boolean
           reputation?: number
           updated_at?: string
         }
@@ -522,8 +518,6 @@ export type Database = {
           email_verified?: boolean
           id?: string
           is_banned?: boolean
-          phone?: string | null
-          phone_verified?: boolean
           reputation?: number
           updated_at?: string
         }
