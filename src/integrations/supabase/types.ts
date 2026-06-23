@@ -292,6 +292,104 @@ export type Database = {
           },
         ]
       }
+      listing_images: {
+        Row: {
+          id: string
+          image_url: string
+          listing_id: string
+        }
+        Insert: {
+          id?: string
+          image_url: string
+          listing_id: string
+        }
+        Update: {
+          id?: string
+          image_url?: string
+          listing_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "listing_images_listing_id_fkey"
+            columns: ["listing_id"]
+            isOneToOne: false
+            referencedRelation: "listings"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      listings: {
+        Row: {
+          created_at: string
+          description: string
+          id: string
+          location_id: string
+          price: number
+          status: string
+          subcategory_id: string
+          title: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          description: string
+          id?: string
+          location_id: string
+          price: number
+          status: string
+          subcategory_id: string
+          title: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          description?: string
+          id?: string
+          location_id?: string
+          price?: number
+          status?: string
+          subcategory_id?: string
+          title?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "listings_location_id_fkey"
+            columns: ["location_id"]
+            isOneToOne: false
+            referencedRelation: "locations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "listings_subcategory_id_fkey"
+            columns: ["subcategory_id"]
+            isOneToOne: false
+            referencedRelation: "subcategories"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      locations: {
+        Row: {
+          city_name: string
+          id: string
+          slug: string
+          state_region: string
+        }
+        Insert: {
+          city_name: string
+          id?: string
+          slug: string
+          state_region: string
+        }
+        Update: {
+          city_name?: string
+          id?: string
+          slug?: string
+          state_region?: string
+        }
+        Relationships: []
+      }
       messages: {
         Row: {
           ad_id: string
