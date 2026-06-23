@@ -1,8 +1,9 @@
 import { Link, useNavigate } from "@tanstack/react-router";
-import { LogOut, Plus, Search, User } from "lucide-react";
+import { LogOut, MapPin, Plus, Search, User } from "lucide-react";
 import { BRAND } from "@/lib/brand";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/use-auth";
+import { useCurrentCity } from "@/hooks/use-current-city";
 import { supabase } from "@/integrations/supabase/client";
 import {
   DropdownMenu,
@@ -18,6 +19,7 @@ export function SiteHeader() {
   const { user } = useAuth();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
+  const city = useCurrentCity();
 
   async function handleSignOut() {
     await queryClient.cancelQueries();
@@ -36,6 +38,29 @@ export function SiteHeader() {
           </span>
           <span className="font-display text-xl font-bold tracking-tight">{BRAND.name}</span>
         </Link>
+
+        {city ? (
+          <Link
+            to="/$state/$city"
+            params={{ state: city.stateSlug, city: city.citySlug }}
+            className="hidden md:inline-flex items-center gap-1.5 rounded-full border border-border bg-secondary/60 px-3 py-1.5 text-xs font-medium text-foreground hover:border-brand"
+            title="Current location — click to change"
+          >
+            <MapPin className="h-3.5 w-3.5 text-brand" />
+            <span>
+              {city.name}, {city.stateCode}
+            </span>
+            <span className="text-muted-foreground">·</span>
+            <span className="text-brand hover:underline">Change</span>
+          </Link>
+        ) : (
+          <Link
+            to="/"
+            className="hidden md:inline-flex items-center gap-1.5 rounded-full border border-dashed border-border px-3 py-1.5 text-xs text-muted-foreground hover:border-brand hover:text-brand"
+          >
+            <MapPin className="h-3.5 w-3.5" /> Choose your city
+          </Link>
+        )}
 
         <div className="hidden md:flex flex-1 max-w-md items-center gap-2 rounded-full border border-border bg-secondary/50 px-4 py-2">
           <Search className="h-4 w-4 text-muted-foreground" />

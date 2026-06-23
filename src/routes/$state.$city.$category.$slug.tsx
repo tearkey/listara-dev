@@ -7,7 +7,7 @@ import { SiteFooter } from "@/components/site-footer";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
-import { getAdByShortId } from "@/lib/catalog.functions";
+import { getAdByShortId, getAdContact } from "@/lib/catalog.functions";
 import { reportAd, sendMessage } from "@/lib/ads.functions";
 import { useServerFn } from "@tanstack/react-start";
 import { useAuth } from "@/hooks/use-auth";
@@ -68,13 +68,46 @@ function AdDetailPage() {
   const { user } = useAuth();
   const reportFn = useServerFn(reportAd);
   const sendFn = useServerFn(sendMessage);
+  const getContactFn = useServerFn(getAdContact);
   const [msg, setMsg] = useState("");
+  const [contact, setContact] = useState<{ contact_phone: string | null; contact_email: string | null } | null>(null);
   const [revealPhone, setRevealPhone] = useState(false);
   const [revealEmail, setRevealEmail] = useState(false);
+  const [loadingContact, setLoadingContact] = useState(false);
   const images = (ad.ad_images ?? [])
     .slice()
     .sort((a: any, b: any) => a.sort_order - b.sort_order)
     .slice(0, 5);
+
+  async function loadContact() {
+    if (contact || loadingContact) return contact;
+    if (!user) {
+      toast.error("Sign in to view contact info");
+      return null;
+    }
+    setLoadingContact(true);
+    try {
+      const c = await getContactFn({ data: { adId: ad.id } });
+      setContact(c);
+      return c;
+    } catch (e: any) {
+      toast.error(e.message);
+      return null;
+    } finally {
+      setLoadingContact(false);
+    }
+  }
+
+  async function handleRevealPhone() {
+    const c = await loadContact();
+    if (c?.contact_phone) setRevealPhone(true);
+    else if (c) toast.info("No phone provided");
+  }
+  async function handleRevealEmail() {
+    const c = await loadContact();
+    if (c?.contact_email) setRevealEmail(true);
+    else if (c) toast.info("No email provided");
+  }
 
   async function handleReport() {
     const reason = window.prompt("Why are you reporting this ad?");
@@ -103,17 +136,7 @@ function AdDetailPage() {
     : "—";
   const neighborhood = ad.cities?.name ?? "—";
 
-  function maskPhone(p: string) {
-    const digits = p.replace(/\D/g, "");
-    if (digits.length < 4) return "•••• ••••";
-    return `${"•".repeat(Math.max(0, digits.length - 4))} ${digits.slice(-4)}`;
-  }
-  function maskEmail(e: string) {
-    const [name, domain] = e.split("@");
-    if (!domain) return "••••@••••";
-    const shown = name.slice(0, 1);
-    return `${shown}${"•".repeat(Math.max(2, name.length - 1))}@${domain}`;
-  }
+  // No client-side masking — public payload never includes the real values.
 
   return (
     <div className="min-h-screen bg-background">
@@ -218,56 +241,50 @@ function AdDetailPage() {
                 </div>
               </div>
 
-              {/* Reveal-on-click contact */}
-              {(ad.contact_phone || ad.contact_email) ? (
-                <div className="mt-4 space-y-2">
-                  {ad.contact_phone && (
-                    revealPhone ? (
-                      <a
-                        href={`tel:${ad.contact_phone}`}
-                        className="flex w-full items-center justify-center gap-2 rounded-lg bg-brand px-4 py-3 text-base font-semibold text-brand-foreground hover:bg-brand/90"
-                      >
-                        <Phone className="h-5 w-5" /> {ad.contact_phone}
-                      </a>
-                    ) : (
-                      <Button
-                        type="button"
-                        onClick={() => setRevealPhone(true)}
-                        className="w-full bg-brand text-brand-foreground hover:bg-brand/90"
-                        size="lg"
-                      >
-                        <Phone className="h-5 w-5 mr-1" />
-                        Show phone · {maskPhone(ad.contact_phone)}
-                      </Button>
-                    )
-                  )}
-                  {ad.contact_email && (
-                    revealEmail ? (
-                      <a
-                        href={`mailto:${ad.contact_email}`}
-                        className="flex w-full items-center justify-center gap-2 rounded-lg border border-border bg-secondary/60 px-4 py-2.5 text-sm font-medium text-foreground hover:bg-secondary"
-                      >
-                        <Mail className="h-4 w-4" /> {ad.contact_email}
-                      </a>
-                    ) : (
-                      <Button
-                        type="button"
-                        variant="outline"
-                        onClick={() => setRevealEmail(true)}
-                        className="w-full"
-                      >
-                        <Mail className="h-4 w-4 mr-1" />
-                        Show email · {maskEmail(ad.contact_email)}
-                      </Button>
-                    )
-                  )}
-                  <p className="text-[11px] text-muted-foreground text-center">
-                    Click to reveal — protects the poster from bots.
-                  </p>
-                </div>
-              ) : (
-                <p className="mt-4 text-xs text-muted-foreground">No direct contact provided. Use the message form below.</p>
-              )}
+              {/* Reveal-on-click contact — fetched only after sign-in. */}
+              <div className="mt-4 space-y-2">
+                {revealPhone && contact?.contact_phone ? (
+                  <a
+                    href={`tel:${contact.contact_phone}`}
+                    className="flex w-full items-center justify-center gap-2 rounded-lg bg-brand px-4 py-3 text-base font-semibold text-brand-foreground hover:bg-brand/90"
+                  >
+                    <Phone className="h-5 w-5" /> {contact.contact_phone}
+                  </a>
+                ) : (
+                  <Button
+                    type="button"
+                    onClick={handleRevealPhone}
+                    disabled={loadingContact}
+                    className="w-full bg-brand text-brand-foreground hover:bg-brand/90"
+                    size="lg"
+                  >
+                    <Phone className="h-5 w-5 mr-1" />
+                    {loadingContact ? "Loading…" : user ? "Show phone" : "Sign in to show phone"}
+                  </Button>
+                )}
+                {revealEmail && contact?.contact_email ? (
+                  <a
+                    href={`mailto:${contact.contact_email}`}
+                    className="flex w-full items-center justify-center gap-2 rounded-lg border border-border bg-secondary/60 px-4 py-2.5 text-sm font-medium text-foreground hover:bg-secondary"
+                  >
+                    <Mail className="h-4 w-4" /> {contact.contact_email}
+                  </a>
+                ) : (
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={handleRevealEmail}
+                    disabled={loadingContact}
+                    className="w-full"
+                  >
+                    <Mail className="h-4 w-4 mr-1" />
+                    {loadingContact ? "Loading…" : user ? "Show email" : "Sign in to show email"}
+                  </Button>
+                )}
+                <p className="text-[11px] text-muted-foreground text-center">
+                  Contact info is hidden from anonymous viewers and revealed only after sign-in.
+                </p>
+              </div>
 
               {ad.allow_messages && (
                 <form onSubmit={handleSend} className="mt-5 space-y-2 border-t border-border pt-4">

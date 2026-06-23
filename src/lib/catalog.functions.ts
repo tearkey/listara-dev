@@ -1,5 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
+import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { getPublicSupabase } from "./supabase-public.server";
 
 export const listStates = createServerFn({ method: "GET" }).handler(async () => {
@@ -85,7 +86,9 @@ export const getAdByShortId = createServerFn({ method: "GET" })
     const sb = getPublicSupabase();
     const { data: ad, error } = await sb
       .from("ads")
-      .select("id,short_id,slug,title,body,price_cents,currency,tier,posted_at,view_count,user_id,allow_messages,contact_email,contact_phone,city_id,category_id,subcategory_id,cities(name,slug,states(code,name,slug)),categories(slug,name),subcategories(slug,name),ad_images(public_url,sort_order),profiles(display_name,avatar_url,reputation)")
+      // contact_email & contact_phone are intentionally excluded from the public payload —
+      // anonymous viewers never receive them. Authenticated viewers fetch via getAdContact.
+      .select("id,short_id,slug,title,body,price_cents,currency,tier,posted_at,view_count,user_id,allow_messages,city_id,category_id,subcategory_id,cities(name,slug,states(code,name,slug)),categories(slug,name),subcategories(slug,name),ad_images(public_url,sort_order),profiles(display_name,avatar_url,reputation)")
       .eq("short_id", data.shortId)
       .eq("status", "live")
       .maybeSingle();
@@ -94,6 +97,24 @@ export const getAdByShortId = createServerFn({ method: "GET" })
       // best-effort view increment via service role would be nicer; skip for SSR speed
     }
     return ad;
+  });
+
+// Authenticated-only contact reveal. Returns contact fields only to signed-in users
+// for a live ad. The auth middleware rejects anonymous callers (401), so contact
+// info never appears in any anonymous API payload.
+export const getAdContact = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d) => z.object({ adId: z.string().uuid() }).parse(d))
+  .handler(async ({ data, context }) => {
+    const { supabase } = context;
+    const { data: ad, error } = await supabase
+      .from("ads")
+      .select("id,status,contact_email,contact_phone")
+      .eq("id", data.adId)
+      .maybeSingle();
+    if (error) throw new Error(error.message);
+    if (!ad || ad.status !== "live") throw new Error("Ad not available");
+    return { contact_email: ad.contact_email, contact_phone: ad.contact_phone };
   });
 
 export const searchAds = createServerFn({ method: "GET" })

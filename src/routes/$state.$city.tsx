@@ -1,10 +1,12 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { queryOptions, useSuspenseQuery } from "@tanstack/react-query";
+import { useEffect } from "react";
 import { MapPin, ArrowRight, ChevronRight } from "lucide-react";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { getCityBySlug, listCategories, listAdsInCity } from "@/lib/catalog.functions";
 import { BRAND } from "@/lib/brand";
+import { setCurrentCity } from "@/hooks/use-current-city";
 
 // Groups visible on the city index. Each group maps to one or more
 // category slugs from the DB.
@@ -67,6 +69,17 @@ function CityPage() {
   }));
 
   if (!c) return null;
+
+  // Persist this city as the user's browsing scope so the header reflects it.
+  useEffect(() => {
+    setCurrentCity({
+      id: c.id,
+      name: c.name,
+      stateCode: c.states.code,
+      stateSlug: c.states.slug,
+      citySlug: c.slug,
+    });
+  }, [c.id, c.name, c.states.code, c.states.slug, c.slug]);
 
   return (
     <div className="min-h-screen bg-background">
