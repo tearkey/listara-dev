@@ -39,9 +39,14 @@ export const setAdStatus = createServerFn({ method: "POST" })
   .inputValidator((d) => setStatusInput.parse(d))
   .handler(async ({ data, context }) => {
     await assertAdmin(context);
-    const patch: Record<string, unknown> = { status: data.status };
-    if (data.status === "live") patch.posted_at = new Date().toISOString();
-    const { error } = await context.supabase.from("ads").update(patch).eq("id", data.id);
+    const { error } = await context.supabase
+      .from("ads")
+      .update(
+        data.status === "live"
+          ? { status: "live" as const, posted_at: new Date().toISOString() }
+          : { status: "rejected" as const },
+      )
+      .eq("id", data.id);
     if (error) throw new Error(error.message);
     return { ok: true, id: data.id, status: data.status };
   });
