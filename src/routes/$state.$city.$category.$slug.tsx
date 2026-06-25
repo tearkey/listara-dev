@@ -77,7 +77,7 @@ function AdDetailPage() {
   const images = (ad.ad_images ?? [])
     .slice()
     .sort((a: any, b: any) => a.sort_order - b.sort_order)
-    .slice(0, 5);
+    .slice(0, 8);
 
   async function loadContact() {
     if (contact || loadingContact) return contact;
@@ -223,7 +223,7 @@ function AdDetailPage() {
           <aside className="space-y-4 lg:sticky lg:top-4 lg:self-start">
             {/* Contact Advertiser card */}
             <div className="rounded-2xl border border-border bg-card p-5 shadow-sm">
-              <h2 className="font-display text-lg font-bold">Contact Advertiser</h2>
+              <h2 className="font-display text-lg font-bold">Contact Publisher</h2>
               <div className="mt-3 flex items-center gap-3">
                 {ad.profiles?.avatar_url ? (
                   <img src={ad.profiles.avatar_url} alt="" className="h-12 w-12 rounded-full object-cover" />
@@ -259,7 +259,7 @@ function AdDetailPage() {
                     size="lg"
                   >
                     <Phone className="h-5 w-5 mr-1" />
-                    {loadingContact ? "Loading…" : user ? "Show phone" : "Sign in to show phone"}
+                    {loadingContact ? "Loading…" : user ? "Show Contact Info" : "Sign in to show contact info"}
                   </Button>
                 )}
                 {revealEmail && contact?.contact_email ? (
