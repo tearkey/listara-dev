@@ -8,7 +8,7 @@ function escape(s: string) {
 export const Route = createFileRoute("/api/public/sitemap.xml")({
   server: {
     handlers: {
-      GET: async ({ request }) => {
+      GET: async ({ request }: { request: Request }) => {
         const origin = new URL(request.url).origin;
         const sb = getPublicSupabase();
         const [{ data: cities }, { data: categories }, { data: ads }] = await Promise.all([
@@ -34,4 +34,4 @@ export const Route = createFileRoute("/api/public/sitemap.xml")({
       },
     },
   },
-});
+} as any);
