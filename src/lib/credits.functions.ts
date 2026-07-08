@@ -39,8 +39,8 @@ export const listStatesWithCities = createServerFn({ method: "GET" }).handler(as
   return (states ?? []).map((s) => ({ ...s, cities: byState.get(s.id) ?? [] }));
 });
 
-const TOPUP_MIN_USD = 2;
-const TOPUP_MAX_USD = 500;
+const TOPUP_MIN_USD = 20;
+const TOPUP_MAX_USD = 5000;
 
 // Create a NowPayments invoice to top up the signed-in user's credit wallet.
 export const createCreditTopupInvoice = createServerFn({ method: "POST" })

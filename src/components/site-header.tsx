@@ -1,5 +1,5 @@
 import { Link, useNavigate } from "@tanstack/react-router";
-import { LogOut, MapPin, Plus, Search, User } from "lucide-react";
+import { LogOut, MapPin, Plus, Search, User, Wallet } from "lucide-react";
 import { BRAND } from "@/lib/brand";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/use-auth";
@@ -83,6 +83,11 @@ export function SiteHeader() {
               <Plus className="h-4 w-4" /> Post Ad
             </Link>
           </Button>
+          <Button asChild size="sm" variant="outline" className="hidden sm:inline-flex border-brand/40 text-brand hover:bg-brand/10 hover:text-brand">
+            <Link to="/credits">
+              <Wallet className="h-4 w-4" /> Buy Credits
+            </Link>
+          </Button>
           {user ? (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
@@ -99,17 +104,19 @@ export function SiteHeader() {
                 <DropdownMenuItem asChild>
                   <Link to="/post">Post a new ad</Link>
                 </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link to="/credits">Buy credits</Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link to="/credits/history">Transaction history</Link>
+                </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem onClick={handleSignOut}>
                   <LogOut className="h-4 w-4 mr-2" /> Sign out
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
-          ) : (
-            <Button asChild variant="ghost" size="sm">
-              <Link to="/auth">Sign in</Link>
-            </Button>
-          )}
+          ) : null}
         </nav>
       </div>
     </header>
