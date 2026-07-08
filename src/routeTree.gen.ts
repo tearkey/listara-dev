@@ -23,6 +23,7 @@ import { Route as ApiPublicSitemapDotxmlRouteImport } from './routes/api/public/
 import { Route as ApiPublicRobotsDottxtRouteImport } from './routes/api/public/robots[.]txt'
 import { Route as AuthenticatedAdminModerationDashboardRouteImport } from './routes/_authenticated/admin.moderation-dashboard'
 import { Route as StateCityCategoryRouteImport } from './routes/$state.$city.$category'
+import { Route as ApiPublicWebhooksNowpaymentsRouteImport } from './routes/api/public/webhooks/nowpayments'
 import { Route as StateCityCategorySlugRouteImport } from './routes/$state.$city.$category.$slug'
 
 const TermsRoute = TermsRouteImport.update({
@@ -95,6 +96,12 @@ const StateCityCategoryRoute = StateCityCategoryRouteImport.update({
   path: '/$category',
   getParentRoute: () => StateCityRoute,
 } as any)
+const ApiPublicWebhooksNowpaymentsRoute =
+  ApiPublicWebhooksNowpaymentsRouteImport.update({
+    id: '/api/public/webhooks/nowpayments',
+    path: '/api/public/webhooks/nowpayments',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const StateCityCategorySlugRoute = StateCityCategorySlugRouteImport.update({
   id: '/$slug',
   path: '/$slug',
@@ -116,6 +123,7 @@ export interface FileRoutesByFullPath {
   '/api/public/robots.txt': typeof ApiPublicRobotsDottxtRoute
   '/api/public/sitemap.xml': typeof ApiPublicSitemapDotxmlRoute
   '/$state/$city/$category/$slug': typeof StateCityCategorySlugRoute
+  '/api/public/webhooks/nowpayments': typeof ApiPublicWebhooksNowpaymentsRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -132,6 +140,7 @@ export interface FileRoutesByTo {
   '/api/public/robots.txt': typeof ApiPublicRobotsDottxtRoute
   '/api/public/sitemap.xml': typeof ApiPublicSitemapDotxmlRoute
   '/$state/$city/$category/$slug': typeof StateCityCategorySlugRoute
+  '/api/public/webhooks/nowpayments': typeof ApiPublicWebhooksNowpaymentsRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -150,6 +159,7 @@ export interface FileRoutesById {
   '/api/public/robots.txt': typeof ApiPublicRobotsDottxtRoute
   '/api/public/sitemap.xml': typeof ApiPublicSitemapDotxmlRoute
   '/$state/$city/$category/$slug': typeof StateCityCategorySlugRoute
+  '/api/public/webhooks/nowpayments': typeof ApiPublicWebhooksNowpaymentsRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -168,6 +178,7 @@ export interface FileRouteTypes {
     | '/api/public/robots.txt'
     | '/api/public/sitemap.xml'
     | '/$state/$city/$category/$slug'
+    | '/api/public/webhooks/nowpayments'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -184,6 +195,7 @@ export interface FileRouteTypes {
     | '/api/public/robots.txt'
     | '/api/public/sitemap.xml'
     | '/$state/$city/$category/$slug'
+    | '/api/public/webhooks/nowpayments'
   id:
     | '__root__'
     | '/'
@@ -201,6 +213,7 @@ export interface FileRouteTypes {
     | '/api/public/robots.txt'
     | '/api/public/sitemap.xml'
     | '/$state/$city/$category/$slug'
+    | '/api/public/webhooks/nowpayments'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -214,6 +227,7 @@ export interface RootRouteChildren {
   StateCityRoute: typeof StateCityRouteWithChildren
   ApiPublicRobotsDottxtRoute: typeof ApiPublicRobotsDottxtRoute
   ApiPublicSitemapDotxmlRoute: typeof ApiPublicSitemapDotxmlRoute
+  ApiPublicWebhooksNowpaymentsRoute: typeof ApiPublicWebhooksNowpaymentsRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -316,6 +330,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof StateCityCategoryRouteImport
       parentRoute: typeof StateCityRoute
     }
+    '/api/public/webhooks/nowpayments': {
+      id: '/api/public/webhooks/nowpayments'
+      path: '/api/public/webhooks/nowpayments'
+      fullPath: '/api/public/webhooks/nowpayments'
+      preLoaderRoute: typeof ApiPublicWebhooksNowpaymentsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/$state/$city/$category/$slug': {
       id: '/$state/$city/$category/$slug'
       path: '/$slug'
@@ -376,6 +397,7 @@ const rootRouteChildren: RootRouteChildren = {
   StateCityRoute: StateCityRouteWithChildren,
   ApiPublicRobotsDottxtRoute: ApiPublicRobotsDottxtRoute,
   ApiPublicSitemapDotxmlRoute: ApiPublicSitemapDotxmlRoute,
+  ApiPublicWebhooksNowpaymentsRoute: ApiPublicWebhooksNowpaymentsRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

@@ -385,6 +385,7 @@ export type Database = {
           location_id: string
           price: number
           status: string
+          sticky_until: string | null
           subcategory_id: string
           title: string
           user_id: string
@@ -396,6 +397,7 @@ export type Database = {
           location_id: string
           price: number
           status: string
+          sticky_until?: string | null
           subcategory_id: string
           title: string
           user_id: string
@@ -407,6 +409,7 @@ export type Database = {
           location_id?: string
           price?: number
           status?: string
+          sticky_until?: string | null
           subcategory_id?: string
           title?: string
           user_id?: string
