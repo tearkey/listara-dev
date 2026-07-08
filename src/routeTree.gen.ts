@@ -13,6 +13,7 @@ import { Route as TermsRouteImport } from './routes/terms'
 import { Route as SearchRouteImport } from './routes/search'
 import { Route as SafetyRouteImport } from './routes/safety'
 import { Route as PrivacyRouteImport } from './routes/privacy'
+import { Route as NotAvailableRouteImport } from './routes/not-available'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as IndexRouteImport } from './routes/index'
@@ -50,6 +51,11 @@ const SafetyRoute = SafetyRouteImport.update({
 const PrivacyRoute = PrivacyRouteImport.update({
   id: '/privacy',
   path: '/privacy',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const NotAvailableRoute = NotAvailableRouteImport.update({
+  id: '/not-available',
+  path: '/not-available',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthRoute = AuthRouteImport.update({
@@ -148,6 +154,7 @@ const StateCityCategorySlugRoute = StateCityCategorySlugRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
+  '/not-available': typeof NotAvailableRoute
   '/privacy': typeof PrivacyRoute
   '/safety': typeof SafetyRoute
   '/search': typeof SearchRoute
@@ -171,6 +178,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
+  '/not-available': typeof NotAvailableRoute
   '/privacy': typeof PrivacyRoute
   '/safety': typeof SafetyRoute
   '/search': typeof SearchRoute
@@ -195,6 +203,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/auth': typeof AuthRoute
+  '/not-available': typeof NotAvailableRoute
   '/privacy': typeof PrivacyRoute
   '/safety': typeof SafetyRoute
   '/search': typeof SearchRoute
@@ -220,6 +229,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/auth'
+    | '/not-available'
     | '/privacy'
     | '/safety'
     | '/search'
@@ -243,6 +253,7 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/auth'
+    | '/not-available'
     | '/privacy'
     | '/safety'
     | '/search'
@@ -266,6 +277,7 @@ export interface FileRouteTypes {
     | '/'
     | '/_authenticated'
     | '/auth'
+    | '/not-available'
     | '/privacy'
     | '/safety'
     | '/search'
@@ -291,6 +303,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   AuthRoute: typeof AuthRoute
+  NotAvailableRoute: typeof NotAvailableRoute
   PrivacyRoute: typeof PrivacyRoute
   SafetyRoute: typeof SafetyRoute
   SearchRoute: typeof SearchRoute
@@ -329,6 +342,13 @@ declare module '@tanstack/react-router' {
       path: '/privacy'
       fullPath: '/privacy'
       preLoaderRoute: typeof PrivacyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/not-available': {
+      id: '/not-available'
+      path: '/not-available'
+      fullPath: '/not-available'
+      preLoaderRoute: typeof NotAvailableRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/auth': {
@@ -533,6 +553,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   AuthRoute: AuthRoute,
+  NotAvailableRoute: NotAvailableRoute,
   PrivacyRoute: PrivacyRoute,
   SafetyRoute: SafetyRoute,
   SearchRoute: SearchRoute,
