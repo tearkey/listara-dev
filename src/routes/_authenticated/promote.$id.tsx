@@ -1,5 +1,6 @@
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, useNavigate, useSearch } from "@tanstack/react-router";
 import { useState } from "react";
+import { z } from "zod";
 import { useServerFn } from "@tanstack/react-start";
 import { useMutation } from "@tanstack/react-query";
 import { SiteHeader } from "@/components/site-header";
@@ -13,6 +14,7 @@ import { Loader2, Sparkles, Check, ArrowLeft } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/promote/$id")({
   head: () => ({ meta: [{ title: `Promote your ad — ${BRAND.name}` }, { name: "robots", content: "noindex" }] }),
+  validateSearch: z.object({ status: z.enum(["processing", "success", "cancel"]).optional() }),
   component: PromotePage,
 });
 
@@ -27,6 +29,7 @@ type Coin = (typeof COINS)[number]["value"];
 
 function PromotePage() {
   const { id } = Route.useParams();
+  const search = useSearch({ from: "/_authenticated/promote/$id" });
   const navigate = useNavigate();
   const [coin, setCoin] = useState<Coin>("btc");
   const createInvoice = useServerFn(createStickyInvoice);
@@ -34,11 +37,19 @@ function PromotePage() {
   const mut = useMutation({
     mutationFn: () => createInvoice({ data: { listing_id: id, pay_currency: coin } }),
     onSuccess: (res) => {
-      toast.success("Redirecting to secure crypto checkout…");
-      window.location.href = res.invoice_url;
+      if (res?.invoice_url) {
+        toast.success("Redirecting to secure crypto checkout…");
+        window.location.href = res.invoice_url;
+        return;
+      }
+      navigate({ to: "/promote/$id", params: { id }, search: { status: "processing" } });
     },
     onError: (e: any) => toast.error(e?.message ?? "Could not start payment"),
   });
+
+  if (search.status === "processing" || search.status === "success") {
+    return <WaitingScreen />;
+  }
 
   return (
     <div className="min-h-screen bg-background">
