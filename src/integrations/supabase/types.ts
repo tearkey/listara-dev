@@ -767,6 +767,7 @@ export type Database = {
         }
         Returns: boolean
       }
+      purge_abandoned_drafts: { Args: never; Returns: undefined }
     }
     Enums: {
       ad_status:
