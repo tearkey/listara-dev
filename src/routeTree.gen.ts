@@ -18,6 +18,7 @@ import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedPostRouteImport } from './routes/_authenticated/post'
 import { Route as AuthenticatedMyAdsRouteImport } from './routes/_authenticated/my-ads'
+import { Route as AuthenticatedCreditsRouteImport } from './routes/_authenticated/credits'
 import { Route as StateCityRouteImport } from './routes/$state.$city'
 import { Route as AuthenticatedPostIndexRouteImport } from './routes/_authenticated/post.index'
 import { Route as ApiPublicSitemapDotxmlRouteImport } from './routes/api/public/sitemap[.]xml'
@@ -71,6 +72,11 @@ const AuthenticatedPostRoute = AuthenticatedPostRouteImport.update({
 const AuthenticatedMyAdsRoute = AuthenticatedMyAdsRouteImport.update({
   id: '/my-ads',
   path: '/my-ads',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedCreditsRoute = AuthenticatedCreditsRouteImport.update({
+  id: '/credits',
+  path: '/credits',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const StateCityRoute = StateCityRouteImport.update({
@@ -134,6 +140,7 @@ export interface FileRoutesByFullPath {
   '/search': typeof SearchRoute
   '/terms': typeof TermsRoute
   '/$state/$city': typeof StateCityRouteWithChildren
+  '/credits': typeof AuthenticatedCreditsRoute
   '/my-ads': typeof AuthenticatedMyAdsRoute
   '/post': typeof AuthenticatedPostRouteWithChildren
   '/$state/$city/$category': typeof StateCityCategoryRouteWithChildren
@@ -154,6 +161,7 @@ export interface FileRoutesByTo {
   '/search': typeof SearchRoute
   '/terms': typeof TermsRoute
   '/$state/$city': typeof StateCityRouteWithChildren
+  '/credits': typeof AuthenticatedCreditsRoute
   '/my-ads': typeof AuthenticatedMyAdsRoute
   '/$state/$city/$category': typeof StateCityCategoryRouteWithChildren
   '/admin/moderation-dashboard': typeof AuthenticatedAdminModerationDashboardRoute
@@ -175,6 +183,7 @@ export interface FileRoutesById {
   '/search': typeof SearchRoute
   '/terms': typeof TermsRoute
   '/$state/$city': typeof StateCityRouteWithChildren
+  '/_authenticated/credits': typeof AuthenticatedCreditsRoute
   '/_authenticated/my-ads': typeof AuthenticatedMyAdsRoute
   '/_authenticated/post': typeof AuthenticatedPostRouteWithChildren
   '/$state/$city/$category': typeof StateCityCategoryRouteWithChildren
@@ -197,6 +206,7 @@ export interface FileRouteTypes {
     | '/search'
     | '/terms'
     | '/$state/$city'
+    | '/credits'
     | '/my-ads'
     | '/post'
     | '/$state/$city/$category'
@@ -217,6 +227,7 @@ export interface FileRouteTypes {
     | '/search'
     | '/terms'
     | '/$state/$city'
+    | '/credits'
     | '/my-ads'
     | '/$state/$city/$category'
     | '/admin/moderation-dashboard'
@@ -237,6 +248,7 @@ export interface FileRouteTypes {
     | '/search'
     | '/terms'
     | '/$state/$city'
+    | '/_authenticated/credits'
     | '/_authenticated/my-ads'
     | '/_authenticated/post'
     | '/$state/$city/$category'
@@ -329,6 +341,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedMyAdsRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/credits': {
+      id: '/_authenticated/credits'
+      path: '/credits'
+      fullPath: '/credits'
+      preLoaderRoute: typeof AuthenticatedCreditsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/$state/$city': {
       id: '/$state/$city'
       path: '/$state/$city'
@@ -416,6 +435,7 @@ const AuthenticatedPostRouteWithChildren =
   AuthenticatedPostRoute._addFileChildren(AuthenticatedPostRouteChildren)
 
 interface AuthenticatedRouteRouteChildren {
+  AuthenticatedCreditsRoute: typeof AuthenticatedCreditsRoute
   AuthenticatedMyAdsRoute: typeof AuthenticatedMyAdsRoute
   AuthenticatedPostRoute: typeof AuthenticatedPostRouteWithChildren
   AuthenticatedAdminModerationDashboardRoute: typeof AuthenticatedAdminModerationDashboardRoute
@@ -423,6 +443,7 @@ interface AuthenticatedRouteRouteChildren {
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
+  AuthenticatedCreditsRoute: AuthenticatedCreditsRoute,
   AuthenticatedMyAdsRoute: AuthenticatedMyAdsRoute,
   AuthenticatedPostRoute: AuthenticatedPostRouteWithChildren,
   AuthenticatedAdminModerationDashboardRoute:
