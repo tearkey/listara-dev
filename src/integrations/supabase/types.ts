@@ -292,6 +292,65 @@ export type Database = {
           },
         ]
       }
+      invoices: {
+        Row: {
+          created_at: string
+          id: string
+          invoice_url: string | null
+          listing_id: string | null
+          nowpayments_order_id: string | null
+          nowpayments_payment_id: string | null
+          pay_amount: number | null
+          pay_currency: string | null
+          price_amount: number | null
+          price_currency: string | null
+          raw_payload: Json | null
+          status: Database["public"]["Enums"]["payment_status"]
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          invoice_url?: string | null
+          listing_id?: string | null
+          nowpayments_order_id?: string | null
+          nowpayments_payment_id?: string | null
+          pay_amount?: number | null
+          pay_currency?: string | null
+          price_amount?: number | null
+          price_currency?: string | null
+          raw_payload?: Json | null
+          status?: Database["public"]["Enums"]["payment_status"]
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          invoice_url?: string | null
+          listing_id?: string | null
+          nowpayments_order_id?: string | null
+          nowpayments_payment_id?: string | null
+          pay_amount?: number | null
+          pay_currency?: string | null
+          price_amount?: number | null
+          price_currency?: string | null
+          raw_payload?: Json | null
+          status?: Database["public"]["Enums"]["payment_status"]
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "invoices_listing_id_fkey"
+            columns: ["listing_id"]
+            isOneToOne: false
+            referencedRelation: "listings"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       listing_images: {
         Row: {
           id: string
