@@ -1,4 +1,4 @@
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { queryOptions, useSuspenseQuery } from "@tanstack/react-query";
 import { useState, useMemo, useRef, useEffect } from "react";
 import { SiteHeader } from "@/components/site-header";
@@ -11,12 +11,13 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { listCategories, listFeaturedCities, listStates } from "@/lib/catalog.functions";
 import { createAd } from "@/lib/ads.functions";
+import { getMyCredits } from "@/lib/credits.functions";
 import { useServerFn } from "@tanstack/react-start";
 import { BRAND } from "@/lib/brand";
 import { toast } from "sonner";
 import {
   ArrowLeft, ArrowRight, Check, MapPin, Tag, FileText, Image as ImageIcon,
-  UploadCloud, X, Eye, Pin, Star, ArrowUp,
+  UploadCloud, X, Eye, Pin, Star, ArrowUp, Wallet,
 } from "lucide-react";
 
 const STEPS = [
@@ -40,6 +41,7 @@ function PostPage() {
   const { data: categories } = useSuspenseQuery(queryOptions({ queryKey: ["categories"], queryFn: () => listCategories() }));
   const { data: cities } = useSuspenseQuery(queryOptions({ queryKey: ["featured-cities"], queryFn: () => listFeaturedCities() }));
   const { data: _states } = useSuspenseQuery(queryOptions({ queryKey: ["states"], queryFn: () => listStates() }));
+  const { data: credits } = useSuspenseQuery(queryOptions({ queryKey: ["my-credits"], queryFn: () => getMyCredits() }));
 
   const [step, setStep] = useState(1);
   const [title, setTitle] = useState("");
@@ -306,6 +308,8 @@ function PostPage() {
               photos={photos}
               upgrades={upgrades}
               setUpgrades={setUpgrades}
+              balanceCents={credits.balance_cents}
+              costCents={POST_COST_CENTS}
             />
           )}
 
@@ -413,6 +417,7 @@ function PhotosStep({
 function ReviewStep({
   title, body, price, neighborhood, email, phone,
   cityLabel, categoryLabel, subLabel, photos, upgrades, setUpgrades,
+  balanceCents, costCents,
 }: {
   title: string;
   body: string;
@@ -426,9 +431,13 @@ function ReviewStep({
   photos: Array<{ id: string; url: string; name: string }>;
   upgrades: { bumped: boolean; featured: boolean; sticky: boolean };
   setUpgrades: (u: { bumped: boolean; featured: boolean; sticky: boolean }) => void;
+  balanceCents: number;
+  costCents: number;
 }) {
   const priceLabel = price ? new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", maximumFractionDigits: 0 }).format(parseFloat(price)) : null;
   const cover = photos[0];
+  const affordable = balanceCents >= costCents;
+  const remaining = balanceCents - costCents;
 
   const upgradeOptions = [
     { key: "bumped" as const, label: "Bump to top", price: "$2.99", desc: "Resurfaces your ad above newer posts for 24h.", icon: ArrowUp },
@@ -441,6 +450,29 @@ function ReviewStep({
       <div>
         <h2 className="font-display text-xl font-bold">Review your ad</h2>
         <p className="text-sm text-muted-foreground">This is what neighbors will see. Make any final tweaks by stepping back.</p>
+      </div>
+
+      {/* Cost + credit summary */}
+      <div className="grid gap-3 sm:grid-cols-3">
+        <div className="rounded-xl border border-border bg-secondary/40 p-3">
+          <div className="text-[11px] uppercase tracking-wide text-muted-foreground">Publishing in</div>
+          <div className="mt-0.5 inline-flex items-center gap-1 font-semibold"><MapPin className="h-3.5 w-3.5 text-brand" /> {cityLabel}</div>
+        </div>
+        <div className="rounded-xl border border-brand/40 bg-brand/5 p-3">
+          <div className="text-[11px] uppercase tracking-wide text-muted-foreground">You'll be charged</div>
+          <div className="font-display text-xl font-bold text-brand">${(costCents / 100).toFixed(2)}</div>
+        </div>
+        <div className="rounded-xl border border-border bg-card p-3">
+          <div className="text-[11px] uppercase tracking-wide text-muted-foreground">Credits after posting</div>
+          <div className={`inline-flex items-center gap-1 font-display text-xl font-bold ${affordable ? "text-foreground" : "text-destructive"}`}>
+            <Wallet className="h-4 w-4 text-brand" /> ${(Math.max(0, remaining) / 100).toFixed(2)}
+          </div>
+          {!affordable && (
+            <div className="mt-0.5 text-[11px] text-destructive">
+              Not enough — <Link to="/credits" className="underline">buy credits</Link>.
+            </div>
+          )}
+        </div>
       </div>
 
       {/* Live preview card */}
