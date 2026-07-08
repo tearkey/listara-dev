@@ -32,6 +32,7 @@ export const listPendingAds = createServerFn({ method: "GET" })
 const setStatusInput = z.object({
   id: z.string().uuid(),
   status: z.enum(["live", "rejected"]),
+  rejection_reason: z.string().trim().max(500).optional(),
 });
 
 export const setAdStatus = createServerFn({ method: "POST" })
@@ -43,8 +44,16 @@ export const setAdStatus = createServerFn({ method: "POST" })
       .from("ads")
       .update(
         data.status === "live"
-          ? { status: "live" as const, posted_at: new Date().toISOString() }
-          : { status: "rejected" as const },
+          ? {
+              status: "live" as const,
+              posted_at: new Date().toISOString(),
+              expires_at: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
+              rejection_reason: null,
+            }
+          : {
+              status: "rejected" as const,
+              rejection_reason: data.rejection_reason ?? "Rejected by moderator",
+            },
       )
       .eq("id", data.id);
     if (error) throw new Error(error.message);
