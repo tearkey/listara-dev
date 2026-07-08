@@ -31,6 +31,7 @@ import { Route as AuthenticatedCreditsHistoryRouteImport } from './routes/_authe
 import { Route as AuthenticatedAdminModerationDashboardRouteImport } from './routes/_authenticated/admin.moderation-dashboard'
 import { Route as StateCityCategoryRouteImport } from './routes/$state.$city.$category'
 import { Route as ApiPublicWebhooksNowpaymentsRouteImport } from './routes/api/public/webhooks/nowpayments'
+import { Route as AuthenticatedAdsIdEditRouteImport } from './routes/_authenticated/ads.$id.edit'
 import { Route as StateCityCategorySlugRouteImport } from './routes/$state.$city.$category.$slug'
 
 const TermsRoute = TermsRouteImport.update({
@@ -145,6 +146,11 @@ const ApiPublicWebhooksNowpaymentsRoute =
     path: '/api/public/webhooks/nowpayments',
     getParentRoute: () => rootRouteImport,
   } as any)
+const AuthenticatedAdsIdEditRoute = AuthenticatedAdsIdEditRouteImport.update({
+  id: '/ads/$id/edit',
+  path: '/ads/$id/edit',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const StateCityCategorySlugRoute = StateCityCategorySlugRouteImport.update({
   id: '/$slug',
   path: '/$slug',
@@ -173,6 +179,7 @@ export interface FileRoutesByFullPath {
   '/api/public/sitemap.xml': typeof ApiPublicSitemapDotxmlRoute
   '/post/': typeof AuthenticatedPostIndexRoute
   '/$state/$city/$category/$slug': typeof StateCityCategorySlugRoute
+  '/ads/$id/edit': typeof AuthenticatedAdsIdEditRoute
   '/api/public/webhooks/nowpayments': typeof ApiPublicWebhooksNowpaymentsRoute
 }
 export interface FileRoutesByTo {
@@ -196,6 +203,7 @@ export interface FileRoutesByTo {
   '/api/public/sitemap.xml': typeof ApiPublicSitemapDotxmlRoute
   '/post': typeof AuthenticatedPostIndexRoute
   '/$state/$city/$category/$slug': typeof StateCityCategorySlugRoute
+  '/ads/$id/edit': typeof AuthenticatedAdsIdEditRoute
   '/api/public/webhooks/nowpayments': typeof ApiPublicWebhooksNowpaymentsRoute
 }
 export interface FileRoutesById {
@@ -222,6 +230,7 @@ export interface FileRoutesById {
   '/api/public/sitemap.xml': typeof ApiPublicSitemapDotxmlRoute
   '/_authenticated/post/': typeof AuthenticatedPostIndexRoute
   '/$state/$city/$category/$slug': typeof StateCityCategorySlugRoute
+  '/_authenticated/ads/$id/edit': typeof AuthenticatedAdsIdEditRoute
   '/api/public/webhooks/nowpayments': typeof ApiPublicWebhooksNowpaymentsRoute
 }
 export interface FileRouteTypes {
@@ -248,6 +257,7 @@ export interface FileRouteTypes {
     | '/api/public/sitemap.xml'
     | '/post/'
     | '/$state/$city/$category/$slug'
+    | '/ads/$id/edit'
     | '/api/public/webhooks/nowpayments'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -271,6 +281,7 @@ export interface FileRouteTypes {
     | '/api/public/sitemap.xml'
     | '/post'
     | '/$state/$city/$category/$slug'
+    | '/ads/$id/edit'
     | '/api/public/webhooks/nowpayments'
   id:
     | '__root__'
@@ -296,6 +307,7 @@ export interface FileRouteTypes {
     | '/api/public/sitemap.xml'
     | '/_authenticated/post/'
     | '/$state/$city/$category/$slug'
+    | '/_authenticated/ads/$id/edit'
     | '/api/public/webhooks/nowpayments'
   fileRoutesById: FileRoutesById
 }
@@ -470,6 +482,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicWebhooksNowpaymentsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authenticated/ads/$id/edit': {
+      id: '/_authenticated/ads/$id/edit'
+      path: '/ads/$id/edit'
+      fullPath: '/ads/$id/edit'
+      preLoaderRoute: typeof AuthenticatedAdsIdEditRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/$state/$city/$category/$slug': {
       id: '/$state/$city/$category/$slug'
       path: '/$slug'
@@ -512,6 +531,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedPostRoute: typeof AuthenticatedPostRouteWithChildren
   AuthenticatedAdminModerationDashboardRoute: typeof AuthenticatedAdminModerationDashboardRoute
   AuthenticatedPromoteIdRoute: typeof AuthenticatedPromoteIdRoute
+  AuthenticatedAdsIdEditRoute: typeof AuthenticatedAdsIdEditRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
@@ -521,6 +541,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedAdminModerationDashboardRoute:
     AuthenticatedAdminModerationDashboardRoute,
   AuthenticatedPromoteIdRoute: AuthenticatedPromoteIdRoute,
+  AuthenticatedAdsIdEditRoute: AuthenticatedAdsIdEditRoute,
 }
 
 const AuthenticatedRouteRouteWithChildren =
