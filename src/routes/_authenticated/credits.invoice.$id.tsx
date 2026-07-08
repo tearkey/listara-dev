@@ -1,4 +1,4 @@
-import { createFileRoute, Link, notFound } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { queryOptions, useSuspenseQuery } from "@tanstack/react-query";
@@ -19,7 +19,7 @@ const getMyInvoice = createServerFn({ method: "GET" })
       .eq("user_id", context.userId)
       .maybeSingle();
     if (error) throw new Error(error.message);
-    if (!inv) throw notFound();
+    if (!inv) throw new Error("Invoice not found");
     const { data: profile } = await context.supabase
       .from("profiles")
       .select("display_name")
