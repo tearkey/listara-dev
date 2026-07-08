@@ -1,5 +1,6 @@
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, useNavigate, useSearch } from "@tanstack/react-router";
 import { useState } from "react";
+import { z } from "zod";
 import { useServerFn } from "@tanstack/react-start";
 import { useMutation } from "@tanstack/react-query";
 import { SiteHeader } from "@/components/site-header";
@@ -13,6 +14,7 @@ import { Loader2, Sparkles, Check, ArrowLeft } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/promote/$id")({
   head: () => ({ meta: [{ title: `Promote your ad — ${BRAND.name}` }, { name: "robots", content: "noindex" }] }),
+  validateSearch: z.object({ status: z.enum(["processing", "success", "cancel"]).optional() }),
   component: PromotePage,
 });
 
@@ -27,6 +29,7 @@ type Coin = (typeof COINS)[number]["value"];
 
 function PromotePage() {
   const { id } = Route.useParams();
+  const search = useSearch({ from: "/_authenticated/promote/$id" });
   const navigate = useNavigate();
   const [coin, setCoin] = useState<Coin>("btc");
   const createInvoice = useServerFn(createStickyInvoice);
@@ -34,11 +37,19 @@ function PromotePage() {
   const mut = useMutation({
     mutationFn: () => createInvoice({ data: { listing_id: id, pay_currency: coin } }),
     onSuccess: (res) => {
-      toast.success("Redirecting to secure crypto checkout…");
-      window.location.href = res.invoice_url;
+      if (res?.invoice_url) {
+        toast.success("Redirecting to secure crypto checkout…");
+        window.location.href = res.invoice_url;
+        return;
+      }
+      navigate({ to: "/promote/$id", params: { id }, search: { status: "processing" } });
     },
     onError: (e: any) => toast.error(e?.message ?? "Could not start payment"),
   });
+
+  if (search.status === "processing" || search.status === "success") {
+    return <WaitingScreen />;
+  }
 
   return (
     <div className="min-h-screen bg-background">
@@ -100,6 +111,29 @@ function PromotePage() {
             You'll be redirected to NowPayments to complete the transaction.
           </p>
         </div>
+      </div>
+      <SiteFooter />
+    </div>
+  );
+}
+
+function WaitingScreen() {
+  return (
+    <div className="min-h-screen bg-background">
+      <SiteHeader />
+      <div className="mx-auto flex max-w-xl flex-col items-center px-4 py-20 text-center">
+        <div className="relative flex h-32 w-32 items-center justify-center">
+          <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-brand/30" />
+          <span className="absolute inline-flex h-24 w-24 animate-pulse rounded-full bg-brand/50" />
+          <div className="relative flex h-16 w-16 items-center justify-center rounded-full bg-brand text-brand-foreground">
+            <Loader2 className="h-8 w-8 animate-spin" />
+          </div>
+        </div>
+        <h1 className="mt-10 font-display text-3xl font-bold">Waiting for blockchain confirmation</h1>
+        <p className="mt-4 max-w-md text-muted-foreground">
+          We've received your payment and it's being verified on-chain. Your ad will be promoted automatically the moment the network confirms the transaction — usually within a few minutes.
+        </p>
+        <p className="mt-6 text-xs text-muted-foreground">You can safely close this page.</p>
       </div>
       <SiteFooter />
     </div>
