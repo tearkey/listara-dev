@@ -292,11 +292,58 @@ export type Database = {
           },
         ]
       }
+      credit_transactions: {
+        Row: {
+          ad_id: string | null
+          created_at: string
+          delta_cents: number
+          id: string
+          invoice_id: string | null
+          reason: string
+          user_id: string
+        }
+        Insert: {
+          ad_id?: string | null
+          created_at?: string
+          delta_cents: number
+          id?: string
+          invoice_id?: string | null
+          reason: string
+          user_id: string
+        }
+        Update: {
+          ad_id?: string | null
+          created_at?: string
+          delta_cents?: number
+          id?: string
+          invoice_id?: string | null
+          reason?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "credit_transactions_ad_id_fkey"
+            columns: ["ad_id"]
+            isOneToOne: false
+            referencedRelation: "ads"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "credit_transactions_invoice_id_fkey"
+            columns: ["invoice_id"]
+            isOneToOne: false
+            referencedRelation: "invoices"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       invoices: {
         Row: {
           created_at: string
+          credit_cents: number | null
           id: string
           invoice_url: string | null
+          kind: string
           listing_id: string | null
           nowpayments_order_id: string | null
           nowpayments_payment_id: string | null
@@ -311,8 +358,10 @@ export type Database = {
         }
         Insert: {
           created_at?: string
+          credit_cents?: number | null
           id?: string
           invoice_url?: string | null
+          kind?: string
           listing_id?: string | null
           nowpayments_order_id?: string | null
           nowpayments_payment_id?: string | null
@@ -327,8 +376,10 @@ export type Database = {
         }
         Update: {
           created_at?: string
+          credit_cents?: number | null
           id?: string
           invoice_url?: string | null
+          kind?: string
           listing_id?: string | null
           nowpayments_order_id?: string | null
           nowpayments_payment_id?: string | null
@@ -720,6 +771,24 @@ export type Database = {
           },
         ]
       }
+      user_credits: {
+        Row: {
+          balance_cents: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          balance_cents?: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          balance_cents?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       user_roles: {
         Row: {
           created_at: string
@@ -756,6 +825,10 @@ export type Database = {
         }
         Returns: number
       }
+      add_credits_from_invoice: {
+        Args: { _amount_cents: number; _invoice_id: string; _user_id: string }
+        Returns: boolean
+      }
       consume_rate_limit: {
         Args: { _action: string; _max: number; _window_seconds: number }
         Returns: boolean
@@ -768,6 +841,10 @@ export type Database = {
         Returns: boolean
       }
       purge_abandoned_drafts: { Args: never; Returns: undefined }
+      spend_credits: {
+        Args: { _ad_id?: string; _amount_cents: number; _reason: string }
+        Returns: boolean
+      }
     }
     Enums: {
       ad_status:

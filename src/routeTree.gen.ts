@@ -18,10 +18,14 @@ import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedPostRouteImport } from './routes/_authenticated/post'
 import { Route as AuthenticatedMyAdsRouteImport } from './routes/_authenticated/my-ads'
+import { Route as AuthenticatedCreditsRouteImport } from './routes/_authenticated/credits'
 import { Route as StateCityRouteImport } from './routes/$state.$city'
+import { Route as AuthenticatedPostIndexRouteImport } from './routes/_authenticated/post.index'
 import { Route as ApiPublicSitemapDotxmlRouteImport } from './routes/api/public/sitemap[.]xml'
 import { Route as ApiPublicRobotsDottxtRouteImport } from './routes/api/public/robots[.]txt'
 import { Route as AuthenticatedPromoteIdRouteImport } from './routes/_authenticated/promote.$id'
+import { Route as AuthenticatedPostMultiRouteImport } from './routes/_authenticated/post.multi'
+import { Route as AuthenticatedPostLocalRouteImport } from './routes/_authenticated/post.local'
 import { Route as AuthenticatedAdminModerationDashboardRouteImport } from './routes/_authenticated/admin.moderation-dashboard'
 import { Route as StateCityCategoryRouteImport } from './routes/$state.$city.$category'
 import { Route as ApiPublicWebhooksNowpaymentsRouteImport } from './routes/api/public/webhooks/nowpayments'
@@ -71,10 +75,20 @@ const AuthenticatedMyAdsRoute = AuthenticatedMyAdsRouteImport.update({
   path: '/my-ads',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedCreditsRoute = AuthenticatedCreditsRouteImport.update({
+  id: '/credits',
+  path: '/credits',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const StateCityRoute = StateCityRouteImport.update({
   id: '/$state/$city',
   path: '/$state/$city',
   getParentRoute: () => rootRouteImport,
+} as any)
+const AuthenticatedPostIndexRoute = AuthenticatedPostIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AuthenticatedPostRoute,
 } as any)
 const ApiPublicSitemapDotxmlRoute = ApiPublicSitemapDotxmlRouteImport.update({
   id: '/api/public/sitemap.xml',
@@ -90,6 +104,16 @@ const AuthenticatedPromoteIdRoute = AuthenticatedPromoteIdRouteImport.update({
   id: '/promote/$id',
   path: '/promote/$id',
   getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedPostMultiRoute = AuthenticatedPostMultiRouteImport.update({
+  id: '/multi',
+  path: '/multi',
+  getParentRoute: () => AuthenticatedPostRoute,
+} as any)
+const AuthenticatedPostLocalRoute = AuthenticatedPostLocalRouteImport.update({
+  id: '/local',
+  path: '/local',
+  getParentRoute: () => AuthenticatedPostRoute,
 } as any)
 const AuthenticatedAdminModerationDashboardRoute =
   AuthenticatedAdminModerationDashboardRouteImport.update({
@@ -122,13 +146,17 @@ export interface FileRoutesByFullPath {
   '/search': typeof SearchRoute
   '/terms': typeof TermsRoute
   '/$state/$city': typeof StateCityRouteWithChildren
+  '/credits': typeof AuthenticatedCreditsRoute
   '/my-ads': typeof AuthenticatedMyAdsRoute
-  '/post': typeof AuthenticatedPostRoute
+  '/post': typeof AuthenticatedPostRouteWithChildren
   '/$state/$city/$category': typeof StateCityCategoryRouteWithChildren
   '/admin/moderation-dashboard': typeof AuthenticatedAdminModerationDashboardRoute
+  '/post/local': typeof AuthenticatedPostLocalRoute
+  '/post/multi': typeof AuthenticatedPostMultiRoute
   '/promote/$id': typeof AuthenticatedPromoteIdRoute
   '/api/public/robots.txt': typeof ApiPublicRobotsDottxtRoute
   '/api/public/sitemap.xml': typeof ApiPublicSitemapDotxmlRoute
+  '/post/': typeof AuthenticatedPostIndexRoute
   '/$state/$city/$category/$slug': typeof StateCityCategorySlugRoute
   '/api/public/webhooks/nowpayments': typeof ApiPublicWebhooksNowpaymentsRoute
 }
@@ -140,13 +168,16 @@ export interface FileRoutesByTo {
   '/search': typeof SearchRoute
   '/terms': typeof TermsRoute
   '/$state/$city': typeof StateCityRouteWithChildren
+  '/credits': typeof AuthenticatedCreditsRoute
   '/my-ads': typeof AuthenticatedMyAdsRoute
-  '/post': typeof AuthenticatedPostRoute
   '/$state/$city/$category': typeof StateCityCategoryRouteWithChildren
   '/admin/moderation-dashboard': typeof AuthenticatedAdminModerationDashboardRoute
+  '/post/local': typeof AuthenticatedPostLocalRoute
+  '/post/multi': typeof AuthenticatedPostMultiRoute
   '/promote/$id': typeof AuthenticatedPromoteIdRoute
   '/api/public/robots.txt': typeof ApiPublicRobotsDottxtRoute
   '/api/public/sitemap.xml': typeof ApiPublicSitemapDotxmlRoute
+  '/post': typeof AuthenticatedPostIndexRoute
   '/$state/$city/$category/$slug': typeof StateCityCategorySlugRoute
   '/api/public/webhooks/nowpayments': typeof ApiPublicWebhooksNowpaymentsRoute
 }
@@ -160,13 +191,17 @@ export interface FileRoutesById {
   '/search': typeof SearchRoute
   '/terms': typeof TermsRoute
   '/$state/$city': typeof StateCityRouteWithChildren
+  '/_authenticated/credits': typeof AuthenticatedCreditsRoute
   '/_authenticated/my-ads': typeof AuthenticatedMyAdsRoute
-  '/_authenticated/post': typeof AuthenticatedPostRoute
+  '/_authenticated/post': typeof AuthenticatedPostRouteWithChildren
   '/$state/$city/$category': typeof StateCityCategoryRouteWithChildren
   '/_authenticated/admin/moderation-dashboard': typeof AuthenticatedAdminModerationDashboardRoute
+  '/_authenticated/post/local': typeof AuthenticatedPostLocalRoute
+  '/_authenticated/post/multi': typeof AuthenticatedPostMultiRoute
   '/_authenticated/promote/$id': typeof AuthenticatedPromoteIdRoute
   '/api/public/robots.txt': typeof ApiPublicRobotsDottxtRoute
   '/api/public/sitemap.xml': typeof ApiPublicSitemapDotxmlRoute
+  '/_authenticated/post/': typeof AuthenticatedPostIndexRoute
   '/$state/$city/$category/$slug': typeof StateCityCategorySlugRoute
   '/api/public/webhooks/nowpayments': typeof ApiPublicWebhooksNowpaymentsRoute
 }
@@ -180,13 +215,17 @@ export interface FileRouteTypes {
     | '/search'
     | '/terms'
     | '/$state/$city'
+    | '/credits'
     | '/my-ads'
     | '/post'
     | '/$state/$city/$category'
     | '/admin/moderation-dashboard'
+    | '/post/local'
+    | '/post/multi'
     | '/promote/$id'
     | '/api/public/robots.txt'
     | '/api/public/sitemap.xml'
+    | '/post/'
     | '/$state/$city/$category/$slug'
     | '/api/public/webhooks/nowpayments'
   fileRoutesByTo: FileRoutesByTo
@@ -198,13 +237,16 @@ export interface FileRouteTypes {
     | '/search'
     | '/terms'
     | '/$state/$city'
+    | '/credits'
     | '/my-ads'
-    | '/post'
     | '/$state/$city/$category'
     | '/admin/moderation-dashboard'
+    | '/post/local'
+    | '/post/multi'
     | '/promote/$id'
     | '/api/public/robots.txt'
     | '/api/public/sitemap.xml'
+    | '/post'
     | '/$state/$city/$category/$slug'
     | '/api/public/webhooks/nowpayments'
   id:
@@ -217,13 +259,17 @@ export interface FileRouteTypes {
     | '/search'
     | '/terms'
     | '/$state/$city'
+    | '/_authenticated/credits'
     | '/_authenticated/my-ads'
     | '/_authenticated/post'
     | '/$state/$city/$category'
     | '/_authenticated/admin/moderation-dashboard'
+    | '/_authenticated/post/local'
+    | '/_authenticated/post/multi'
     | '/_authenticated/promote/$id'
     | '/api/public/robots.txt'
     | '/api/public/sitemap.xml'
+    | '/_authenticated/post/'
     | '/$state/$city/$category/$slug'
     | '/api/public/webhooks/nowpayments'
   fileRoutesById: FileRoutesById
@@ -307,12 +353,26 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedMyAdsRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/credits': {
+      id: '/_authenticated/credits'
+      path: '/credits'
+      fullPath: '/credits'
+      preLoaderRoute: typeof AuthenticatedCreditsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/$state/$city': {
       id: '/$state/$city'
       path: '/$state/$city'
       fullPath: '/$state/$city'
       preLoaderRoute: typeof StateCityRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated/post/': {
+      id: '/_authenticated/post/'
+      path: '/'
+      fullPath: '/post/'
+      preLoaderRoute: typeof AuthenticatedPostIndexRouteImport
+      parentRoute: typeof AuthenticatedPostRoute
     }
     '/api/public/sitemap.xml': {
       id: '/api/public/sitemap.xml'
@@ -334,6 +394,20 @@ declare module '@tanstack/react-router' {
       fullPath: '/promote/$id'
       preLoaderRoute: typeof AuthenticatedPromoteIdRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/post/multi': {
+      id: '/_authenticated/post/multi'
+      path: '/multi'
+      fullPath: '/post/multi'
+      preLoaderRoute: typeof AuthenticatedPostMultiRouteImport
+      parentRoute: typeof AuthenticatedPostRoute
+    }
+    '/_authenticated/post/local': {
+      id: '/_authenticated/post/local'
+      path: '/local'
+      fullPath: '/post/local'
+      preLoaderRoute: typeof AuthenticatedPostLocalRouteImport
+      parentRoute: typeof AuthenticatedPostRoute
     }
     '/_authenticated/admin/moderation-dashboard': {
       id: '/_authenticated/admin/moderation-dashboard'
@@ -366,16 +440,33 @@ declare module '@tanstack/react-router' {
   }
 }
 
+interface AuthenticatedPostRouteChildren {
+  AuthenticatedPostLocalRoute: typeof AuthenticatedPostLocalRoute
+  AuthenticatedPostMultiRoute: typeof AuthenticatedPostMultiRoute
+  AuthenticatedPostIndexRoute: typeof AuthenticatedPostIndexRoute
+}
+
+const AuthenticatedPostRouteChildren: AuthenticatedPostRouteChildren = {
+  AuthenticatedPostLocalRoute: AuthenticatedPostLocalRoute,
+  AuthenticatedPostMultiRoute: AuthenticatedPostMultiRoute,
+  AuthenticatedPostIndexRoute: AuthenticatedPostIndexRoute,
+}
+
+const AuthenticatedPostRouteWithChildren =
+  AuthenticatedPostRoute._addFileChildren(AuthenticatedPostRouteChildren)
+
 interface AuthenticatedRouteRouteChildren {
+  AuthenticatedCreditsRoute: typeof AuthenticatedCreditsRoute
   AuthenticatedMyAdsRoute: typeof AuthenticatedMyAdsRoute
-  AuthenticatedPostRoute: typeof AuthenticatedPostRoute
+  AuthenticatedPostRoute: typeof AuthenticatedPostRouteWithChildren
   AuthenticatedAdminModerationDashboardRoute: typeof AuthenticatedAdminModerationDashboardRoute
   AuthenticatedPromoteIdRoute: typeof AuthenticatedPromoteIdRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
+  AuthenticatedCreditsRoute: AuthenticatedCreditsRoute,
   AuthenticatedMyAdsRoute: AuthenticatedMyAdsRoute,
-  AuthenticatedPostRoute: AuthenticatedPostRoute,
+  AuthenticatedPostRoute: AuthenticatedPostRouteWithChildren,
   AuthenticatedAdminModerationDashboardRoute:
     AuthenticatedAdminModerationDashboardRoute,
   AuthenticatedPromoteIdRoute: AuthenticatedPromoteIdRoute,
@@ -423,13 +514,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}

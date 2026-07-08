@@ -15,7 +15,7 @@ function slugify(s: string) {
 const adInput = z.object({
   title: z.string().trim().min(4).max(120),
   body: z.string().trim().min(20).max(8000),
-  city_id: z.string().uuid(),
+  city_ids: z.array(z.string().uuid()).min(1).max(100),
   category_id: z.string().uuid(),
   subcategory_id: z.string().uuid().optional().nullable(),
   price_cents: z.number().int().min(0).max(100_000_000).optional().nullable(),
@@ -23,6 +23,8 @@ const adInput = z.object({
   contact_phone: z.string().max(40).optional().nullable(),
   allow_messages: z.boolean().optional(),
 });
+
+const POST_COST_CENTS = 10; // $0.10 per city
 
 export const createAd = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
@@ -61,32 +63,89 @@ export const createAd = createServerFn({ method: "POST" })
       }
     }
 
+    // Debit credits BEFORE inserting rows (10¢ per selected city). Rejected
+    // ads still don't insert — we only charge if we accept the post.
+    const cityIds = Array.from(new Set(data.city_ids));
+    const cost = cityIds.length * POST_COST_CENTS;
+
+    if (status !== "rejected") {
+      const { data: spent, error: spendErr } = await supabase.rpc("spend_credits", {
+        _amount_cents: cost,
+        _reason: cityIds.length > 1 ? `post_ad_multi_${cityIds.length}` : "post_ad_local",
+      });
+      if (spendErr) throw new Error(spendErr.message);
+      if (!spent) {
+        return { status: "insufficient_credits" as const, needed_cents: cost };
+      }
+    }
+
     const slug = slugify(data.title);
     const now = new Date().toISOString();
     const expiresAt = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString();
 
-    const { data: ad, error } = await supabase
+    if (status === "rejected") {
+      // Insert a single rejected row for moderator audit; no city fanout, no charge.
+      const { data: ad, error } = await supabase
+        .from("ads")
+        .insert({
+          user_id: userId,
+          city_id: cityIds[0],
+          category_id: data.category_id,
+          subcategory_id: data.subcategory_id ?? null,
+          title: data.title, slug, body: data.body,
+          price_cents: data.price_cents ?? null,
+          contact_email: data.contact_email ?? null,
+          contact_phone: data.contact_phone ?? null,
+          allow_messages: data.allow_messages ?? true,
+          status: "rejected",
+        })
+        .select("id,short_id,slug,status")
+        .single();
+      if (error) throw new Error(error.message);
+      return { ...ad, status: ad.status as "rejected", posted_count: 0 };
+    }
+
+    // Insert one ad row per selected city (multi-city fanout).
+    const rows = cityIds.map((cid) => ({
+      user_id: userId,
+      city_id: cid,
+      category_id: data.category_id,
+      subcategory_id: data.subcategory_id ?? null,
+      title: data.title,
+      slug,
+      body: data.body,
+      price_cents: data.price_cents ?? null,
+      contact_email: data.contact_email ?? null,
+      contact_phone: data.contact_phone ?? null,
+      allow_messages: data.allow_messages ?? true,
+      status,
+      posted_at: status === "live" ? now : null,
+      expires_at: status === "live" ? expiresAt : null,
+    }));
+
+    const { data: ads, error } = await supabase
       .from("ads")
-      .insert({
-        user_id: userId,
-        city_id: data.city_id,
-        category_id: data.category_id,
-        subcategory_id: data.subcategory_id ?? null,
-        title: data.title,
-        slug,
-        body: data.body,
-        price_cents: data.price_cents ?? null,
-        contact_email: data.contact_email ?? null,
-        contact_phone: data.contact_phone ?? null,
-        allow_messages: data.allow_messages ?? true,
-        status,
-        posted_at: status === "live" ? now : null,
-        expires_at: status === "live" ? expiresAt : null,
-      })
-      .select("id,short_id,slug,status")
-      .single();
-    if (error) throw new Error(error.message);
-    return ad;
+      .insert(rows)
+      .select("id,short_id,slug,status");
+    if (error) {
+      // Refund credits on insert failure so users aren't charged for nothing.
+      await supabaseAdmin.from("user_credits").update({
+        balance_cents: (
+          await supabaseAdmin.from("user_credits").select("balance_cents").eq("user_id", userId).maybeSingle()
+        ).data?.balance_cents! + cost,
+      }).eq("user_id", userId);
+      await supabaseAdmin.from("credit_transactions").insert({
+        user_id: userId, delta_cents: cost, reason: "refund_post_failed",
+      });
+      throw new Error(error.message);
+    }
+    return {
+      id: ads[0].id,
+      short_id: ads[0].short_id,
+      slug: ads[0].slug,
+      status: ads[0].status,
+      posted_count: ads.length,
+    };
   });
 
 export const listMyAds = createServerFn({ method: "GET" })
