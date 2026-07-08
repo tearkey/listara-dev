@@ -58,7 +58,7 @@ export const Route = createFileRoute("/api/public/webhooks/nowpayments")({
 
         const { data: invoice, error: findErr } = await supabaseAdmin
           .from("invoices")
-          .select("id,listing_id,status")
+          .select("id,listing_id,status,kind,credit_cents,user_id")
           .eq("nowpayments_order_id", orderId)
           .maybeSingle();
         if (findErr) {
@@ -88,17 +88,29 @@ export const Route = createFileRoute("/api/public/webhooks/nowpayments")({
           return new Response("Update failed", { status: 500 });
         }
 
-        // Only flip the listing when the payment fully confirms and we
-        // haven't already applied this invoice (idempotent).
-        if (nextStatus === "paid" && invoice.status !== "paid" && invoice.listing_id) {
-          const stickyUntil = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString();
-          const { error: listingErr } = await supabaseAdmin
-            .from("listings")
-            .update({ sticky_until: stickyUntil })
-            .eq("id", invoice.listing_id);
-          if (listingErr) {
-            console.error("Failed to apply sticky upgrade", listingErr);
-            return new Response("Listing update failed", { status: 500 });
+        // Only apply side-effects when payment fully confirms AND we haven't
+        // already applied this invoice (idempotent).
+        if (nextStatus === "paid" && invoice.status !== "paid") {
+          if (invoice.kind === "credit" && invoice.credit_cents && invoice.user_id) {
+            const { error: creditErr } = await supabaseAdmin.rpc("add_credits_from_invoice", {
+              _user_id: invoice.user_id,
+              _amount_cents: invoice.credit_cents,
+              _invoice_id: invoice.id,
+            });
+            if (creditErr) {
+              console.error("Failed to credit user wallet", creditErr);
+              return new Response("Credit failed", { status: 500 });
+            }
+          } else if (invoice.listing_id) {
+            const stickyUntil = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString();
+            const { error: listingErr } = await supabaseAdmin
+              .from("listings")
+              .update({ sticky_until: stickyUntil })
+              .eq("id", invoice.listing_id);
+            if (listingErr) {
+              console.error("Failed to apply sticky upgrade", listingErr);
+              return new Response("Listing update failed", { status: 500 });
+            }
           }
         }
 
