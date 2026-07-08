@@ -67,10 +67,8 @@ export const Route = createFileRoute("/api/public/webhooks/nowpayments")({
         }
         if (!invoice) return new Response("Unknown invoice", { status: 404 });
 
-        let nextStatus: "pending" | "confirming" | "confirmed" | "failed" | "refunded" =
-          "pending";
-        if (CONFIRMED_STATES.has(status)) nextStatus = "confirmed";
-        else if (status === "confirming" || status === "partially_paid") nextStatus = "confirming";
+        let nextStatus: "pending" | "paid" | "failed" | "refunded" = "pending";
+        if (CONFIRMED_STATES.has(status)) nextStatus = "paid";
         else if (FAILED_STATES.has(status)) {
           nextStatus = status === "refunded" ? "refunded" : "failed";
         }
@@ -92,7 +90,7 @@ export const Route = createFileRoute("/api/public/webhooks/nowpayments")({
 
         // Only flip the listing when the payment fully confirms and we
         // haven't already applied this invoice (idempotent).
-        if (nextStatus === "confirmed" && invoice.status !== "confirmed" && invoice.listing_id) {
+        if (nextStatus === "paid" && invoice.status !== "paid" && invoice.listing_id) {
           const stickyUntil = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString();
           const { error: listingErr } = await supabaseAdmin
             .from("listings")
