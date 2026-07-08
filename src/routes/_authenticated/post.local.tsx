@@ -27,9 +27,10 @@ const STEPS = [
 ] as const;
 
 const MAX_IMAGES = 8;
+const POST_COST_CENTS = 10; // $0.10 per city
 
 export const Route = createFileRoute("/_authenticated/post/local")({
-  head: () => ({ meta: [{ title: `Post a free ad — ${BRAND.name}` }, { name: "robots", content: "noindex" }] }),
+  head: () => ({ meta: [{ title: `Post an ad — one city — ${BRAND.name}` }, { name: "robots", content: "noindex" }] }),
   component: PostPage,
 });
 
@@ -115,13 +116,19 @@ function PostPage() {
         : body;
       const result = await createFn({
         data: {
-          title, body: fullBody, city_id: cityId, category_id: categoryId,
+          title, body: fullBody, city_ids: [cityId], category_id: categoryId,
           subcategory_id: subcategoryId || undefined,
           price_cents: price ? Math.round(parseFloat(price) * 100) : undefined,
           contact_email: email || undefined,
           contact_phone: phone || undefined,
         },
       });
+      if (result.status === "insufficient_credits") {
+        toast.error("Not enough credits — buy credits to post.");
+        setSubmitting(false);
+        navigate({ to: "/credits" });
+        return;
+      }
       if (result.status === "rejected") {
         toast.error("Your ad was blocked by our policy filter. Please revise and try again.");
         setSubmitting(false);
@@ -130,7 +137,7 @@ function PostPage() {
       if (result.status === "pending") {
         toast.success("🎉 Ad submitted — pending quick moderator review.");
       } else {
-        toast.success("🎉 Your ad is live! Neighbors can see it now.");
+        toast.success(`🎉 Ad is live! $${(POST_COST_CENTS/100).toFixed(2)} deducted.`);
       }
       navigate({ to: "/my-ads" });
     } catch (e: any) {
