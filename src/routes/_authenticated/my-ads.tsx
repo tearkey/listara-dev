@@ -6,7 +6,7 @@ import { SiteFooter } from "@/components/site-footer";
 import { Button } from "@/components/ui/button";
 import { listMyAds, deleteMyAd, bumpMyAd } from "@/lib/ads.functions";
 import { BRAND } from "@/lib/brand";
-import { ArrowUp, Plus, Trash2, Eye } from "lucide-react";
+import { ArrowUp, Plus, Trash2, Eye, Sparkles } from "lucide-react";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/_authenticated/my-ads")({
@@ -76,6 +76,11 @@ function MyAdsPage() {
                     {ad.status === "live" && (
                       <Button size="sm" variant="outline" onClick={() => bumpMut.mutate(ad.id)} disabled={bumpMut.isPending}>
                         <ArrowUp className="h-3 w-3" /> Bump
+                      </Button>
+                    )}
+                    {ad.status === "live" && (
+                      <Button asChild size="sm" className="bg-brand text-brand-foreground hover:bg-brand/90">
+                        <Link to="/promote/$id" params={{ id: ad.id }}><Sparkles className="h-3 w-3" /> Promote</Link>
                       </Button>
                     )}
                     <Button size="sm" variant="ghost" className="text-destructive" onClick={() => { if (confirm("Remove this ad?")) delMut.mutate(ad.id); }}>

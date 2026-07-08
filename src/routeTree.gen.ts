@@ -21,6 +21,7 @@ import { Route as AuthenticatedMyAdsRouteImport } from './routes/_authenticated/
 import { Route as StateCityRouteImport } from './routes/$state.$city'
 import { Route as ApiPublicSitemapDotxmlRouteImport } from './routes/api/public/sitemap[.]xml'
 import { Route as ApiPublicRobotsDottxtRouteImport } from './routes/api/public/robots[.]txt'
+import { Route as AuthenticatedPromoteIdRouteImport } from './routes/_authenticated/promote.$id'
 import { Route as AuthenticatedAdminModerationDashboardRouteImport } from './routes/_authenticated/admin.moderation-dashboard'
 import { Route as StateCityCategoryRouteImport } from './routes/$state.$city.$category'
 import { Route as ApiPublicWebhooksNowpaymentsRouteImport } from './routes/api/public/webhooks/nowpayments'
@@ -85,6 +86,11 @@ const ApiPublicRobotsDottxtRoute = ApiPublicRobotsDottxtRouteImport.update({
   path: '/api/public/robots.txt',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthenticatedPromoteIdRoute = AuthenticatedPromoteIdRouteImport.update({
+  id: '/promote/$id',
+  path: '/promote/$id',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedAdminModerationDashboardRoute =
   AuthenticatedAdminModerationDashboardRouteImport.update({
     id: '/admin/moderation-dashboard',
@@ -120,6 +126,7 @@ export interface FileRoutesByFullPath {
   '/post': typeof AuthenticatedPostRoute
   '/$state/$city/$category': typeof StateCityCategoryRouteWithChildren
   '/admin/moderation-dashboard': typeof AuthenticatedAdminModerationDashboardRoute
+  '/promote/$id': typeof AuthenticatedPromoteIdRoute
   '/api/public/robots.txt': typeof ApiPublicRobotsDottxtRoute
   '/api/public/sitemap.xml': typeof ApiPublicSitemapDotxmlRoute
   '/$state/$city/$category/$slug': typeof StateCityCategorySlugRoute
@@ -137,6 +144,7 @@ export interface FileRoutesByTo {
   '/post': typeof AuthenticatedPostRoute
   '/$state/$city/$category': typeof StateCityCategoryRouteWithChildren
   '/admin/moderation-dashboard': typeof AuthenticatedAdminModerationDashboardRoute
+  '/promote/$id': typeof AuthenticatedPromoteIdRoute
   '/api/public/robots.txt': typeof ApiPublicRobotsDottxtRoute
   '/api/public/sitemap.xml': typeof ApiPublicSitemapDotxmlRoute
   '/$state/$city/$category/$slug': typeof StateCityCategorySlugRoute
@@ -156,6 +164,7 @@ export interface FileRoutesById {
   '/_authenticated/post': typeof AuthenticatedPostRoute
   '/$state/$city/$category': typeof StateCityCategoryRouteWithChildren
   '/_authenticated/admin/moderation-dashboard': typeof AuthenticatedAdminModerationDashboardRoute
+  '/_authenticated/promote/$id': typeof AuthenticatedPromoteIdRoute
   '/api/public/robots.txt': typeof ApiPublicRobotsDottxtRoute
   '/api/public/sitemap.xml': typeof ApiPublicSitemapDotxmlRoute
   '/$state/$city/$category/$slug': typeof StateCityCategorySlugRoute
@@ -175,6 +184,7 @@ export interface FileRouteTypes {
     | '/post'
     | '/$state/$city/$category'
     | '/admin/moderation-dashboard'
+    | '/promote/$id'
     | '/api/public/robots.txt'
     | '/api/public/sitemap.xml'
     | '/$state/$city/$category/$slug'
@@ -192,6 +202,7 @@ export interface FileRouteTypes {
     | '/post'
     | '/$state/$city/$category'
     | '/admin/moderation-dashboard'
+    | '/promote/$id'
     | '/api/public/robots.txt'
     | '/api/public/sitemap.xml'
     | '/$state/$city/$category/$slug'
@@ -210,6 +221,7 @@ export interface FileRouteTypes {
     | '/_authenticated/post'
     | '/$state/$city/$category'
     | '/_authenticated/admin/moderation-dashboard'
+    | '/_authenticated/promote/$id'
     | '/api/public/robots.txt'
     | '/api/public/sitemap.xml'
     | '/$state/$city/$category/$slug'
@@ -316,6 +328,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicRobotsDottxtRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authenticated/promote/$id': {
+      id: '/_authenticated/promote/$id'
+      path: '/promote/$id'
+      fullPath: '/promote/$id'
+      preLoaderRoute: typeof AuthenticatedPromoteIdRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/admin/moderation-dashboard': {
       id: '/_authenticated/admin/moderation-dashboard'
       path: '/admin/moderation-dashboard'
@@ -351,6 +370,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedMyAdsRoute: typeof AuthenticatedMyAdsRoute
   AuthenticatedPostRoute: typeof AuthenticatedPostRoute
   AuthenticatedAdminModerationDashboardRoute: typeof AuthenticatedAdminModerationDashboardRoute
+  AuthenticatedPromoteIdRoute: typeof AuthenticatedPromoteIdRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
@@ -358,6 +378,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedPostRoute: AuthenticatedPostRoute,
   AuthenticatedAdminModerationDashboardRoute:
     AuthenticatedAdminModerationDashboardRoute,
+  AuthenticatedPromoteIdRoute: AuthenticatedPromoteIdRoute,
 }
 
 const AuthenticatedRouteRouteWithChildren =
