@@ -31,6 +31,7 @@ import { Route as AuthenticatedCreditsHistoryRouteImport } from './routes/_authe
 import { Route as AuthenticatedAdminModerationDashboardRouteImport } from './routes/_authenticated/admin.moderation-dashboard'
 import { Route as StateCityCategoryRouteImport } from './routes/$state.$city.$category'
 import { Route as ApiPublicWebhooksNowpaymentsRouteImport } from './routes/api/public/webhooks/nowpayments'
+import { Route as AuthenticatedCreditsInvoiceIdRouteImport } from './routes/_authenticated/credits.invoice.$id'
 import { Route as AuthenticatedAdsIdEditRouteImport } from './routes/_authenticated/ads.$id.edit'
 import { Route as StateCityCategorySlugRouteImport } from './routes/$state.$city.$category.$slug'
 
@@ -146,6 +147,12 @@ const ApiPublicWebhooksNowpaymentsRoute =
     path: '/api/public/webhooks/nowpayments',
     getParentRoute: () => rootRouteImport,
   } as any)
+const AuthenticatedCreditsInvoiceIdRoute =
+  AuthenticatedCreditsInvoiceIdRouteImport.update({
+    id: '/invoice/$id',
+    path: '/invoice/$id',
+    getParentRoute: () => AuthenticatedCreditsRoute,
+  } as any)
 const AuthenticatedAdsIdEditRoute = AuthenticatedAdsIdEditRouteImport.update({
   id: '/ads/$id/edit',
   path: '/ads/$id/edit',
@@ -180,6 +187,7 @@ export interface FileRoutesByFullPath {
   '/post/': typeof AuthenticatedPostIndexRoute
   '/$state/$city/$category/$slug': typeof StateCityCategorySlugRoute
   '/ads/$id/edit': typeof AuthenticatedAdsIdEditRoute
+  '/credits/invoice/$id': typeof AuthenticatedCreditsInvoiceIdRoute
   '/api/public/webhooks/nowpayments': typeof ApiPublicWebhooksNowpaymentsRoute
 }
 export interface FileRoutesByTo {
@@ -204,6 +212,7 @@ export interface FileRoutesByTo {
   '/post': typeof AuthenticatedPostIndexRoute
   '/$state/$city/$category/$slug': typeof StateCityCategorySlugRoute
   '/ads/$id/edit': typeof AuthenticatedAdsIdEditRoute
+  '/credits/invoice/$id': typeof AuthenticatedCreditsInvoiceIdRoute
   '/api/public/webhooks/nowpayments': typeof ApiPublicWebhooksNowpaymentsRoute
 }
 export interface FileRoutesById {
@@ -231,6 +240,7 @@ export interface FileRoutesById {
   '/_authenticated/post/': typeof AuthenticatedPostIndexRoute
   '/$state/$city/$category/$slug': typeof StateCityCategorySlugRoute
   '/_authenticated/ads/$id/edit': typeof AuthenticatedAdsIdEditRoute
+  '/_authenticated/credits/invoice/$id': typeof AuthenticatedCreditsInvoiceIdRoute
   '/api/public/webhooks/nowpayments': typeof ApiPublicWebhooksNowpaymentsRoute
 }
 export interface FileRouteTypes {
@@ -258,6 +268,7 @@ export interface FileRouteTypes {
     | '/post/'
     | '/$state/$city/$category/$slug'
     | '/ads/$id/edit'
+    | '/credits/invoice/$id'
     | '/api/public/webhooks/nowpayments'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -282,6 +293,7 @@ export interface FileRouteTypes {
     | '/post'
     | '/$state/$city/$category/$slug'
     | '/ads/$id/edit'
+    | '/credits/invoice/$id'
     | '/api/public/webhooks/nowpayments'
   id:
     | '__root__'
@@ -308,6 +320,7 @@ export interface FileRouteTypes {
     | '/_authenticated/post/'
     | '/$state/$city/$category/$slug'
     | '/_authenticated/ads/$id/edit'
+    | '/_authenticated/credits/invoice/$id'
     | '/api/public/webhooks/nowpayments'
   fileRoutesById: FileRoutesById
 }
@@ -482,6 +495,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicWebhooksNowpaymentsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authenticated/credits/invoice/$id': {
+      id: '/_authenticated/credits/invoice/$id'
+      path: '/invoice/$id'
+      fullPath: '/credits/invoice/$id'
+      preLoaderRoute: typeof AuthenticatedCreditsInvoiceIdRouteImport
+      parentRoute: typeof AuthenticatedCreditsRoute
+    }
     '/_authenticated/ads/$id/edit': {
       id: '/_authenticated/ads/$id/edit'
       path: '/ads/$id/edit'
@@ -501,10 +521,12 @@ declare module '@tanstack/react-router' {
 
 interface AuthenticatedCreditsRouteChildren {
   AuthenticatedCreditsHistoryRoute: typeof AuthenticatedCreditsHistoryRoute
+  AuthenticatedCreditsInvoiceIdRoute: typeof AuthenticatedCreditsInvoiceIdRoute
 }
 
 const AuthenticatedCreditsRouteChildren: AuthenticatedCreditsRouteChildren = {
   AuthenticatedCreditsHistoryRoute: AuthenticatedCreditsHistoryRoute,
+  AuthenticatedCreditsInvoiceIdRoute: AuthenticatedCreditsInvoiceIdRoute,
 }
 
 const AuthenticatedCreditsRouteWithChildren =

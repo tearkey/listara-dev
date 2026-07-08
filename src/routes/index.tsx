@@ -1,6 +1,6 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { queryOptions, useSuspenseQuery } from "@tanstack/react-query";
-import { useState } from "react";
+import { queryOptions, useSuspenseQuery, useQuery } from "@tanstack/react-query";
+import { useEffect, useState } from "react";
 import { Search, MapPin, Briefcase, Home, ShoppingBag, Wrench, Car, Users, Zap, Heart, ArrowRight } from "lucide-react";
 import { BRAND } from "@/lib/brand";
 import { Button } from "@/components/ui/button";
@@ -8,6 +8,9 @@ import { Input } from "@/components/ui/input";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { listFeaturedCities, listCategories, listStates } from "@/lib/catalog.functions";
+import { detectVisitorCity } from "@/lib/geo.functions";
+import { setCurrentCity, useCurrentCity } from "@/hooks/use-current-city";
+import { toast } from "sonner";
 
 const ICONS: Record<string, React.ComponentType<{ className?: string }>> = {
   "shopping-bag": ShoppingBag, briefcase: Briefcase, home: Home, wrench: Wrench,
@@ -56,6 +59,36 @@ function HomePage() {
   const { data: categories } = useSuspenseQuery(categoriesOpts);
   const navigate = useNavigate();
   const [q, setQ] = useState("");
+  const currentCity = useCurrentCity();
+
+  // Auto-detect the visitor's city on first visit (only when nothing is cached).
+  const { data: geo } = useQuery({
+    queryKey: ["visitor-geo"],
+    queryFn: () => detectVisitorCity(),
+    enabled: !currentCity,
+    staleTime: 24 * 60 * 60 * 1000,
+    retry: false,
+  });
+
+  useEffect(() => {
+    if (!geo) return;
+    if (!geo.ok) {
+      if (geo.reason === "non_us") {
+        navigate({ to: "/not-available", replace: true });
+      }
+      // 'unavailable' silently falls back to the manual picker below.
+      return;
+    }
+    if (currentCity) return;
+    setCurrentCity({
+      id: geo.city.id,
+      name: geo.city.name,
+      stateCode: geo.city.stateCode,
+      stateSlug: geo.city.stateSlug,
+      citySlug: geo.city.slug,
+    });
+    toast.success(`Showing listings near ${geo.city.name}, ${geo.city.stateCode}`);
+  }, [geo, currentCity, navigate]);
 
   return (
     <div className="min-h-screen bg-background">
