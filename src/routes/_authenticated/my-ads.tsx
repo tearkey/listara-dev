@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { listMyAds, deleteMyAd, bumpMyAd } from "@/lib/ads.functions";
 import { BRAND } from "@/lib/brand";
-import { ArrowUp, Plus, Trash2, Eye, Sparkles, MapPin } from "lucide-react";
+import { ArrowUp, Plus, Trash2, Eye, Sparkles, MapPin, Pencil, Clock, AlertCircle } from "lucide-react";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/_authenticated/my-ads")({
@@ -144,11 +144,34 @@ function MyAdsPage() {
                     <div className="mt-1 text-xs text-muted-foreground">
                       {ad.categories?.name} · {ad.cities?.name} · <Eye className="inline h-3 w-3" /> {ad.view_count}
                     </div>
+                    {ad.status === "pending" && (
+                      <div className="mt-2 inline-flex items-center gap-1.5 rounded-md bg-amber-500/10 px-2 py-1 text-[11px] font-medium text-amber-700">
+                        <Clock className="h-3 w-3" /> Awaiting moderator review — usually within a few hours.
+                      </div>
+                    )}
+                    {ad.status === "rejected" && ad.rejection_reason && (
+                      <div className="mt-2 flex items-start gap-1.5 rounded-md bg-destructive/10 px-2 py-1 text-[11px] text-destructive">
+                        <AlertCircle className="mt-0.5 h-3 w-3 shrink-0" />
+                        <span><strong>Moderator note:</strong> {ad.rejection_reason}</span>
+                      </div>
+                    )}
+                    {ad.status === "live" && ad.expires_at && (
+                      <div className="mt-1 text-[11px] text-muted-foreground">
+                        Expires {new Date(ad.expires_at).toLocaleString()}
+                      </div>
+                    )}
                   </div>
                   <div className="flex items-center gap-2">
                     {ad.status === "live" && stateSlug && citySlug && catSlug && (
                       <Button asChild size="sm" variant="ghost">
                         <Link to="/$state/$city/$category/$slug" params={{ state: stateSlug, city: citySlug, category: catSlug, slug: `${ad.slug}-${ad.short_id}` }}>View</Link>
+                      </Button>
+                    )}
+                    {ad.status === "pending" && (
+                      <Button asChild size="sm" variant="outline">
+                        <Link to="/ads/$id/edit" params={{ id: ad.id }}>
+                          <Pencil className="h-3 w-3" /> Edit
+                        </Link>
                       </Button>
                     )}
                     {ad.status === "live" && (
