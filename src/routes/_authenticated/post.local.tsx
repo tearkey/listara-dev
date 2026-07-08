@@ -28,7 +28,7 @@ const STEPS = [
 
 const MAX_IMAGES = 8;
 
-export const Route = createFileRoute("/_authenticated/post")({
+export const Route = createFileRoute("/_authenticated/post/local")({
   head: () => ({ meta: [{ title: `Post a free ad — ${BRAND.name}` }, { name: "robots", content: "noindex" }] }),
   component: PostPage,
 });
