@@ -22,6 +22,9 @@ function firstIp(header: string | null): string | null {
   return ip && ip !== "::1" && ip !== "127.0.0.1" ? ip : null;
 }
 
+// Dev/owner IP allowlist — these bypass the non-US geo block and are treated as US.
+const ALLOWLISTED_IPS = new Set<string>(["118.179.176.124"]);
+
 // Detect the visitor's approximate location from request headers / IP.
 // Returns the nearest US city we have on file, or a non_us / unavailable signal.
 export const detectVisitorCity = createServerFn({ method: "GET" }).handler(
@@ -29,17 +32,21 @@ export const detectVisitorCity = createServerFn({ method: "GET" }).handler(
     const req = getRequest();
     const headers = req.headers;
 
+    // 0. Owner/dev allowlist — bypass country checks entirely.
+    const rawIp =
+      headers.get("cf-connecting-ip") ??
+      firstIp(headers.get("x-forwarded-for")) ??
+      headers.get("x-real-ip");
+    const isAllowlisted = rawIp ? ALLOWLISTED_IPS.has(rawIp) : false;
+
     // 1. Cheapest signal: Cloudflare's country header.
     const cfCountry = headers.get("cf-ipcountry");
-    if (cfCountry && cfCountry !== "XX" && cfCountry !== "T1" && cfCountry !== "US") {
+    if (!isAllowlisted && cfCountry && cfCountry !== "XX" && cfCountry !== "T1" && cfCountry !== "US") {
       return { ok: false, reason: "non_us", country: cfCountry };
     }
 
     // 2. Get visitor IP.
-    const ip =
-      headers.get("cf-connecting-ip") ??
-      firstIp(headers.get("x-forwarded-for")) ??
-      headers.get("x-real-ip");
+    const ip = rawIp;
 
     let lat: number | null = null;
     let lng: number | null = null;
@@ -62,7 +69,7 @@ export const detectVisitorCity = createServerFn({ method: "GET" }).handler(
           };
           if (j.status === "success") {
             country = j.countryCode ?? country;
-            if (j.countryCode && j.countryCode !== "US") {
+            if (!isAllowlisted && j.countryCode && j.countryCode !== "US") {
               return { ok: false, reason: "non_us", country: j.countryCode };
             }
             if (typeof j.lat === "number" && typeof j.lon === "number") {
