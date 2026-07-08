@@ -24,6 +24,7 @@ import { Route as AuthenticatedPostIndexRouteImport } from './routes/_authentica
 import { Route as ApiPublicSitemapDotxmlRouteImport } from './routes/api/public/sitemap[.]xml'
 import { Route as ApiPublicRobotsDottxtRouteImport } from './routes/api/public/robots[.]txt'
 import { Route as AuthenticatedPromoteIdRouteImport } from './routes/_authenticated/promote.$id'
+import { Route as AuthenticatedPostMultiRouteImport } from './routes/_authenticated/post.multi'
 import { Route as AuthenticatedPostLocalRouteImport } from './routes/_authenticated/post.local'
 import { Route as AuthenticatedAdminModerationDashboardRouteImport } from './routes/_authenticated/admin.moderation-dashboard'
 import { Route as StateCityCategoryRouteImport } from './routes/$state.$city.$category'
@@ -104,6 +105,11 @@ const AuthenticatedPromoteIdRoute = AuthenticatedPromoteIdRouteImport.update({
   path: '/promote/$id',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedPostMultiRoute = AuthenticatedPostMultiRouteImport.update({
+  id: '/multi',
+  path: '/multi',
+  getParentRoute: () => AuthenticatedPostRoute,
+} as any)
 const AuthenticatedPostLocalRoute = AuthenticatedPostLocalRouteImport.update({
   id: '/local',
   path: '/local',
@@ -146,6 +152,7 @@ export interface FileRoutesByFullPath {
   '/$state/$city/$category': typeof StateCityCategoryRouteWithChildren
   '/admin/moderation-dashboard': typeof AuthenticatedAdminModerationDashboardRoute
   '/post/local': typeof AuthenticatedPostLocalRoute
+  '/post/multi': typeof AuthenticatedPostMultiRoute
   '/promote/$id': typeof AuthenticatedPromoteIdRoute
   '/api/public/robots.txt': typeof ApiPublicRobotsDottxtRoute
   '/api/public/sitemap.xml': typeof ApiPublicSitemapDotxmlRoute
@@ -166,6 +173,7 @@ export interface FileRoutesByTo {
   '/$state/$city/$category': typeof StateCityCategoryRouteWithChildren
   '/admin/moderation-dashboard': typeof AuthenticatedAdminModerationDashboardRoute
   '/post/local': typeof AuthenticatedPostLocalRoute
+  '/post/multi': typeof AuthenticatedPostMultiRoute
   '/promote/$id': typeof AuthenticatedPromoteIdRoute
   '/api/public/robots.txt': typeof ApiPublicRobotsDottxtRoute
   '/api/public/sitemap.xml': typeof ApiPublicSitemapDotxmlRoute
@@ -189,6 +197,7 @@ export interface FileRoutesById {
   '/$state/$city/$category': typeof StateCityCategoryRouteWithChildren
   '/_authenticated/admin/moderation-dashboard': typeof AuthenticatedAdminModerationDashboardRoute
   '/_authenticated/post/local': typeof AuthenticatedPostLocalRoute
+  '/_authenticated/post/multi': typeof AuthenticatedPostMultiRoute
   '/_authenticated/promote/$id': typeof AuthenticatedPromoteIdRoute
   '/api/public/robots.txt': typeof ApiPublicRobotsDottxtRoute
   '/api/public/sitemap.xml': typeof ApiPublicSitemapDotxmlRoute
@@ -212,6 +221,7 @@ export interface FileRouteTypes {
     | '/$state/$city/$category'
     | '/admin/moderation-dashboard'
     | '/post/local'
+    | '/post/multi'
     | '/promote/$id'
     | '/api/public/robots.txt'
     | '/api/public/sitemap.xml'
@@ -232,6 +242,7 @@ export interface FileRouteTypes {
     | '/$state/$city/$category'
     | '/admin/moderation-dashboard'
     | '/post/local'
+    | '/post/multi'
     | '/promote/$id'
     | '/api/public/robots.txt'
     | '/api/public/sitemap.xml'
@@ -254,6 +265,7 @@ export interface FileRouteTypes {
     | '/$state/$city/$category'
     | '/_authenticated/admin/moderation-dashboard'
     | '/_authenticated/post/local'
+    | '/_authenticated/post/multi'
     | '/_authenticated/promote/$id'
     | '/api/public/robots.txt'
     | '/api/public/sitemap.xml'
@@ -383,6 +395,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedPromoteIdRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/post/multi': {
+      id: '/_authenticated/post/multi'
+      path: '/multi'
+      fullPath: '/post/multi'
+      preLoaderRoute: typeof AuthenticatedPostMultiRouteImport
+      parentRoute: typeof AuthenticatedPostRoute
+    }
     '/_authenticated/post/local': {
       id: '/_authenticated/post/local'
       path: '/local'
@@ -423,11 +442,13 @@ declare module '@tanstack/react-router' {
 
 interface AuthenticatedPostRouteChildren {
   AuthenticatedPostLocalRoute: typeof AuthenticatedPostLocalRoute
+  AuthenticatedPostMultiRoute: typeof AuthenticatedPostMultiRoute
   AuthenticatedPostIndexRoute: typeof AuthenticatedPostIndexRoute
 }
 
 const AuthenticatedPostRouteChildren: AuthenticatedPostRouteChildren = {
   AuthenticatedPostLocalRoute: AuthenticatedPostLocalRoute,
+  AuthenticatedPostMultiRoute: AuthenticatedPostMultiRoute,
   AuthenticatedPostIndexRoute: AuthenticatedPostIndexRoute,
 }
 
