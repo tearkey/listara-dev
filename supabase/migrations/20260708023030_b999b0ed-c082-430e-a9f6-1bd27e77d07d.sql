@@ -1,0 +1,1 @@
+REVOKE EXECUTE ON FUNCTION public.expire_stale_ads() FROM PUBLIC, anon, authenticated;

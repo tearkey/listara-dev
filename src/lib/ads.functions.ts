@@ -25,6 +25,7 @@ const adInput = z.object({
 });
 
 const POST_COST_CENTS = 10; // $0.10 per city
+const AD_LIFETIME_MS = 24 * 60 * 60 * 1000; // 24 hours per requirement
 
 export const createAd = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
@@ -81,7 +82,7 @@ export const createAd = createServerFn({ method: "POST" })
 
     const slug = slugify(data.title);
     const now = new Date().toISOString();
-    const expiresAt = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString();
+    const expiresAt = new Date(Date.now() + AD_LIFETIME_MS).toISOString();
 
     if (status === "rejected") {
       // Insert a single rejected row for moderator audit; no city fanout, no charge.
@@ -154,11 +155,74 @@ export const listMyAds = createServerFn({ method: "GET" })
     const { supabase, userId } = context;
     const { data, error } = await supabase
       .from("ads")
-      .select("id,short_id,slug,title,status,tier,posted_at,expires_at,view_count,cities(name,slug,states(code,slug)),categories(slug,name)")
+      .select("id,short_id,slug,title,status,tier,posted_at,expires_at,view_count,rejection_reason,updated_at,cities(name,slug,states(code,slug)),categories(slug,name)")
       .eq("user_id", userId)
       .order("created_at", { ascending: false });
     if (error) throw new Error(error.message);
     return data ?? [];
+  });
+
+// Fetch one of the current user's ads (any status) for editing.
+export const getMyAd = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d) => z.object({ id: z.string().uuid() }).parse(d))
+  .handler(async ({ data, context }) => {
+    const { data: ad, error } = await context.supabase
+      .from("ads")
+      .select("id,title,body,city_id,category_id,subcategory_id,price_cents,contact_email,contact_phone,allow_messages,status,tier,rejection_reason,cities(name,states(code))")
+      .eq("id", data.id)
+      .eq("user_id", context.userId)
+      .maybeSingle();
+    if (error) throw new Error(error.message);
+    if (!ad) throw new Error("Ad not found");
+    return ad;
+  });
+
+// Edit a pending ad — user may adjust content, city, and promotion tier before
+// it goes live. Only allowed while status='pending'.
+const editPendingInput = z.object({
+  id: z.string().uuid(),
+  title: z.string().trim().min(4).max(120),
+  body: z.string().trim().min(20).max(8000),
+  city_id: z.string().uuid(),
+  price_cents: z.number().int().min(0).max(100_000_000).optional().nullable(),
+  contact_email: z.string().email().max(255).optional().nullable(),
+  contact_phone: z.string().max(40).optional().nullable(),
+  tier: z.enum(["free", "bumped", "featured", "sticky"]).default("free"),
+});
+
+export const updatePendingAd = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d) => editPendingInput.parse(d))
+  .handler(async ({ data, context }) => {
+    const { supabase, userId } = context;
+    const { data: current, error: readErr } = await supabase
+      .from("ads")
+      .select("id,status")
+      .eq("id", data.id)
+      .eq("user_id", userId)
+      .maybeSingle();
+    if (readErr) throw new Error(readErr.message);
+    if (!current) throw new Error("Ad not found");
+    if (current.status !== "pending") {
+      throw new Error("Only pending ads can be edited. Live ads must be removed and re-posted.");
+    }
+
+    const { error } = await supabase
+      .from("ads")
+      .update({
+        title: data.title,
+        body: data.body,
+        city_id: data.city_id,
+        price_cents: data.price_cents ?? null,
+        contact_email: data.contact_email ?? null,
+        contact_phone: data.contact_phone ?? null,
+        tier: data.tier,
+      })
+      .eq("id", data.id)
+      .eq("user_id", userId);
+    if (error) throw new Error(error.message);
+    return { ok: true };
   });
 
 export const deleteMyAd = createServerFn({ method: "POST" })

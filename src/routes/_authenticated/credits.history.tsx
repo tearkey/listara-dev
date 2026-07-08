@@ -7,7 +7,7 @@ import { listMyCreditTransactions, listMyInvoices, getMyCredits } from "@/lib/cr
 import { BRAND } from "@/lib/brand";
 import {
   ArrowDownRight, ArrowUpRight, ExternalLink, Wallet, Clock,
-  CheckCircle2, XCircle, Hourglass, Receipt,
+  CheckCircle2, XCircle, Hourglass, Receipt, FileText,
 } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/credits/history")({
@@ -118,7 +118,7 @@ function HistoryPage() {
                     <th className="px-4 py-2.5">Amount</th>
                     <th className="px-4 py-2.5">Status</th>
                     <th className="px-4 py-2.5">Order</th>
-                    <th className="px-4 py-2.5 text-right">Invoice</th>
+                    <th className="px-4 py-2.5 text-right">Receipt</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-border">
@@ -129,11 +129,20 @@ function HistoryPage() {
                       <td className="px-4 py-3">{statusBadge(inv.status)}</td>
                       <td className="px-4 py-3 font-mono text-[11px] text-muted-foreground">{inv.nowpayments_order_id ?? "—"}</td>
                       <td className="px-4 py-3 text-right">
-                        {inv.invoice_url ? (
-                          <a href={inv.invoice_url} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 text-xs font-semibold text-brand hover:underline">
-                            Open <ExternalLink className="h-3 w-3" />
-                          </a>
-                        ) : <span className="text-xs text-muted-foreground">—</span>}
+                        <div className="flex items-center justify-end gap-3">
+                          <Link
+                            to="/credits/invoice/$id"
+                            params={{ id: inv.id }}
+                            className="inline-flex items-center gap-1 text-xs font-semibold text-brand hover:underline"
+                          >
+                            <FileText className="h-3 w-3" /> View
+                          </Link>
+                          {inv.invoice_url && (
+                            <a href={inv.invoice_url} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 text-xs text-muted-foreground hover:text-brand">
+                              Pay <ExternalLink className="h-3 w-3" />
+                            </a>
+                          )}
+                        </div>
                       </td>
                     </tr>
                   ))}

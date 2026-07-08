@@ -70,6 +70,7 @@ export type Database = {
           id: string
           posted_at: string | null
           price_cents: number | null
+          rejection_reason: string | null
           report_count: number
           search_vector: unknown
           short_id: string
@@ -97,6 +98,7 @@ export type Database = {
           id?: string
           posted_at?: string | null
           price_cents?: number | null
+          rejection_reason?: string | null
           report_count?: number
           search_vector?: unknown
           short_id?: string
@@ -124,6 +126,7 @@ export type Database = {
           id?: string
           posted_at?: string | null
           price_cents?: number | null
+          rejection_reason?: string | null
           report_count?: number
           search_vector?: unknown
           short_id?: string
@@ -833,6 +836,7 @@ export type Database = {
         Args: { _action: string; _max: number; _window_seconds: number }
         Returns: boolean
       }
+      expire_stale_ads: { Args: never; Returns: number }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]

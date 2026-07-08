@@ -41,9 +41,18 @@ function ModerationDashboard() {
   const [busy, setBusy] = useState<Record<string, "live" | "rejected" | undefined>>({});
 
   async function act(id: string, status: "live" | "rejected") {
+    let reason: string | undefined;
+    if (status === "rejected") {
+      const r = window.prompt(
+        "Reason for rejection (shown to the user):",
+        "Content violates our posting guidelines.",
+      );
+      if (r === null) return; // cancelled
+      reason = r.trim() || "Rejected by moderator";
+    }
     setBusy((b) => ({ ...b, [id]: status }));
     try {
-      await setStatusFn({ data: { id, status } });
+      await setStatusFn({ data: { id, status, rejection_reason: reason } });
       toast.success(status === "live" ? "Listing approved" : "Listing rejected");
       await qc.invalidateQueries({ queryKey: ["admin", "pending-ads"] });
     } catch (e: any) {

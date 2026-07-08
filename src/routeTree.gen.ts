@@ -13,6 +13,7 @@ import { Route as TermsRouteImport } from './routes/terms'
 import { Route as SearchRouteImport } from './routes/search'
 import { Route as SafetyRouteImport } from './routes/safety'
 import { Route as PrivacyRouteImport } from './routes/privacy'
+import { Route as NotAvailableRouteImport } from './routes/not-available'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as IndexRouteImport } from './routes/index'
@@ -30,6 +31,8 @@ import { Route as AuthenticatedCreditsHistoryRouteImport } from './routes/_authe
 import { Route as AuthenticatedAdminModerationDashboardRouteImport } from './routes/_authenticated/admin.moderation-dashboard'
 import { Route as StateCityCategoryRouteImport } from './routes/$state.$city.$category'
 import { Route as ApiPublicWebhooksNowpaymentsRouteImport } from './routes/api/public/webhooks/nowpayments'
+import { Route as AuthenticatedCreditsInvoiceIdRouteImport } from './routes/_authenticated/credits.invoice.$id'
+import { Route as AuthenticatedAdsIdEditRouteImport } from './routes/_authenticated/ads.$id.edit'
 import { Route as StateCityCategorySlugRouteImport } from './routes/$state.$city.$category.$slug'
 
 const TermsRoute = TermsRouteImport.update({
@@ -50,6 +53,11 @@ const SafetyRoute = SafetyRouteImport.update({
 const PrivacyRoute = PrivacyRouteImport.update({
   id: '/privacy',
   path: '/privacy',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const NotAvailableRoute = NotAvailableRouteImport.update({
+  id: '/not-available',
+  path: '/not-available',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthRoute = AuthRouteImport.update({
@@ -139,6 +147,17 @@ const ApiPublicWebhooksNowpaymentsRoute =
     path: '/api/public/webhooks/nowpayments',
     getParentRoute: () => rootRouteImport,
   } as any)
+const AuthenticatedCreditsInvoiceIdRoute =
+  AuthenticatedCreditsInvoiceIdRouteImport.update({
+    id: '/invoice/$id',
+    path: '/invoice/$id',
+    getParentRoute: () => AuthenticatedCreditsRoute,
+  } as any)
+const AuthenticatedAdsIdEditRoute = AuthenticatedAdsIdEditRouteImport.update({
+  id: '/ads/$id/edit',
+  path: '/ads/$id/edit',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const StateCityCategorySlugRoute = StateCityCategorySlugRouteImport.update({
   id: '/$slug',
   path: '/$slug',
@@ -148,6 +167,7 @@ const StateCityCategorySlugRoute = StateCityCategorySlugRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
+  '/not-available': typeof NotAvailableRoute
   '/privacy': typeof PrivacyRoute
   '/safety': typeof SafetyRoute
   '/search': typeof SearchRoute
@@ -166,11 +186,14 @@ export interface FileRoutesByFullPath {
   '/api/public/sitemap.xml': typeof ApiPublicSitemapDotxmlRoute
   '/post/': typeof AuthenticatedPostIndexRoute
   '/$state/$city/$category/$slug': typeof StateCityCategorySlugRoute
+  '/ads/$id/edit': typeof AuthenticatedAdsIdEditRoute
+  '/credits/invoice/$id': typeof AuthenticatedCreditsInvoiceIdRoute
   '/api/public/webhooks/nowpayments': typeof ApiPublicWebhooksNowpaymentsRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
+  '/not-available': typeof NotAvailableRoute
   '/privacy': typeof PrivacyRoute
   '/safety': typeof SafetyRoute
   '/search': typeof SearchRoute
@@ -188,6 +211,8 @@ export interface FileRoutesByTo {
   '/api/public/sitemap.xml': typeof ApiPublicSitemapDotxmlRoute
   '/post': typeof AuthenticatedPostIndexRoute
   '/$state/$city/$category/$slug': typeof StateCityCategorySlugRoute
+  '/ads/$id/edit': typeof AuthenticatedAdsIdEditRoute
+  '/credits/invoice/$id': typeof AuthenticatedCreditsInvoiceIdRoute
   '/api/public/webhooks/nowpayments': typeof ApiPublicWebhooksNowpaymentsRoute
 }
 export interface FileRoutesById {
@@ -195,6 +220,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/auth': typeof AuthRoute
+  '/not-available': typeof NotAvailableRoute
   '/privacy': typeof PrivacyRoute
   '/safety': typeof SafetyRoute
   '/search': typeof SearchRoute
@@ -213,6 +239,8 @@ export interface FileRoutesById {
   '/api/public/sitemap.xml': typeof ApiPublicSitemapDotxmlRoute
   '/_authenticated/post/': typeof AuthenticatedPostIndexRoute
   '/$state/$city/$category/$slug': typeof StateCityCategorySlugRoute
+  '/_authenticated/ads/$id/edit': typeof AuthenticatedAdsIdEditRoute
+  '/_authenticated/credits/invoice/$id': typeof AuthenticatedCreditsInvoiceIdRoute
   '/api/public/webhooks/nowpayments': typeof ApiPublicWebhooksNowpaymentsRoute
 }
 export interface FileRouteTypes {
@@ -220,6 +248,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/auth'
+    | '/not-available'
     | '/privacy'
     | '/safety'
     | '/search'
@@ -238,11 +267,14 @@ export interface FileRouteTypes {
     | '/api/public/sitemap.xml'
     | '/post/'
     | '/$state/$city/$category/$slug'
+    | '/ads/$id/edit'
+    | '/credits/invoice/$id'
     | '/api/public/webhooks/nowpayments'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/auth'
+    | '/not-available'
     | '/privacy'
     | '/safety'
     | '/search'
@@ -260,12 +292,15 @@ export interface FileRouteTypes {
     | '/api/public/sitemap.xml'
     | '/post'
     | '/$state/$city/$category/$slug'
+    | '/ads/$id/edit'
+    | '/credits/invoice/$id'
     | '/api/public/webhooks/nowpayments'
   id:
     | '__root__'
     | '/'
     | '/_authenticated'
     | '/auth'
+    | '/not-available'
     | '/privacy'
     | '/safety'
     | '/search'
@@ -284,6 +319,8 @@ export interface FileRouteTypes {
     | '/api/public/sitemap.xml'
     | '/_authenticated/post/'
     | '/$state/$city/$category/$slug'
+    | '/_authenticated/ads/$id/edit'
+    | '/_authenticated/credits/invoice/$id'
     | '/api/public/webhooks/nowpayments'
   fileRoutesById: FileRoutesById
 }
@@ -291,6 +328,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   AuthRoute: typeof AuthRoute
+  NotAvailableRoute: typeof NotAvailableRoute
   PrivacyRoute: typeof PrivacyRoute
   SafetyRoute: typeof SafetyRoute
   SearchRoute: typeof SearchRoute
@@ -329,6 +367,13 @@ declare module '@tanstack/react-router' {
       path: '/privacy'
       fullPath: '/privacy'
       preLoaderRoute: typeof PrivacyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/not-available': {
+      id: '/not-available'
+      path: '/not-available'
+      fullPath: '/not-available'
+      preLoaderRoute: typeof NotAvailableRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/auth': {
@@ -450,6 +495,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicWebhooksNowpaymentsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authenticated/credits/invoice/$id': {
+      id: '/_authenticated/credits/invoice/$id'
+      path: '/invoice/$id'
+      fullPath: '/credits/invoice/$id'
+      preLoaderRoute: typeof AuthenticatedCreditsInvoiceIdRouteImport
+      parentRoute: typeof AuthenticatedCreditsRoute
+    }
+    '/_authenticated/ads/$id/edit': {
+      id: '/_authenticated/ads/$id/edit'
+      path: '/ads/$id/edit'
+      fullPath: '/ads/$id/edit'
+      preLoaderRoute: typeof AuthenticatedAdsIdEditRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/$state/$city/$category/$slug': {
       id: '/$state/$city/$category/$slug'
       path: '/$slug'
@@ -462,10 +521,12 @@ declare module '@tanstack/react-router' {
 
 interface AuthenticatedCreditsRouteChildren {
   AuthenticatedCreditsHistoryRoute: typeof AuthenticatedCreditsHistoryRoute
+  AuthenticatedCreditsInvoiceIdRoute: typeof AuthenticatedCreditsInvoiceIdRoute
 }
 
 const AuthenticatedCreditsRouteChildren: AuthenticatedCreditsRouteChildren = {
   AuthenticatedCreditsHistoryRoute: AuthenticatedCreditsHistoryRoute,
+  AuthenticatedCreditsInvoiceIdRoute: AuthenticatedCreditsInvoiceIdRoute,
 }
 
 const AuthenticatedCreditsRouteWithChildren =
@@ -492,6 +553,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedPostRoute: typeof AuthenticatedPostRouteWithChildren
   AuthenticatedAdminModerationDashboardRoute: typeof AuthenticatedAdminModerationDashboardRoute
   AuthenticatedPromoteIdRoute: typeof AuthenticatedPromoteIdRoute
+  AuthenticatedAdsIdEditRoute: typeof AuthenticatedAdsIdEditRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
@@ -501,6 +563,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedAdminModerationDashboardRoute:
     AuthenticatedAdminModerationDashboardRoute,
   AuthenticatedPromoteIdRoute: AuthenticatedPromoteIdRoute,
+  AuthenticatedAdsIdEditRoute: AuthenticatedAdsIdEditRoute,
 }
 
 const AuthenticatedRouteRouteWithChildren =
@@ -533,6 +596,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   AuthRoute: AuthRoute,
+  NotAvailableRoute: NotAvailableRoute,
   PrivacyRoute: PrivacyRoute,
   SafetyRoute: SafetyRoute,
   SearchRoute: SearchRoute,
