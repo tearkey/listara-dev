@@ -16,6 +16,43 @@ export const getMyCredits = createServerFn({ method: "GET" })
     return { balance_cents: data?.balance_cents ?? 0, updated_at: data?.updated_at ?? null };
   });
 
+// List the signed-in user's credit ledger + linked invoice metadata.
+export const listMyCreditTransactions = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    const { data: txs, error } = await context.supabase
+      .from("credit_transactions")
+      .select("id,created_at,delta_cents,reason,ad_id,invoice_id")
+      .eq("user_id", context.userId)
+      .order("created_at", { ascending: false })
+      .limit(200);
+    if (error) throw new Error(error.message);
+    const invoiceIds = Array.from(new Set((txs ?? []).map((t) => t.invoice_id).filter(Boolean))) as string[];
+    let invoices: Record<string, { status: string; price_amount: number | null; pay_currency: string | null; invoice_url: string | null; nowpayments_order_id: string | null }> = {};
+    if (invoiceIds.length > 0) {
+      const { data: invs } = await context.supabase
+        .from("invoices")
+        .select("id,status,price_amount,pay_currency,invoice_url,nowpayments_order_id")
+        .in("id", invoiceIds);
+      for (const i of invs ?? []) invoices[i.id] = i as any;
+    }
+    return (txs ?? []).map((t) => ({ ...t, invoice: t.invoice_id ? invoices[t.invoice_id] ?? null : null }));
+  });
+
+// Recent invoices (pending + paid) so users can see webhook confirmation status.
+export const listMyInvoices = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    const { data, error } = await context.supabase
+      .from("invoices")
+      .select("id,created_at,updated_at,kind,status,price_amount,pay_currency,credit_cents,invoice_url,nowpayments_order_id")
+      .eq("user_id", context.userId)
+      .order("created_at", { ascending: false })
+      .limit(50);
+    if (error) throw new Error(error.message);
+    return data ?? [];
+  });
+
 // List every state with its featured cities — used by the multi-city picker.
 export const listStatesWithCities = createServerFn({ method: "GET" }).handler(async () => {
   const sb = getPublicSupabase();
