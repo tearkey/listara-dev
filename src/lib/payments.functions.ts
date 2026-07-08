@@ -3,7 +3,7 @@ import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
 const STICKY_PRICE_USD = 10;
-const ALLOWED_CURRENCIES = ["btc", "usdttrc20", "usdc"] as const;
+const ALLOWED_CURRENCIES = ["btc", "usdttrc20", "ltc", "trx"] as const;
 
 export const createStickyInvoice = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
