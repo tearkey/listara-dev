@@ -116,3 +116,26 @@ function PromotePage() {
     </div>
   );
 }
+
+function WaitingScreen() {
+  return (
+    <div className="min-h-screen bg-background">
+      <SiteHeader />
+      <div className="mx-auto flex max-w-xl flex-col items-center px-4 py-20 text-center">
+        <div className="relative flex h-32 w-32 items-center justify-center">
+          <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-brand/30" />
+          <span className="absolute inline-flex h-24 w-24 animate-pulse rounded-full bg-brand/50" />
+          <div className="relative flex h-16 w-16 items-center justify-center rounded-full bg-brand text-brand-foreground">
+            <Loader2 className="h-8 w-8 animate-spin" />
+          </div>
+        </div>
+        <h1 className="mt-10 font-display text-3xl font-bold">Waiting for blockchain confirmation</h1>
+        <p className="mt-4 max-w-md text-muted-foreground">
+          We've received your payment and it's being verified on-chain. Your ad will be promoted automatically the moment the network confirms the transaction — usually within a few minutes.
+        </p>
+        <p className="mt-6 text-xs text-muted-foreground">You can safely close this page.</p>
+      </div>
+      <SiteFooter />
+    </div>
+  );
+}
