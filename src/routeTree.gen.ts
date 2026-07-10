@@ -35,9 +35,11 @@ import { Route as AuthenticatedAdminPaymentsRouteImport } from './routes/_authen
 import { Route as AuthenticatedAdminModerationDashboardRouteImport } from './routes/_authenticated/admin.moderation-dashboard'
 import { Route as AuthenticatedAdminFlagsRouteImport } from './routes/_authenticated/admin.flags'
 import { Route as AuthenticatedAdminAuditRouteImport } from './routes/_authenticated/admin.audit'
+import { Route as AuthenticatedAdminAnalyticsRouteImport } from './routes/_authenticated/admin.analytics'
 import { Route as AuthenticatedAdminAdsRouteImport } from './routes/_authenticated/admin.ads'
 import { Route as StateCityCategoryRouteImport } from './routes/$state.$city.$category'
 import { Route as ApiPublicWebhooksNowpaymentsRouteImport } from './routes/api/public/webhooks/nowpayments'
+import { Route as ApiAdminAnalyticsExportRouteImport } from './routes/api/admin/analytics.export'
 import { Route as AuthenticatedCreditsInvoiceIdRouteImport } from './routes/_authenticated/credits.invoice.$id'
 import { Route as AuthenticatedAdsIdEditRouteImport } from './routes/_authenticated/ads.$id.edit'
 import { Route as StateCityCategorySlugRouteImport } from './routes/$state.$city.$category.$slug'
@@ -174,6 +176,12 @@ const AuthenticatedAdminAuditRoute = AuthenticatedAdminAuditRouteImport.update({
   path: '/audit',
   getParentRoute: () => AuthenticatedAdminRoute,
 } as any)
+const AuthenticatedAdminAnalyticsRoute =
+  AuthenticatedAdminAnalyticsRouteImport.update({
+    id: '/analytics',
+    path: '/analytics',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
 const AuthenticatedAdminAdsRoute = AuthenticatedAdminAdsRouteImport.update({
   id: '/ads',
   path: '/ads',
@@ -190,6 +198,11 @@ const ApiPublicWebhooksNowpaymentsRoute =
     path: '/api/public/webhooks/nowpayments',
     getParentRoute: () => rootRouteImport,
   } as any)
+const ApiAdminAnalyticsExportRoute = ApiAdminAnalyticsExportRouteImport.update({
+  id: '/api/admin/analytics/export',
+  path: '/api/admin/analytics/export',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthenticatedCreditsInvoiceIdRoute =
   AuthenticatedCreditsInvoiceIdRouteImport.update({
     id: '/invoice/$id',
@@ -222,6 +235,7 @@ export interface FileRoutesByFullPath {
   '/post': typeof AuthenticatedPostRouteWithChildren
   '/$state/$city/$category': typeof StateCityCategoryRouteWithChildren
   '/admin/ads': typeof AuthenticatedAdminAdsRoute
+  '/admin/analytics': typeof AuthenticatedAdminAnalyticsRoute
   '/admin/audit': typeof AuthenticatedAdminAuditRoute
   '/admin/flags': typeof AuthenticatedAdminFlagsRoute
   '/admin/moderation-dashboard': typeof AuthenticatedAdminModerationDashboardRoute
@@ -238,6 +252,7 @@ export interface FileRoutesByFullPath {
   '/$state/$city/$category/$slug': typeof StateCityCategorySlugRoute
   '/ads/$id/edit': typeof AuthenticatedAdsIdEditRoute
   '/credits/invoice/$id': typeof AuthenticatedCreditsInvoiceIdRoute
+  '/api/admin/analytics/export': typeof ApiAdminAnalyticsExportRoute
   '/api/public/webhooks/nowpayments': typeof ApiPublicWebhooksNowpaymentsRoute
 }
 export interface FileRoutesByTo {
@@ -253,6 +268,7 @@ export interface FileRoutesByTo {
   '/my-ads': typeof AuthenticatedMyAdsRoute
   '/$state/$city/$category': typeof StateCityCategoryRouteWithChildren
   '/admin/ads': typeof AuthenticatedAdminAdsRoute
+  '/admin/analytics': typeof AuthenticatedAdminAnalyticsRoute
   '/admin/audit': typeof AuthenticatedAdminAuditRoute
   '/admin/flags': typeof AuthenticatedAdminFlagsRoute
   '/admin/moderation-dashboard': typeof AuthenticatedAdminModerationDashboardRoute
@@ -269,6 +285,7 @@ export interface FileRoutesByTo {
   '/$state/$city/$category/$slug': typeof StateCityCategorySlugRoute
   '/ads/$id/edit': typeof AuthenticatedAdsIdEditRoute
   '/credits/invoice/$id': typeof AuthenticatedCreditsInvoiceIdRoute
+  '/api/admin/analytics/export': typeof ApiAdminAnalyticsExportRoute
   '/api/public/webhooks/nowpayments': typeof ApiPublicWebhooksNowpaymentsRoute
 }
 export interface FileRoutesById {
@@ -288,6 +305,7 @@ export interface FileRoutesById {
   '/_authenticated/post': typeof AuthenticatedPostRouteWithChildren
   '/$state/$city/$category': typeof StateCityCategoryRouteWithChildren
   '/_authenticated/admin/ads': typeof AuthenticatedAdminAdsRoute
+  '/_authenticated/admin/analytics': typeof AuthenticatedAdminAnalyticsRoute
   '/_authenticated/admin/audit': typeof AuthenticatedAdminAuditRoute
   '/_authenticated/admin/flags': typeof AuthenticatedAdminFlagsRoute
   '/_authenticated/admin/moderation-dashboard': typeof AuthenticatedAdminModerationDashboardRoute
@@ -304,6 +322,7 @@ export interface FileRoutesById {
   '/$state/$city/$category/$slug': typeof StateCityCategorySlugRoute
   '/_authenticated/ads/$id/edit': typeof AuthenticatedAdsIdEditRoute
   '/_authenticated/credits/invoice/$id': typeof AuthenticatedCreditsInvoiceIdRoute
+  '/api/admin/analytics/export': typeof ApiAdminAnalyticsExportRoute
   '/api/public/webhooks/nowpayments': typeof ApiPublicWebhooksNowpaymentsRoute
 }
 export interface FileRouteTypes {
@@ -323,6 +342,7 @@ export interface FileRouteTypes {
     | '/post'
     | '/$state/$city/$category'
     | '/admin/ads'
+    | '/admin/analytics'
     | '/admin/audit'
     | '/admin/flags'
     | '/admin/moderation-dashboard'
@@ -339,6 +359,7 @@ export interface FileRouteTypes {
     | '/$state/$city/$category/$slug'
     | '/ads/$id/edit'
     | '/credits/invoice/$id'
+    | '/api/admin/analytics/export'
     | '/api/public/webhooks/nowpayments'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -354,6 +375,7 @@ export interface FileRouteTypes {
     | '/my-ads'
     | '/$state/$city/$category'
     | '/admin/ads'
+    | '/admin/analytics'
     | '/admin/audit'
     | '/admin/flags'
     | '/admin/moderation-dashboard'
@@ -370,6 +392,7 @@ export interface FileRouteTypes {
     | '/$state/$city/$category/$slug'
     | '/ads/$id/edit'
     | '/credits/invoice/$id'
+    | '/api/admin/analytics/export'
     | '/api/public/webhooks/nowpayments'
   id:
     | '__root__'
@@ -388,6 +411,7 @@ export interface FileRouteTypes {
     | '/_authenticated/post'
     | '/$state/$city/$category'
     | '/_authenticated/admin/ads'
+    | '/_authenticated/admin/analytics'
     | '/_authenticated/admin/audit'
     | '/_authenticated/admin/flags'
     | '/_authenticated/admin/moderation-dashboard'
@@ -404,6 +428,7 @@ export interface FileRouteTypes {
     | '/$state/$city/$category/$slug'
     | '/_authenticated/ads/$id/edit'
     | '/_authenticated/credits/invoice/$id'
+    | '/api/admin/analytics/export'
     | '/api/public/webhooks/nowpayments'
   fileRoutesById: FileRoutesById
 }
@@ -419,6 +444,7 @@ export interface RootRouteChildren {
   StateCityRoute: typeof StateCityRouteWithChildren
   ApiPublicRobotsDottxtRoute: typeof ApiPublicRobotsDottxtRoute
   ApiPublicSitemapDotxmlRoute: typeof ApiPublicSitemapDotxmlRoute
+  ApiAdminAnalyticsExportRoute: typeof ApiAdminAnalyticsExportRoute
   ApiPublicWebhooksNowpaymentsRoute: typeof ApiPublicWebhooksNowpaymentsRoute
 }
 
@@ -606,6 +632,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminAuditRouteImport
       parentRoute: typeof AuthenticatedAdminRoute
     }
+    '/_authenticated/admin/analytics': {
+      id: '/_authenticated/admin/analytics'
+      path: '/analytics'
+      fullPath: '/admin/analytics'
+      preLoaderRoute: typeof AuthenticatedAdminAnalyticsRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
     '/_authenticated/admin/ads': {
       id: '/_authenticated/admin/ads'
       path: '/ads'
@@ -625,6 +658,13 @@ declare module '@tanstack/react-router' {
       path: '/api/public/webhooks/nowpayments'
       fullPath: '/api/public/webhooks/nowpayments'
       preLoaderRoute: typeof ApiPublicWebhooksNowpaymentsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/admin/analytics/export': {
+      id: '/api/admin/analytics/export'
+      path: '/api/admin/analytics/export'
+      fullPath: '/api/admin/analytics/export'
+      preLoaderRoute: typeof ApiAdminAnalyticsExportRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_authenticated/credits/invoice/$id': {
@@ -653,6 +693,7 @@ declare module '@tanstack/react-router' {
 
 interface AuthenticatedAdminRouteChildren {
   AuthenticatedAdminAdsRoute: typeof AuthenticatedAdminAdsRoute
+  AuthenticatedAdminAnalyticsRoute: typeof AuthenticatedAdminAnalyticsRoute
   AuthenticatedAdminAuditRoute: typeof AuthenticatedAdminAuditRoute
   AuthenticatedAdminFlagsRoute: typeof AuthenticatedAdminFlagsRoute
   AuthenticatedAdminModerationDashboardRoute: typeof AuthenticatedAdminModerationDashboardRoute
@@ -663,6 +704,7 @@ interface AuthenticatedAdminRouteChildren {
 
 const AuthenticatedAdminRouteChildren: AuthenticatedAdminRouteChildren = {
   AuthenticatedAdminAdsRoute: AuthenticatedAdminAdsRoute,
+  AuthenticatedAdminAnalyticsRoute: AuthenticatedAdminAnalyticsRoute,
   AuthenticatedAdminAuditRoute: AuthenticatedAdminAuditRoute,
   AuthenticatedAdminFlagsRoute: AuthenticatedAdminFlagsRoute,
   AuthenticatedAdminModerationDashboardRoute:
@@ -759,6 +801,7 @@ const rootRouteChildren: RootRouteChildren = {
   StateCityRoute: StateCityRouteWithChildren,
   ApiPublicRobotsDottxtRoute: ApiPublicRobotsDottxtRoute,
   ApiPublicSitemapDotxmlRoute: ApiPublicSitemapDotxmlRoute,
+  ApiAdminAnalyticsExportRoute: ApiAdminAnalyticsExportRoute,
   ApiPublicWebhooksNowpaymentsRoute: ApiPublicWebhooksNowpaymentsRoute,
 }
 export const routeTree = rootRouteImport

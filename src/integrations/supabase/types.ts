@@ -860,6 +860,20 @@ export type Database = {
         Args: { _delta_cents: number; _reason: string; _target_user: string }
         Returns: number
       }
+      admin_analytics_series: {
+        Args: { _bucket?: string; _from: string; _to: string }
+        Returns: {
+          bucket_start: string
+          new_ads: number
+          orders: number
+          paid_ads: number
+          revenue_cents: number
+        }[]
+      }
+      admin_analytics_summary: {
+        Args: { _from: string; _to: string }
+        Returns: Json
+      }
       consume_rate_limit: {
         Args: { _action: string; _max: number; _window_seconds: number }
         Returns: boolean
