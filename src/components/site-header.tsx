@@ -1,5 +1,6 @@
 import { Link, useNavigate } from "@tanstack/react-router";
-import { LogOut, MapPin, Plus, Search, User, Wallet } from "lucide-react";
+import { LogOut, MapPin, Plus, Search, ShieldCheck, User, Wallet } from "lucide-react";
+import { useEffect, useState } from "react";
 import { BRAND } from "@/lib/brand";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/use-auth";
@@ -20,6 +21,20 @@ export function SiteHeader() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const city = useCurrentCity();
+  const [isAdmin, setIsAdmin] = useState(false);
+
+  useEffect(() => {
+    let cancelled = false;
+    if (!user) { setIsAdmin(false); return; }
+    supabase
+      .from("user_roles")
+      .select("role")
+      .eq("user_id", user.id)
+      .eq("role", "admin")
+      .maybeSingle()
+      .then(({ data }) => { if (!cancelled) setIsAdmin(!!data); });
+    return () => { cancelled = true; };
+  }, [user]);
 
   async function handleSignOut() {
     await queryClient.cancelQueries();
@@ -110,6 +125,14 @@ export function SiteHeader() {
                 <DropdownMenuItem asChild>
                   <Link to="/credits/history">Transaction history</Link>
                 </DropdownMenuItem>
+                {isAdmin ? (
+                  <>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem asChild>
+                      <Link to="/admin"><ShieldCheck className="h-4 w-4 mr-2" /> Admin panel</Link>
+                    </DropdownMenuItem>
+                  </>
+                ) : null}
                 <DropdownMenuSeparator />
                 <DropdownMenuItem onClick={handleSignOut}>
                   <LogOut className="h-4 w-4 mr-2" /> Sign out
