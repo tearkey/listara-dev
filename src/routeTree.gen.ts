@@ -38,6 +38,7 @@ import { Route as AuthenticatedAdminAuditRouteImport } from './routes/_authentic
 import { Route as AuthenticatedAdminAdsRouteImport } from './routes/_authenticated/admin.ads'
 import { Route as StateCityCategoryRouteImport } from './routes/$state.$city.$category'
 import { Route as ApiPublicWebhooksNowpaymentsRouteImport } from './routes/api/public/webhooks/nowpayments'
+import { Route as ApiAdminAnalyticsExportRouteImport } from './routes/api/admin/analytics.export'
 import { Route as AuthenticatedCreditsInvoiceIdRouteImport } from './routes/_authenticated/credits.invoice.$id'
 import { Route as AuthenticatedAdsIdEditRouteImport } from './routes/_authenticated/ads.$id.edit'
 import { Route as StateCityCategorySlugRouteImport } from './routes/$state.$city.$category.$slug'
@@ -190,6 +191,11 @@ const ApiPublicWebhooksNowpaymentsRoute =
     path: '/api/public/webhooks/nowpayments',
     getParentRoute: () => rootRouteImport,
   } as any)
+const ApiAdminAnalyticsExportRoute = ApiAdminAnalyticsExportRouteImport.update({
+  id: '/api/admin/analytics/export',
+  path: '/api/admin/analytics/export',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthenticatedCreditsInvoiceIdRoute =
   AuthenticatedCreditsInvoiceIdRouteImport.update({
     id: '/invoice/$id',
@@ -238,6 +244,7 @@ export interface FileRoutesByFullPath {
   '/$state/$city/$category/$slug': typeof StateCityCategorySlugRoute
   '/ads/$id/edit': typeof AuthenticatedAdsIdEditRoute
   '/credits/invoice/$id': typeof AuthenticatedCreditsInvoiceIdRoute
+  '/api/admin/analytics/export': typeof ApiAdminAnalyticsExportRoute
   '/api/public/webhooks/nowpayments': typeof ApiPublicWebhooksNowpaymentsRoute
 }
 export interface FileRoutesByTo {
@@ -269,6 +276,7 @@ export interface FileRoutesByTo {
   '/$state/$city/$category/$slug': typeof StateCityCategorySlugRoute
   '/ads/$id/edit': typeof AuthenticatedAdsIdEditRoute
   '/credits/invoice/$id': typeof AuthenticatedCreditsInvoiceIdRoute
+  '/api/admin/analytics/export': typeof ApiAdminAnalyticsExportRoute
   '/api/public/webhooks/nowpayments': typeof ApiPublicWebhooksNowpaymentsRoute
 }
 export interface FileRoutesById {
@@ -304,6 +312,7 @@ export interface FileRoutesById {
   '/$state/$city/$category/$slug': typeof StateCityCategorySlugRoute
   '/_authenticated/ads/$id/edit': typeof AuthenticatedAdsIdEditRoute
   '/_authenticated/credits/invoice/$id': typeof AuthenticatedCreditsInvoiceIdRoute
+  '/api/admin/analytics/export': typeof ApiAdminAnalyticsExportRoute
   '/api/public/webhooks/nowpayments': typeof ApiPublicWebhooksNowpaymentsRoute
 }
 export interface FileRouteTypes {
@@ -339,6 +348,7 @@ export interface FileRouteTypes {
     | '/$state/$city/$category/$slug'
     | '/ads/$id/edit'
     | '/credits/invoice/$id'
+    | '/api/admin/analytics/export'
     | '/api/public/webhooks/nowpayments'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -370,6 +380,7 @@ export interface FileRouteTypes {
     | '/$state/$city/$category/$slug'
     | '/ads/$id/edit'
     | '/credits/invoice/$id'
+    | '/api/admin/analytics/export'
     | '/api/public/webhooks/nowpayments'
   id:
     | '__root__'
@@ -404,6 +415,7 @@ export interface FileRouteTypes {
     | '/$state/$city/$category/$slug'
     | '/_authenticated/ads/$id/edit'
     | '/_authenticated/credits/invoice/$id'
+    | '/api/admin/analytics/export'
     | '/api/public/webhooks/nowpayments'
   fileRoutesById: FileRoutesById
 }
@@ -419,6 +431,7 @@ export interface RootRouteChildren {
   StateCityRoute: typeof StateCityRouteWithChildren
   ApiPublicRobotsDottxtRoute: typeof ApiPublicRobotsDottxtRoute
   ApiPublicSitemapDotxmlRoute: typeof ApiPublicSitemapDotxmlRoute
+  ApiAdminAnalyticsExportRoute: typeof ApiAdminAnalyticsExportRoute
   ApiPublicWebhooksNowpaymentsRoute: typeof ApiPublicWebhooksNowpaymentsRoute
 }
 
@@ -627,6 +640,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicWebhooksNowpaymentsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/admin/analytics/export': {
+      id: '/api/admin/analytics/export'
+      path: '/api/admin/analytics/export'
+      fullPath: '/api/admin/analytics/export'
+      preLoaderRoute: typeof ApiAdminAnalyticsExportRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/_authenticated/credits/invoice/$id': {
       id: '/_authenticated/credits/invoice/$id'
       path: '/invoice/$id'
@@ -759,6 +779,7 @@ const rootRouteChildren: RootRouteChildren = {
   StateCityRoute: StateCityRouteWithChildren,
   ApiPublicRobotsDottxtRoute: ApiPublicRobotsDottxtRoute,
   ApiPublicSitemapDotxmlRoute: ApiPublicSitemapDotxmlRoute,
+  ApiAdminAnalyticsExportRoute: ApiAdminAnalyticsExportRoute,
   ApiPublicWebhooksNowpaymentsRoute: ApiPublicWebhooksNowpaymentsRoute,
 }
 export const routeTree = rootRouteImport
