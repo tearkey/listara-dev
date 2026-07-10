@@ -4,7 +4,9 @@ import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { createClient } from "@supabase/supabase-js";
 import type { Database } from "@/integrations/supabase/types";
 
-export type SiteSettings = Record<string, Record<string, unknown>>;
+// TanStack Start server fn returns must be JSON-serializable — no `unknown`.
+type JsonValue = string | number | boolean | null | JsonValue[] | { [k: string]: JsonValue };
+export type SiteSettings = Record<string, Record<string, JsonValue>>;
 
 /** Public settings — safe for SSR / anon; only rows with is_public=true. */
 export const getPublicSettings = createServerFn({ method: "GET" }).handler(async () => {
@@ -25,13 +27,13 @@ export const getAllSettings = createServerFn({ method: "GET" })
     const { data, error } = await context.supabase.from("site_settings").select("key,value");
     if (error) throw new Error(error.message);
     const out: SiteSettings = {};
-    for (const row of data ?? []) out[row.key] = row.value as Record<string, unknown>;
+    for (const row of data ?? []) out[row.key] = row.value as Record<string, JsonValue>;
     return out;
   });
 
 const UpdateInput = z.object({
   key: z.string().min(1).max(64),
-  value: z.record(z.string(), z.unknown()),
+  value: z.record(z.string(), z.any()),
 });
 
 /** Admin: patch a single settings key (deep-merge value). */
@@ -73,14 +75,14 @@ export const exportSnapshot = createServerFn({ method: "POST" })
   .handler(async ({ context }) => {
     const { data, error } = await context.supabase.rpc("admin_export_snapshot");
     if (error) throw new Error(error.message);
-    return data as Record<string, unknown>;
+    return data as Record<string, JsonValue>;
   });
 
 /** Admin: import a snapshot document (upserts settings + layouts + templates only). */
 const ImportInput = z.object({
   snapshot: z.object({
-    site_settings: z.array(z.object({ key: z.string(), value: z.unknown(), section: z.string().optional(), is_public: z.boolean().optional() })).optional(),
-    page_layouts:  z.array(z.object({ slug: z.string(), name: z.string(), document: z.unknown(), css_override: z.string().nullable().optional(), is_active: z.boolean().optional() })).optional(),
+    site_settings: z.array(z.object({ key: z.string(), value: z.any(), section: z.string().optional(), is_public: z.boolean().optional() })).optional(),
+    page_layouts:  z.array(z.object({ slug: z.string(), name: z.string(), document: z.any(), css_override: z.string().nullable().optional(), is_active: z.boolean().optional() })).optional(),
     page_templates:z.array(z.object({ post_type: z.string(), scope_key: z.string().nullable().optional(), layout_slug: z.string(), is_default: z.boolean().optional() })).optional(),
   }),
 });
