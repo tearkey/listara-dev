@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useMemo, createElement } from "react";
 import { Link } from "@tanstack/react-router";
 import type {
   Column, LayoutDocument, Row, Section, Widget,
@@ -71,10 +71,12 @@ function WidgetView({ node, dataSlots }: { node: Widget; dataSlots: Record<strin
   const commonCls = extractClass(node);
 
   switch (node.type) {
-    case "heading": {
-      const Tag = node.props.level as keyof JSX.IntrinsicElements;
-      return <Tag className={`font-display font-bold ${commonCls}`} style={commonStyle}>{node.props.text}</Tag>;
-    }
+    case "heading":
+      return createElement(
+        node.props.level,
+        { className: `font-display font-bold ${commonCls}`, style: commonStyle },
+        node.props.text,
+      );
     case "text":
       return (
         <div
