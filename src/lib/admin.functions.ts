@@ -23,7 +23,7 @@ export const getAdminStats = createServerFn({ method: "GET" })
       supabaseAdmin.from("ads").select("*", { count: "exact", head: true }),
       supabaseAdmin.from("ads").select("*", { count: "exact", head: true }).eq("status", "pending"),
       supabaseAdmin.from("ads").select("*", { count: "exact", head: true }).eq("status", "live"),
-      supabaseAdmin.from("invoices").select("credit_cents").eq("status", "finished"),
+      supabaseAdmin.from("invoices").select("credit_cents").eq("status", "paid"),
       supabaseAdmin.from("user_credits").select("balance_cents"),
     ]);
     const topupTotal = (topups.data ?? []).reduce((s: number, r: any) => s + (r.credit_cents ?? 0), 0);
