@@ -60,6 +60,7 @@ export type Database = {
           allow_messages: boolean
           body: string
           bumped_at: string | null
+          canonical_url: string | null
           category_id: string
           city_id: string
           contact_email: string | null
@@ -67,12 +68,16 @@ export type Database = {
           created_at: string
           currency: string
           expires_at: string | null
+          focus_keywords: string[] | null
           id: string
+          meta_description: string | null
+          og_image: string | null
           posted_at: string | null
           price_cents: number | null
           rejection_reason: string | null
           report_count: number
           search_vector: unknown
+          seo_title: string | null
           short_id: string
           slug: string
           status: Database["public"]["Enums"]["ad_status"]
@@ -88,6 +93,7 @@ export type Database = {
           allow_messages?: boolean
           body: string
           bumped_at?: string | null
+          canonical_url?: string | null
           category_id: string
           city_id: string
           contact_email?: string | null
@@ -95,12 +101,16 @@ export type Database = {
           created_at?: string
           currency?: string
           expires_at?: string | null
+          focus_keywords?: string[] | null
           id?: string
+          meta_description?: string | null
+          og_image?: string | null
           posted_at?: string | null
           price_cents?: number | null
           rejection_reason?: string | null
           report_count?: number
           search_vector?: unknown
+          seo_title?: string | null
           short_id?: string
           slug: string
           status?: Database["public"]["Enums"]["ad_status"]
@@ -116,6 +126,7 @@ export type Database = {
           allow_messages?: boolean
           body?: string
           bumped_at?: string | null
+          canonical_url?: string | null
           category_id?: string
           city_id?: string
           contact_email?: string | null
@@ -123,12 +134,16 @@ export type Database = {
           created_at?: string
           currency?: string
           expires_at?: string | null
+          focus_keywords?: string[] | null
           id?: string
+          meta_description?: string | null
+          og_image?: string | null
           posted_at?: string | null
           price_cents?: number | null
           rejection_reason?: string | null
           report_count?: number
           search_vector?: unknown
+          seo_title?: string | null
           short_id?: string
           slug?: string
           status?: Database["public"]["Enums"]["ad_status"]
@@ -212,6 +227,63 @@ export type Database = {
           id?: string
           keyword?: string
           severity?: string
+        }
+        Relationships: []
+      }
+      blog_posts: {
+        Row: {
+          author_id: string
+          body_markdown: string
+          canonical_url: string | null
+          cover_image: string | null
+          created_at: string
+          excerpt: string | null
+          focus_keywords: string[] | null
+          id: string
+          meta_description: string | null
+          og_image: string | null
+          published_at: string | null
+          seo_title: string | null
+          slug: string
+          status: Database["public"]["Enums"]["post_status"]
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          author_id: string
+          body_markdown?: string
+          canonical_url?: string | null
+          cover_image?: string | null
+          created_at?: string
+          excerpt?: string | null
+          focus_keywords?: string[] | null
+          id?: string
+          meta_description?: string | null
+          og_image?: string | null
+          published_at?: string | null
+          seo_title?: string | null
+          slug: string
+          status?: Database["public"]["Enums"]["post_status"]
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          author_id?: string
+          body_markdown?: string
+          canonical_url?: string | null
+          cover_image?: string | null
+          created_at?: string
+          excerpt?: string | null
+          focus_keywords?: string[] | null
+          id?: string
+          meta_description?: string | null
+          og_image?: string | null
+          published_at?: string | null
+          seo_title?: string | null
+          slug?: string
+          status?: Database["public"]["Enums"]["post_status"]
+          title?: string
+          updated_at?: string
         }
         Relationships: []
       }
@@ -568,6 +640,86 @@ export type Database = {
           },
         ]
       }
+      page_layouts: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          css_override: string | null
+          description: string | null
+          document: Json
+          id: string
+          is_active: boolean
+          name: string
+          slug: string
+          updated_at: string
+          version: number
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          css_override?: string | null
+          description?: string | null
+          document: Json
+          id?: string
+          is_active?: boolean
+          name: string
+          slug: string
+          updated_at?: string
+          version?: number
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          css_override?: string | null
+          description?: string | null
+          document?: Json
+          id?: string
+          is_active?: boolean
+          name?: string
+          slug?: string
+          updated_at?: string
+          version?: number
+        }
+        Relationships: []
+      }
+      page_templates: {
+        Row: {
+          created_at: string
+          id: string
+          is_default: boolean
+          layout_id: string
+          post_type: string
+          scope_key: string | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          is_default?: boolean
+          layout_id: string
+          post_type: string
+          scope_key?: string | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          is_default?: boolean
+          layout_id?: string
+          post_type?: string
+          scope_key?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "page_templates_layout_id_fkey"
+            columns: ["layout_id"]
+            isOneToOne: false
+            referencedRelation: "page_layouts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       payments: {
         Row: {
           ad_id: string | null
@@ -736,6 +888,39 @@ export type Database = {
           },
         ]
       }
+      site_settings: {
+        Row: {
+          created_at: string
+          description: string | null
+          is_public: boolean
+          key: string
+          section: string
+          updated_at: string
+          updated_by: string | null
+          value: Json
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          is_public?: boolean
+          key: string
+          section: string
+          updated_at?: string
+          updated_by?: string | null
+          value?: Json
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          is_public?: boolean
+          key?: string
+          section?: string
+          updated_at?: string
+          updated_by?: string | null
+          value?: Json
+        }
+        Relationships: []
+      }
       states: {
         Row: {
           code: string
@@ -874,11 +1059,14 @@ export type Database = {
         Args: { _from: string; _to: string }
         Returns: Json
       }
+      admin_export_snapshot: { Args: never; Returns: Json }
+      admin_site_health: { Args: never; Returns: Json }
       consume_rate_limit: {
         Args: { _action: string; _max: number; _window_seconds: number }
         Returns: boolean
       }
       expire_stale_ads: { Args: never; Returns: number }
+      get_public_settings: { Args: never; Returns: Json }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
@@ -903,6 +1091,7 @@ export type Database = {
       ad_tier: "free" | "bumped" | "featured" | "sticky"
       app_role: "admin" | "moderator" | "user"
       payment_status: "pending" | "paid" | "failed" | "refunded"
+      post_status: "draft" | "published" | "archived"
       report_status: "open" | "reviewing" | "resolved" | "dismissed"
     }
     CompositeTypes: {
@@ -1035,6 +1224,7 @@ export const Constants = {
       ad_tier: ["free", "bumped", "featured", "sticky"],
       app_role: ["admin", "moderator", "user"],
       payment_status: ["pending", "paid", "failed", "refunded"],
+      post_status: ["draft", "published", "archived"],
       report_status: ["open", "reviewing", "resolved", "dismissed"],
     },
   },
