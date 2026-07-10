@@ -20,6 +20,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedPostRouteImport } from './routes/_authenticated/post'
 import { Route as AuthenticatedMyAdsRouteImport } from './routes/_authenticated/my-ads'
 import { Route as AuthenticatedCreditsRouteImport } from './routes/_authenticated/credits'
+import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
 import { Route as StateCityRouteImport } from './routes/$state.$city'
 import { Route as AuthenticatedPostIndexRouteImport } from './routes/_authenticated/post.index'
 import { Route as ApiPublicSitemapDotxmlRouteImport } from './routes/api/public/sitemap[.]xml'
@@ -89,6 +90,11 @@ const AuthenticatedCreditsRoute = AuthenticatedCreditsRouteImport.update({
   path: '/credits',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedAdminRoute = AuthenticatedAdminRouteImport.update({
+  id: '/admin',
+  path: '/admin',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const StateCityRoute = StateCityRouteImport.update({
   id: '/$state/$city',
   path: '/$state/$city',
@@ -132,9 +138,9 @@ const AuthenticatedCreditsHistoryRoute =
   } as any)
 const AuthenticatedAdminModerationDashboardRoute =
   AuthenticatedAdminModerationDashboardRouteImport.update({
-    id: '/admin/moderation-dashboard',
-    path: '/admin/moderation-dashboard',
-    getParentRoute: () => AuthenticatedRouteRoute,
+    id: '/moderation-dashboard',
+    path: '/moderation-dashboard',
+    getParentRoute: () => AuthenticatedAdminRoute,
   } as any)
 const StateCityCategoryRoute = StateCityCategoryRouteImport.update({
   id: '/$category',
@@ -173,6 +179,7 @@ export interface FileRoutesByFullPath {
   '/search': typeof SearchRoute
   '/terms': typeof TermsRoute
   '/$state/$city': typeof StateCityRouteWithChildren
+  '/admin': typeof AuthenticatedAdminRouteWithChildren
   '/credits': typeof AuthenticatedCreditsRouteWithChildren
   '/my-ads': typeof AuthenticatedMyAdsRoute
   '/post': typeof AuthenticatedPostRouteWithChildren
@@ -199,6 +206,7 @@ export interface FileRoutesByTo {
   '/search': typeof SearchRoute
   '/terms': typeof TermsRoute
   '/$state/$city': typeof StateCityRouteWithChildren
+  '/admin': typeof AuthenticatedAdminRouteWithChildren
   '/credits': typeof AuthenticatedCreditsRouteWithChildren
   '/my-ads': typeof AuthenticatedMyAdsRoute
   '/$state/$city/$category': typeof StateCityCategoryRouteWithChildren
@@ -226,6 +234,7 @@ export interface FileRoutesById {
   '/search': typeof SearchRoute
   '/terms': typeof TermsRoute
   '/$state/$city': typeof StateCityRouteWithChildren
+  '/_authenticated/admin': typeof AuthenticatedAdminRouteWithChildren
   '/_authenticated/credits': typeof AuthenticatedCreditsRouteWithChildren
   '/_authenticated/my-ads': typeof AuthenticatedMyAdsRoute
   '/_authenticated/post': typeof AuthenticatedPostRouteWithChildren
@@ -254,6 +263,7 @@ export interface FileRouteTypes {
     | '/search'
     | '/terms'
     | '/$state/$city'
+    | '/admin'
     | '/credits'
     | '/my-ads'
     | '/post'
@@ -280,6 +290,7 @@ export interface FileRouteTypes {
     | '/search'
     | '/terms'
     | '/$state/$city'
+    | '/admin'
     | '/credits'
     | '/my-ads'
     | '/$state/$city/$category'
@@ -306,6 +317,7 @@ export interface FileRouteTypes {
     | '/search'
     | '/terms'
     | '/$state/$city'
+    | '/_authenticated/admin'
     | '/_authenticated/credits'
     | '/_authenticated/my-ads'
     | '/_authenticated/post'
@@ -418,6 +430,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedCreditsRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/admin': {
+      id: '/_authenticated/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AuthenticatedAdminRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/$state/$city': {
       id: '/$state/$city'
       path: '/$state/$city'
@@ -476,10 +495,10 @@ declare module '@tanstack/react-router' {
     }
     '/_authenticated/admin/moderation-dashboard': {
       id: '/_authenticated/admin/moderation-dashboard'
-      path: '/admin/moderation-dashboard'
+      path: '/moderation-dashboard'
       fullPath: '/admin/moderation-dashboard'
       preLoaderRoute: typeof AuthenticatedAdminModerationDashboardRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+      parentRoute: typeof AuthenticatedAdminRoute
     }
     '/$state/$city/$category': {
       id: '/$state/$city/$category'
@@ -519,6 +538,18 @@ declare module '@tanstack/react-router' {
   }
 }
 
+interface AuthenticatedAdminRouteChildren {
+  AuthenticatedAdminModerationDashboardRoute: typeof AuthenticatedAdminModerationDashboardRoute
+}
+
+const AuthenticatedAdminRouteChildren: AuthenticatedAdminRouteChildren = {
+  AuthenticatedAdminModerationDashboardRoute:
+    AuthenticatedAdminModerationDashboardRoute,
+}
+
+const AuthenticatedAdminRouteWithChildren =
+  AuthenticatedAdminRoute._addFileChildren(AuthenticatedAdminRouteChildren)
+
 interface AuthenticatedCreditsRouteChildren {
   AuthenticatedCreditsHistoryRoute: typeof AuthenticatedCreditsHistoryRoute
   AuthenticatedCreditsInvoiceIdRoute: typeof AuthenticatedCreditsInvoiceIdRoute
@@ -548,20 +579,19 @@ const AuthenticatedPostRouteWithChildren =
   AuthenticatedPostRoute._addFileChildren(AuthenticatedPostRouteChildren)
 
 interface AuthenticatedRouteRouteChildren {
+  AuthenticatedAdminRoute: typeof AuthenticatedAdminRouteWithChildren
   AuthenticatedCreditsRoute: typeof AuthenticatedCreditsRouteWithChildren
   AuthenticatedMyAdsRoute: typeof AuthenticatedMyAdsRoute
   AuthenticatedPostRoute: typeof AuthenticatedPostRouteWithChildren
-  AuthenticatedAdminModerationDashboardRoute: typeof AuthenticatedAdminModerationDashboardRoute
   AuthenticatedPromoteIdRoute: typeof AuthenticatedPromoteIdRoute
   AuthenticatedAdsIdEditRoute: typeof AuthenticatedAdsIdEditRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
+  AuthenticatedAdminRoute: AuthenticatedAdminRouteWithChildren,
   AuthenticatedCreditsRoute: AuthenticatedCreditsRouteWithChildren,
   AuthenticatedMyAdsRoute: AuthenticatedMyAdsRoute,
   AuthenticatedPostRoute: AuthenticatedPostRouteWithChildren,
-  AuthenticatedAdminModerationDashboardRoute:
-    AuthenticatedAdminModerationDashboardRoute,
   AuthenticatedPromoteIdRoute: AuthenticatedPromoteIdRoute,
   AuthenticatedAdsIdEditRoute: AuthenticatedAdsIdEditRoute,
 }
