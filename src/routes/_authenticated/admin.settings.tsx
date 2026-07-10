@@ -181,11 +181,11 @@ function SystemTools() {
         </label>
       </div>
       {status && <p className="text-xs text-muted-foreground">{status}</p>}
-      {snap && (
+      {snap ? (
         <pre className="max-h-80 overflow-auto rounded-md border border-border bg-background p-3 text-xs">
           {JSON.stringify(snap, null, 2)}
         </pre>
-      )}
+      ) : null}
       <p className="text-xs text-muted-foreground">
         SQL-format dump/restore is intentionally not exposed; use the JSON snapshot above for config, and{" "}
         <span className="font-medium">Backend → Advanced → Export data</span> for full-table backups.

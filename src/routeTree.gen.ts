@@ -31,6 +31,7 @@ import { Route as AuthenticatedPostMultiRouteImport } from './routes/_authentica
 import { Route as AuthenticatedPostLocalRouteImport } from './routes/_authenticated/post.local'
 import { Route as AuthenticatedCreditsHistoryRouteImport } from './routes/_authenticated/credits.history'
 import { Route as AuthenticatedAdminUsersRouteImport } from './routes/_authenticated/admin.users'
+import { Route as AuthenticatedAdminSettingsRouteImport } from './routes/_authenticated/admin.settings'
 import { Route as AuthenticatedAdminPaymentsRouteImport } from './routes/_authenticated/admin.payments'
 import { Route as AuthenticatedAdminModerationDashboardRouteImport } from './routes/_authenticated/admin.moderation-dashboard'
 import { Route as AuthenticatedAdminFlagsRouteImport } from './routes/_authenticated/admin.flags'
@@ -154,6 +155,12 @@ const AuthenticatedAdminUsersRoute = AuthenticatedAdminUsersRouteImport.update({
   path: '/users',
   getParentRoute: () => AuthenticatedAdminRoute,
 } as any)
+const AuthenticatedAdminSettingsRoute =
+  AuthenticatedAdminSettingsRouteImport.update({
+    id: '/settings',
+    path: '/settings',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
 const AuthenticatedAdminPaymentsRoute =
   AuthenticatedAdminPaymentsRouteImport.update({
     id: '/payments',
@@ -240,6 +247,7 @@ export interface FileRoutesByFullPath {
   '/admin/flags': typeof AuthenticatedAdminFlagsRoute
   '/admin/moderation-dashboard': typeof AuthenticatedAdminModerationDashboardRoute
   '/admin/payments': typeof AuthenticatedAdminPaymentsRoute
+  '/admin/settings': typeof AuthenticatedAdminSettingsRoute
   '/admin/users': typeof AuthenticatedAdminUsersRoute
   '/credits/history': typeof AuthenticatedCreditsHistoryRoute
   '/post/local': typeof AuthenticatedPostLocalRoute
@@ -273,6 +281,7 @@ export interface FileRoutesByTo {
   '/admin/flags': typeof AuthenticatedAdminFlagsRoute
   '/admin/moderation-dashboard': typeof AuthenticatedAdminModerationDashboardRoute
   '/admin/payments': typeof AuthenticatedAdminPaymentsRoute
+  '/admin/settings': typeof AuthenticatedAdminSettingsRoute
   '/admin/users': typeof AuthenticatedAdminUsersRoute
   '/credits/history': typeof AuthenticatedCreditsHistoryRoute
   '/post/local': typeof AuthenticatedPostLocalRoute
@@ -310,6 +319,7 @@ export interface FileRoutesById {
   '/_authenticated/admin/flags': typeof AuthenticatedAdminFlagsRoute
   '/_authenticated/admin/moderation-dashboard': typeof AuthenticatedAdminModerationDashboardRoute
   '/_authenticated/admin/payments': typeof AuthenticatedAdminPaymentsRoute
+  '/_authenticated/admin/settings': typeof AuthenticatedAdminSettingsRoute
   '/_authenticated/admin/users': typeof AuthenticatedAdminUsersRoute
   '/_authenticated/credits/history': typeof AuthenticatedCreditsHistoryRoute
   '/_authenticated/post/local': typeof AuthenticatedPostLocalRoute
@@ -347,6 +357,7 @@ export interface FileRouteTypes {
     | '/admin/flags'
     | '/admin/moderation-dashboard'
     | '/admin/payments'
+    | '/admin/settings'
     | '/admin/users'
     | '/credits/history'
     | '/post/local'
@@ -380,6 +391,7 @@ export interface FileRouteTypes {
     | '/admin/flags'
     | '/admin/moderation-dashboard'
     | '/admin/payments'
+    | '/admin/settings'
     | '/admin/users'
     | '/credits/history'
     | '/post/local'
@@ -416,6 +428,7 @@ export interface FileRouteTypes {
     | '/_authenticated/admin/flags'
     | '/_authenticated/admin/moderation-dashboard'
     | '/_authenticated/admin/payments'
+    | '/_authenticated/admin/settings'
     | '/_authenticated/admin/users'
     | '/_authenticated/credits/history'
     | '/_authenticated/post/local'
@@ -604,6 +617,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminUsersRouteImport
       parentRoute: typeof AuthenticatedAdminRoute
     }
+    '/_authenticated/admin/settings': {
+      id: '/_authenticated/admin/settings'
+      path: '/settings'
+      fullPath: '/admin/settings'
+      preLoaderRoute: typeof AuthenticatedAdminSettingsRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
     '/_authenticated/admin/payments': {
       id: '/_authenticated/admin/payments'
       path: '/payments'
@@ -698,6 +718,7 @@ interface AuthenticatedAdminRouteChildren {
   AuthenticatedAdminFlagsRoute: typeof AuthenticatedAdminFlagsRoute
   AuthenticatedAdminModerationDashboardRoute: typeof AuthenticatedAdminModerationDashboardRoute
   AuthenticatedAdminPaymentsRoute: typeof AuthenticatedAdminPaymentsRoute
+  AuthenticatedAdminSettingsRoute: typeof AuthenticatedAdminSettingsRoute
   AuthenticatedAdminUsersRoute: typeof AuthenticatedAdminUsersRoute
   AuthenticatedAdminIndexRoute: typeof AuthenticatedAdminIndexRoute
 }
@@ -710,6 +731,7 @@ const AuthenticatedAdminRouteChildren: AuthenticatedAdminRouteChildren = {
   AuthenticatedAdminModerationDashboardRoute:
     AuthenticatedAdminModerationDashboardRoute,
   AuthenticatedAdminPaymentsRoute: AuthenticatedAdminPaymentsRoute,
+  AuthenticatedAdminSettingsRoute: AuthenticatedAdminSettingsRoute,
   AuthenticatedAdminUsersRoute: AuthenticatedAdminUsersRoute,
   AuthenticatedAdminIndexRoute: AuthenticatedAdminIndexRoute,
 }
