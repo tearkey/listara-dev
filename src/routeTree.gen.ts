@@ -29,6 +29,7 @@ import { Route as AuthenticatedPromoteIdRouteImport } from './routes/_authentica
 import { Route as AuthenticatedPostMultiRouteImport } from './routes/_authenticated/post.multi'
 import { Route as AuthenticatedPostLocalRouteImport } from './routes/_authenticated/post.local'
 import { Route as AuthenticatedCreditsHistoryRouteImport } from './routes/_authenticated/credits.history'
+import { Route as AuthenticatedAdminModerationDashboardRouteImport } from './routes/_authenticated/admin.moderation-dashboard'
 import { Route as StateCityCategoryRouteImport } from './routes/$state.$city.$category'
 import { Route as ApiPublicWebhooksNowpaymentsRouteImport } from './routes/api/public/webhooks/nowpayments'
 import { Route as AuthenticatedCreditsInvoiceIdRouteImport } from './routes/_authenticated/credits.invoice.$id'
@@ -135,6 +136,12 @@ const AuthenticatedCreditsHistoryRoute =
     path: '/history',
     getParentRoute: () => AuthenticatedCreditsRoute,
   } as any)
+const AuthenticatedAdminModerationDashboardRoute =
+  AuthenticatedAdminModerationDashboardRouteImport.update({
+    id: '/moderation-dashboard',
+    path: '/moderation-dashboard',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
 const StateCityCategoryRoute = StateCityCategoryRouteImport.update({
   id: '/$category',
   path: '/$category',
@@ -172,11 +179,12 @@ export interface FileRoutesByFullPath {
   '/search': typeof SearchRoute
   '/terms': typeof TermsRoute
   '/$state/$city': typeof StateCityRouteWithChildren
-  '/admin': typeof AuthenticatedAdminRoute
+  '/admin': typeof AuthenticatedAdminRouteWithChildren
   '/credits': typeof AuthenticatedCreditsRouteWithChildren
   '/my-ads': typeof AuthenticatedMyAdsRoute
   '/post': typeof AuthenticatedPostRouteWithChildren
   '/$state/$city/$category': typeof StateCityCategoryRouteWithChildren
+  '/admin/moderation-dashboard': typeof AuthenticatedAdminModerationDashboardRoute
   '/credits/history': typeof AuthenticatedCreditsHistoryRoute
   '/post/local': typeof AuthenticatedPostLocalRoute
   '/post/multi': typeof AuthenticatedPostMultiRoute
@@ -198,10 +206,11 @@ export interface FileRoutesByTo {
   '/search': typeof SearchRoute
   '/terms': typeof TermsRoute
   '/$state/$city': typeof StateCityRouteWithChildren
-  '/admin': typeof AuthenticatedAdminRoute
+  '/admin': typeof AuthenticatedAdminRouteWithChildren
   '/credits': typeof AuthenticatedCreditsRouteWithChildren
   '/my-ads': typeof AuthenticatedMyAdsRoute
   '/$state/$city/$category': typeof StateCityCategoryRouteWithChildren
+  '/admin/moderation-dashboard': typeof AuthenticatedAdminModerationDashboardRoute
   '/credits/history': typeof AuthenticatedCreditsHistoryRoute
   '/post/local': typeof AuthenticatedPostLocalRoute
   '/post/multi': typeof AuthenticatedPostMultiRoute
@@ -225,11 +234,12 @@ export interface FileRoutesById {
   '/search': typeof SearchRoute
   '/terms': typeof TermsRoute
   '/$state/$city': typeof StateCityRouteWithChildren
-  '/_authenticated/admin': typeof AuthenticatedAdminRoute
+  '/_authenticated/admin': typeof AuthenticatedAdminRouteWithChildren
   '/_authenticated/credits': typeof AuthenticatedCreditsRouteWithChildren
   '/_authenticated/my-ads': typeof AuthenticatedMyAdsRoute
   '/_authenticated/post': typeof AuthenticatedPostRouteWithChildren
   '/$state/$city/$category': typeof StateCityCategoryRouteWithChildren
+  '/_authenticated/admin/moderation-dashboard': typeof AuthenticatedAdminModerationDashboardRoute
   '/_authenticated/credits/history': typeof AuthenticatedCreditsHistoryRoute
   '/_authenticated/post/local': typeof AuthenticatedPostLocalRoute
   '/_authenticated/post/multi': typeof AuthenticatedPostMultiRoute
@@ -258,6 +268,7 @@ export interface FileRouteTypes {
     | '/my-ads'
     | '/post'
     | '/$state/$city/$category'
+    | '/admin/moderation-dashboard'
     | '/credits/history'
     | '/post/local'
     | '/post/multi'
@@ -283,6 +294,7 @@ export interface FileRouteTypes {
     | '/credits'
     | '/my-ads'
     | '/$state/$city/$category'
+    | '/admin/moderation-dashboard'
     | '/credits/history'
     | '/post/local'
     | '/post/multi'
@@ -310,6 +322,7 @@ export interface FileRouteTypes {
     | '/_authenticated/my-ads'
     | '/_authenticated/post'
     | '/$state/$city/$category'
+    | '/_authenticated/admin/moderation-dashboard'
     | '/_authenticated/credits/history'
     | '/_authenticated/post/local'
     | '/_authenticated/post/multi'
@@ -480,6 +493,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedCreditsHistoryRouteImport
       parentRoute: typeof AuthenticatedCreditsRoute
     }
+    '/_authenticated/admin/moderation-dashboard': {
+      id: '/_authenticated/admin/moderation-dashboard'
+      path: '/moderation-dashboard'
+      fullPath: '/admin/moderation-dashboard'
+      preLoaderRoute: typeof AuthenticatedAdminModerationDashboardRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
     '/$state/$city/$category': {
       id: '/$state/$city/$category'
       path: '/$category'
@@ -518,6 +538,18 @@ declare module '@tanstack/react-router' {
   }
 }
 
+interface AuthenticatedAdminRouteChildren {
+  AuthenticatedAdminModerationDashboardRoute: typeof AuthenticatedAdminModerationDashboardRoute
+}
+
+const AuthenticatedAdminRouteChildren: AuthenticatedAdminRouteChildren = {
+  AuthenticatedAdminModerationDashboardRoute:
+    AuthenticatedAdminModerationDashboardRoute,
+}
+
+const AuthenticatedAdminRouteWithChildren =
+  AuthenticatedAdminRoute._addFileChildren(AuthenticatedAdminRouteChildren)
+
 interface AuthenticatedCreditsRouteChildren {
   AuthenticatedCreditsHistoryRoute: typeof AuthenticatedCreditsHistoryRoute
   AuthenticatedCreditsInvoiceIdRoute: typeof AuthenticatedCreditsInvoiceIdRoute
@@ -547,7 +579,7 @@ const AuthenticatedPostRouteWithChildren =
   AuthenticatedPostRoute._addFileChildren(AuthenticatedPostRouteChildren)
 
 interface AuthenticatedRouteRouteChildren {
-  AuthenticatedAdminRoute: typeof AuthenticatedAdminRoute
+  AuthenticatedAdminRoute: typeof AuthenticatedAdminRouteWithChildren
   AuthenticatedCreditsRoute: typeof AuthenticatedCreditsRouteWithChildren
   AuthenticatedMyAdsRoute: typeof AuthenticatedMyAdsRoute
   AuthenticatedPostRoute: typeof AuthenticatedPostRouteWithChildren
@@ -556,7 +588,7 @@ interface AuthenticatedRouteRouteChildren {
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
-  AuthenticatedAdminRoute: AuthenticatedAdminRoute,
+  AuthenticatedAdminRoute: AuthenticatedAdminRouteWithChildren,
   AuthenticatedCreditsRoute: AuthenticatedCreditsRouteWithChildren,
   AuthenticatedMyAdsRoute: AuthenticatedMyAdsRoute,
   AuthenticatedPostRoute: AuthenticatedPostRouteWithChildren,
