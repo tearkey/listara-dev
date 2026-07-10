@@ -23,6 +23,7 @@ import { Route as AuthenticatedCreditsRouteImport } from './routes/_authenticate
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
 import { Route as StateCityRouteImport } from './routes/$state.$city'
 import { Route as AuthenticatedPostIndexRouteImport } from './routes/_authenticated/post.index'
+import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin.index'
 import { Route as ApiPublicSitemapDotxmlRouteImport } from './routes/api/public/sitemap[.]xml'
 import { Route as ApiPublicRobotsDottxtRouteImport } from './routes/api/public/robots[.]txt'
 import { Route as AuthenticatedPromoteIdRouteImport } from './routes/_authenticated/promote.$id'
@@ -104,6 +105,11 @@ const AuthenticatedPostIndexRoute = AuthenticatedPostIndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => AuthenticatedPostRoute,
+} as any)
+const AuthenticatedAdminIndexRoute = AuthenticatedAdminIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AuthenticatedAdminRoute,
 } as any)
 const ApiPublicSitemapDotxmlRoute = ApiPublicSitemapDotxmlRouteImport.update({
   id: '/api/public/sitemap.xml',
@@ -191,6 +197,7 @@ export interface FileRoutesByFullPath {
   '/promote/$id': typeof AuthenticatedPromoteIdRoute
   '/api/public/robots.txt': typeof ApiPublicRobotsDottxtRoute
   '/api/public/sitemap.xml': typeof ApiPublicSitemapDotxmlRoute
+  '/admin/': typeof AuthenticatedAdminIndexRoute
   '/post/': typeof AuthenticatedPostIndexRoute
   '/$state/$city/$category/$slug': typeof StateCityCategorySlugRoute
   '/ads/$id/edit': typeof AuthenticatedAdsIdEditRoute
@@ -206,7 +213,6 @@ export interface FileRoutesByTo {
   '/search': typeof SearchRoute
   '/terms': typeof TermsRoute
   '/$state/$city': typeof StateCityRouteWithChildren
-  '/admin': typeof AuthenticatedAdminRouteWithChildren
   '/credits': typeof AuthenticatedCreditsRouteWithChildren
   '/my-ads': typeof AuthenticatedMyAdsRoute
   '/$state/$city/$category': typeof StateCityCategoryRouteWithChildren
@@ -217,6 +223,7 @@ export interface FileRoutesByTo {
   '/promote/$id': typeof AuthenticatedPromoteIdRoute
   '/api/public/robots.txt': typeof ApiPublicRobotsDottxtRoute
   '/api/public/sitemap.xml': typeof ApiPublicSitemapDotxmlRoute
+  '/admin': typeof AuthenticatedAdminIndexRoute
   '/post': typeof AuthenticatedPostIndexRoute
   '/$state/$city/$category/$slug': typeof StateCityCategorySlugRoute
   '/ads/$id/edit': typeof AuthenticatedAdsIdEditRoute
@@ -246,6 +253,7 @@ export interface FileRoutesById {
   '/_authenticated/promote/$id': typeof AuthenticatedPromoteIdRoute
   '/api/public/robots.txt': typeof ApiPublicRobotsDottxtRoute
   '/api/public/sitemap.xml': typeof ApiPublicSitemapDotxmlRoute
+  '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
   '/_authenticated/post/': typeof AuthenticatedPostIndexRoute
   '/$state/$city/$category/$slug': typeof StateCityCategorySlugRoute
   '/_authenticated/ads/$id/edit': typeof AuthenticatedAdsIdEditRoute
@@ -275,6 +283,7 @@ export interface FileRouteTypes {
     | '/promote/$id'
     | '/api/public/robots.txt'
     | '/api/public/sitemap.xml'
+    | '/admin/'
     | '/post/'
     | '/$state/$city/$category/$slug'
     | '/ads/$id/edit'
@@ -290,7 +299,6 @@ export interface FileRouteTypes {
     | '/search'
     | '/terms'
     | '/$state/$city'
-    | '/admin'
     | '/credits'
     | '/my-ads'
     | '/$state/$city/$category'
@@ -301,6 +309,7 @@ export interface FileRouteTypes {
     | '/promote/$id'
     | '/api/public/robots.txt'
     | '/api/public/sitemap.xml'
+    | '/admin'
     | '/post'
     | '/$state/$city/$category/$slug'
     | '/ads/$id/edit'
@@ -329,6 +338,7 @@ export interface FileRouteTypes {
     | '/_authenticated/promote/$id'
     | '/api/public/robots.txt'
     | '/api/public/sitemap.xml'
+    | '/_authenticated/admin/'
     | '/_authenticated/post/'
     | '/$state/$city/$category/$slug'
     | '/_authenticated/ads/$id/edit'
@@ -451,6 +461,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedPostIndexRouteImport
       parentRoute: typeof AuthenticatedPostRoute
     }
+    '/_authenticated/admin/': {
+      id: '/_authenticated/admin/'
+      path: '/'
+      fullPath: '/admin/'
+      preLoaderRoute: typeof AuthenticatedAdminIndexRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
     '/api/public/sitemap.xml': {
       id: '/api/public/sitemap.xml'
       path: '/api/public/sitemap.xml'
@@ -540,11 +557,13 @@ declare module '@tanstack/react-router' {
 
 interface AuthenticatedAdminRouteChildren {
   AuthenticatedAdminModerationDashboardRoute: typeof AuthenticatedAdminModerationDashboardRoute
+  AuthenticatedAdminIndexRoute: typeof AuthenticatedAdminIndexRoute
 }
 
 const AuthenticatedAdminRouteChildren: AuthenticatedAdminRouteChildren = {
   AuthenticatedAdminModerationDashboardRoute:
     AuthenticatedAdminModerationDashboardRoute,
+  AuthenticatedAdminIndexRoute: AuthenticatedAdminIndexRoute,
 }
 
 const AuthenticatedAdminRouteWithChildren =
