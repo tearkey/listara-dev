@@ -31,6 +31,7 @@ import { Route as AuthenticatedPostMultiRouteImport } from './routes/_authentica
 import { Route as AuthenticatedPostLocalRouteImport } from './routes/_authenticated/post.local'
 import { Route as AuthenticatedCreditsHistoryRouteImport } from './routes/_authenticated/credits.history'
 import { Route as AuthenticatedAdminUsersRouteImport } from './routes/_authenticated/admin.users'
+import { Route as AuthenticatedAdminPaymentsRouteImport } from './routes/_authenticated/admin.payments'
 import { Route as AuthenticatedAdminModerationDashboardRouteImport } from './routes/_authenticated/admin.moderation-dashboard'
 import { Route as AuthenticatedAdminAdsRouteImport } from './routes/_authenticated/admin.ads'
 import { Route as StateCityCategoryRouteImport } from './routes/$state.$city.$category'
@@ -149,6 +150,12 @@ const AuthenticatedAdminUsersRoute = AuthenticatedAdminUsersRouteImport.update({
   path: '/users',
   getParentRoute: () => AuthenticatedAdminRoute,
 } as any)
+const AuthenticatedAdminPaymentsRoute =
+  AuthenticatedAdminPaymentsRouteImport.update({
+    id: '/payments',
+    path: '/payments',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
 const AuthenticatedAdminModerationDashboardRoute =
   AuthenticatedAdminModerationDashboardRouteImport.update({
     id: '/moderation-dashboard',
@@ -204,6 +211,7 @@ export interface FileRoutesByFullPath {
   '/$state/$city/$category': typeof StateCityCategoryRouteWithChildren
   '/admin/ads': typeof AuthenticatedAdminAdsRoute
   '/admin/moderation-dashboard': typeof AuthenticatedAdminModerationDashboardRoute
+  '/admin/payments': typeof AuthenticatedAdminPaymentsRoute
   '/admin/users': typeof AuthenticatedAdminUsersRoute
   '/credits/history': typeof AuthenticatedCreditsHistoryRoute
   '/post/local': typeof AuthenticatedPostLocalRoute
@@ -232,6 +240,7 @@ export interface FileRoutesByTo {
   '/$state/$city/$category': typeof StateCityCategoryRouteWithChildren
   '/admin/ads': typeof AuthenticatedAdminAdsRoute
   '/admin/moderation-dashboard': typeof AuthenticatedAdminModerationDashboardRoute
+  '/admin/payments': typeof AuthenticatedAdminPaymentsRoute
   '/admin/users': typeof AuthenticatedAdminUsersRoute
   '/credits/history': typeof AuthenticatedCreditsHistoryRoute
   '/post/local': typeof AuthenticatedPostLocalRoute
@@ -264,6 +273,7 @@ export interface FileRoutesById {
   '/$state/$city/$category': typeof StateCityCategoryRouteWithChildren
   '/_authenticated/admin/ads': typeof AuthenticatedAdminAdsRoute
   '/_authenticated/admin/moderation-dashboard': typeof AuthenticatedAdminModerationDashboardRoute
+  '/_authenticated/admin/payments': typeof AuthenticatedAdminPaymentsRoute
   '/_authenticated/admin/users': typeof AuthenticatedAdminUsersRoute
   '/_authenticated/credits/history': typeof AuthenticatedCreditsHistoryRoute
   '/_authenticated/post/local': typeof AuthenticatedPostLocalRoute
@@ -296,6 +306,7 @@ export interface FileRouteTypes {
     | '/$state/$city/$category'
     | '/admin/ads'
     | '/admin/moderation-dashboard'
+    | '/admin/payments'
     | '/admin/users'
     | '/credits/history'
     | '/post/local'
@@ -324,6 +335,7 @@ export interface FileRouteTypes {
     | '/$state/$city/$category'
     | '/admin/ads'
     | '/admin/moderation-dashboard'
+    | '/admin/payments'
     | '/admin/users'
     | '/credits/history'
     | '/post/local'
@@ -355,6 +367,7 @@ export interface FileRouteTypes {
     | '/$state/$city/$category'
     | '/_authenticated/admin/ads'
     | '/_authenticated/admin/moderation-dashboard'
+    | '/_authenticated/admin/payments'
     | '/_authenticated/admin/users'
     | '/_authenticated/credits/history'
     | '/_authenticated/post/local'
@@ -541,6 +554,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminUsersRouteImport
       parentRoute: typeof AuthenticatedAdminRoute
     }
+    '/_authenticated/admin/payments': {
+      id: '/_authenticated/admin/payments'
+      path: '/payments'
+      fullPath: '/admin/payments'
+      preLoaderRoute: typeof AuthenticatedAdminPaymentsRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
     '/_authenticated/admin/moderation-dashboard': {
       id: '/_authenticated/admin/moderation-dashboard'
       path: '/moderation-dashboard'
@@ -596,6 +616,7 @@ declare module '@tanstack/react-router' {
 interface AuthenticatedAdminRouteChildren {
   AuthenticatedAdminAdsRoute: typeof AuthenticatedAdminAdsRoute
   AuthenticatedAdminModerationDashboardRoute: typeof AuthenticatedAdminModerationDashboardRoute
+  AuthenticatedAdminPaymentsRoute: typeof AuthenticatedAdminPaymentsRoute
   AuthenticatedAdminUsersRoute: typeof AuthenticatedAdminUsersRoute
   AuthenticatedAdminIndexRoute: typeof AuthenticatedAdminIndexRoute
 }
@@ -604,6 +625,7 @@ const AuthenticatedAdminRouteChildren: AuthenticatedAdminRouteChildren = {
   AuthenticatedAdminAdsRoute: AuthenticatedAdminAdsRoute,
   AuthenticatedAdminModerationDashboardRoute:
     AuthenticatedAdminModerationDashboardRoute,
+  AuthenticatedAdminPaymentsRoute: AuthenticatedAdminPaymentsRoute,
   AuthenticatedAdminUsersRoute: AuthenticatedAdminUsersRoute,
   AuthenticatedAdminIndexRoute: AuthenticatedAdminIndexRoute,
 }
