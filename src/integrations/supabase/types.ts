@@ -340,6 +340,30 @@ export type Database = {
           },
         ]
       }
+      feature_flags: {
+        Row: {
+          description: string | null
+          enabled: boolean
+          key: string
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          description?: string | null
+          enabled?: boolean
+          key: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          description?: string | null
+          enabled?: boolean
+          key?: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: []
+      }
       invoices: {
         Row: {
           created_at: string
@@ -831,6 +855,10 @@ export type Database = {
       add_credits_from_invoice: {
         Args: { _amount_cents: number; _invoice_id: string; _user_id: string }
         Returns: boolean
+      }
+      admin_adjust_credits: {
+        Args: { _delta_cents: number; _reason: string; _target_user: string }
+        Returns: number
       }
       consume_rate_limit: {
         Args: { _action: string; _max: number; _window_seconds: number }
