@@ -13,6 +13,7 @@ export const Route = createFileRoute("/privacy")({
   component: () => (
     <div className="min-h-screen bg-background">
       <SiteHeader />
+      <main>
       <article className="prose mx-auto max-w-3xl px-4 py-12 text-sm leading-relaxed text-foreground/90">
         <h1 className="font-display text-3xl font-bold">Privacy Policy</h1>
         <p className="mt-2 text-muted-foreground">Last updated: {new Date().toLocaleDateString()}</p>
@@ -99,6 +100,7 @@ export const Route = createFileRoute("/privacy")({
           before you rely on it for a live commercial service, especially if you serve users in the EU, UK, or California.
         </p>
       </article>
+      </main>
       <SiteFooter />
     </div>
   ),
