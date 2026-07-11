@@ -14,9 +14,12 @@ import { Route as SearchRouteImport } from './routes/search'
 import { Route as SafetyRouteImport } from './routes/safety'
 import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as NotAvailableRouteImport } from './routes/not-available'
+import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as DashboardIndexRouteImport } from './routes/dashboard.index'
+import { Route as DashboardMfaRouteImport } from './routes/dashboard.mfa'
 import { Route as AuthenticatedPostRouteImport } from './routes/_authenticated/post'
 import { Route as AuthenticatedMyAdsRouteImport } from './routes/_authenticated/my-ads'
 import { Route as AuthenticatedCreditsRouteImport } from './routes/_authenticated/credits'
@@ -26,6 +29,7 @@ import { Route as AuthenticatedPostIndexRouteImport } from './routes/_authentica
 import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin.index'
 import { Route as ApiPublicSitemapDotxmlRouteImport } from './routes/api/public/sitemap[.]xml'
 import { Route as ApiPublicRobotsDottxtRouteImport } from './routes/api/public/robots[.]txt'
+import { Route as ApiPublicBootstrapSuperadminRouteImport } from './routes/api/public/bootstrap-superadmin'
 import { Route as AuthenticatedPromoteIdRouteImport } from './routes/_authenticated/promote.$id'
 import { Route as AuthenticatedPostMultiRouteImport } from './routes/_authenticated/post.multi'
 import { Route as AuthenticatedPostLocalRouteImport } from './routes/_authenticated/post.local'
@@ -71,6 +75,11 @@ const NotAvailableRoute = NotAvailableRouteImport.update({
   path: '/not-available',
   getParentRoute: () => rootRouteImport,
 } as any)
+const DashboardRoute = DashboardRouteImport.update({
+  id: '/dashboard',
+  path: '/dashboard',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthRoute = AuthRouteImport.update({
   id: '/auth',
   path: '/auth',
@@ -84,6 +93,16 @@ const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
+} as any)
+const DashboardIndexRoute = DashboardIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => DashboardRoute,
+} as any)
+const DashboardMfaRoute = DashboardMfaRouteImport.update({
+  id: '/mfa',
+  path: '/mfa',
+  getParentRoute: () => DashboardRoute,
 } as any)
 const AuthenticatedPostRoute = AuthenticatedPostRouteImport.update({
   id: '/post',
@@ -130,6 +149,12 @@ const ApiPublicRobotsDottxtRoute = ApiPublicRobotsDottxtRouteImport.update({
   path: '/api/public/robots.txt',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiPublicBootstrapSuperadminRoute =
+  ApiPublicBootstrapSuperadminRouteImport.update({
+    id: '/api/public/bootstrap-superadmin',
+    path: '/api/public/bootstrap-superadmin',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const AuthenticatedPromoteIdRoute = AuthenticatedPromoteIdRouteImport.update({
   id: '/promote/$id',
   path: '/promote/$id',
@@ -237,6 +262,7 @@ const StateCityCategorySlugRoute = StateCityCategorySlugRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
+  '/dashboard': typeof DashboardRouteWithChildren
   '/not-available': typeof NotAvailableRoute
   '/privacy': typeof PrivacyRoute
   '/safety': typeof SafetyRoute
@@ -247,6 +273,8 @@ export interface FileRoutesByFullPath {
   '/credits': typeof AuthenticatedCreditsRouteWithChildren
   '/my-ads': typeof AuthenticatedMyAdsRoute
   '/post': typeof AuthenticatedPostRouteWithChildren
+  '/dashboard/mfa': typeof DashboardMfaRoute
+  '/dashboard/': typeof DashboardIndexRoute
   '/$state/$city/$category': typeof StateCityCategoryRouteWithChildren
   '/admin/ads': typeof AuthenticatedAdminAdsRoute
   '/admin/analytics': typeof AuthenticatedAdminAnalyticsRoute
@@ -261,6 +289,7 @@ export interface FileRoutesByFullPath {
   '/post/local': typeof AuthenticatedPostLocalRoute
   '/post/multi': typeof AuthenticatedPostMultiRoute
   '/promote/$id': typeof AuthenticatedPromoteIdRoute
+  '/api/public/bootstrap-superadmin': typeof ApiPublicBootstrapSuperadminRoute
   '/api/public/robots.txt': typeof ApiPublicRobotsDottxtRoute
   '/api/public/sitemap.xml': typeof ApiPublicSitemapDotxmlRoute
   '/admin/': typeof AuthenticatedAdminIndexRoute
@@ -282,6 +311,8 @@ export interface FileRoutesByTo {
   '/$state/$city': typeof StateCityRouteWithChildren
   '/credits': typeof AuthenticatedCreditsRouteWithChildren
   '/my-ads': typeof AuthenticatedMyAdsRoute
+  '/dashboard/mfa': typeof DashboardMfaRoute
+  '/dashboard': typeof DashboardIndexRoute
   '/$state/$city/$category': typeof StateCityCategoryRouteWithChildren
   '/admin/ads': typeof AuthenticatedAdminAdsRoute
   '/admin/analytics': typeof AuthenticatedAdminAnalyticsRoute
@@ -296,6 +327,7 @@ export interface FileRoutesByTo {
   '/post/local': typeof AuthenticatedPostLocalRoute
   '/post/multi': typeof AuthenticatedPostMultiRoute
   '/promote/$id': typeof AuthenticatedPromoteIdRoute
+  '/api/public/bootstrap-superadmin': typeof ApiPublicBootstrapSuperadminRoute
   '/api/public/robots.txt': typeof ApiPublicRobotsDottxtRoute
   '/api/public/sitemap.xml': typeof ApiPublicSitemapDotxmlRoute
   '/admin': typeof AuthenticatedAdminIndexRoute
@@ -311,6 +343,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/auth': typeof AuthRoute
+  '/dashboard': typeof DashboardRouteWithChildren
   '/not-available': typeof NotAvailableRoute
   '/privacy': typeof PrivacyRoute
   '/safety': typeof SafetyRoute
@@ -321,6 +354,8 @@ export interface FileRoutesById {
   '/_authenticated/credits': typeof AuthenticatedCreditsRouteWithChildren
   '/_authenticated/my-ads': typeof AuthenticatedMyAdsRoute
   '/_authenticated/post': typeof AuthenticatedPostRouteWithChildren
+  '/dashboard/mfa': typeof DashboardMfaRoute
+  '/dashboard/': typeof DashboardIndexRoute
   '/$state/$city/$category': typeof StateCityCategoryRouteWithChildren
   '/_authenticated/admin/ads': typeof AuthenticatedAdminAdsRoute
   '/_authenticated/admin/analytics': typeof AuthenticatedAdminAnalyticsRoute
@@ -335,6 +370,7 @@ export interface FileRoutesById {
   '/_authenticated/post/local': typeof AuthenticatedPostLocalRoute
   '/_authenticated/post/multi': typeof AuthenticatedPostMultiRoute
   '/_authenticated/promote/$id': typeof AuthenticatedPromoteIdRoute
+  '/api/public/bootstrap-superadmin': typeof ApiPublicBootstrapSuperadminRoute
   '/api/public/robots.txt': typeof ApiPublicRobotsDottxtRoute
   '/api/public/sitemap.xml': typeof ApiPublicSitemapDotxmlRoute
   '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
@@ -350,6 +386,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/auth'
+    | '/dashboard'
     | '/not-available'
     | '/privacy'
     | '/safety'
@@ -360,6 +397,8 @@ export interface FileRouteTypes {
     | '/credits'
     | '/my-ads'
     | '/post'
+    | '/dashboard/mfa'
+    | '/dashboard/'
     | '/$state/$city/$category'
     | '/admin/ads'
     | '/admin/analytics'
@@ -374,6 +413,7 @@ export interface FileRouteTypes {
     | '/post/local'
     | '/post/multi'
     | '/promote/$id'
+    | '/api/public/bootstrap-superadmin'
     | '/api/public/robots.txt'
     | '/api/public/sitemap.xml'
     | '/admin/'
@@ -395,6 +435,8 @@ export interface FileRouteTypes {
     | '/$state/$city'
     | '/credits'
     | '/my-ads'
+    | '/dashboard/mfa'
+    | '/dashboard'
     | '/$state/$city/$category'
     | '/admin/ads'
     | '/admin/analytics'
@@ -409,6 +451,7 @@ export interface FileRouteTypes {
     | '/post/local'
     | '/post/multi'
     | '/promote/$id'
+    | '/api/public/bootstrap-superadmin'
     | '/api/public/robots.txt'
     | '/api/public/sitemap.xml'
     | '/admin'
@@ -423,6 +466,7 @@ export interface FileRouteTypes {
     | '/'
     | '/_authenticated'
     | '/auth'
+    | '/dashboard'
     | '/not-available'
     | '/privacy'
     | '/safety'
@@ -433,6 +477,8 @@ export interface FileRouteTypes {
     | '/_authenticated/credits'
     | '/_authenticated/my-ads'
     | '/_authenticated/post'
+    | '/dashboard/mfa'
+    | '/dashboard/'
     | '/$state/$city/$category'
     | '/_authenticated/admin/ads'
     | '/_authenticated/admin/analytics'
@@ -447,6 +493,7 @@ export interface FileRouteTypes {
     | '/_authenticated/post/local'
     | '/_authenticated/post/multi'
     | '/_authenticated/promote/$id'
+    | '/api/public/bootstrap-superadmin'
     | '/api/public/robots.txt'
     | '/api/public/sitemap.xml'
     | '/_authenticated/admin/'
@@ -462,12 +509,14 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   AuthRoute: typeof AuthRoute
+  DashboardRoute: typeof DashboardRouteWithChildren
   NotAvailableRoute: typeof NotAvailableRoute
   PrivacyRoute: typeof PrivacyRoute
   SafetyRoute: typeof SafetyRoute
   SearchRoute: typeof SearchRoute
   TermsRoute: typeof TermsRoute
   StateCityRoute: typeof StateCityRouteWithChildren
+  ApiPublicBootstrapSuperadminRoute: typeof ApiPublicBootstrapSuperadminRoute
   ApiPublicRobotsDottxtRoute: typeof ApiPublicRobotsDottxtRoute
   ApiPublicSitemapDotxmlRoute: typeof ApiPublicSitemapDotxmlRoute
   ApiAdminAnalyticsExportRoute: typeof ApiAdminAnalyticsExportRoute
@@ -511,6 +560,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof NotAvailableRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/dashboard': {
+      id: '/dashboard'
+      path: '/dashboard'
+      fullPath: '/dashboard'
+      preLoaderRoute: typeof DashboardRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/auth': {
       id: '/auth'
       path: '/auth'
@@ -531,6 +587,20 @@ declare module '@tanstack/react-router' {
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/dashboard/': {
+      id: '/dashboard/'
+      path: '/'
+      fullPath: '/dashboard/'
+      preLoaderRoute: typeof DashboardIndexRouteImport
+      parentRoute: typeof DashboardRoute
+    }
+    '/dashboard/mfa': {
+      id: '/dashboard/mfa'
+      path: '/mfa'
+      fullPath: '/dashboard/mfa'
+      preLoaderRoute: typeof DashboardMfaRouteImport
+      parentRoute: typeof DashboardRoute
     }
     '/_authenticated/post': {
       id: '/_authenticated/post'
@@ -593,6 +663,13 @@ declare module '@tanstack/react-router' {
       path: '/api/public/robots.txt'
       fullPath: '/api/public/robots.txt'
       preLoaderRoute: typeof ApiPublicRobotsDottxtRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/bootstrap-superadmin': {
+      id: '/api/public/bootstrap-superadmin'
+      path: '/api/public/bootstrap-superadmin'
+      fullPath: '/api/public/bootstrap-superadmin'
+      preLoaderRoute: typeof ApiPublicBootstrapSuperadminRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_authenticated/promote/$id': {
@@ -810,6 +887,20 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
 const AuthenticatedRouteRouteWithChildren =
   AuthenticatedRouteRoute._addFileChildren(AuthenticatedRouteRouteChildren)
 
+interface DashboardRouteChildren {
+  DashboardMfaRoute: typeof DashboardMfaRoute
+  DashboardIndexRoute: typeof DashboardIndexRoute
+}
+
+const DashboardRouteChildren: DashboardRouteChildren = {
+  DashboardMfaRoute: DashboardMfaRoute,
+  DashboardIndexRoute: DashboardIndexRoute,
+}
+
+const DashboardRouteWithChildren = DashboardRoute._addFileChildren(
+  DashboardRouteChildren,
+)
+
 interface StateCityCategoryRouteChildren {
   StateCityCategorySlugRoute: typeof StateCityCategorySlugRoute
 }
@@ -837,12 +928,14 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   AuthRoute: AuthRoute,
+  DashboardRoute: DashboardRouteWithChildren,
   NotAvailableRoute: NotAvailableRoute,
   PrivacyRoute: PrivacyRoute,
   SafetyRoute: SafetyRoute,
   SearchRoute: SearchRoute,
   TermsRoute: TermsRoute,
   StateCityRoute: StateCityRouteWithChildren,
+  ApiPublicBootstrapSuperadminRoute: ApiPublicBootstrapSuperadminRoute,
   ApiPublicRobotsDottxtRoute: ApiPublicRobotsDottxtRoute,
   ApiPublicSitemapDotxmlRoute: ApiPublicSitemapDotxmlRoute,
   ApiAdminAnalyticsExportRoute: ApiAdminAnalyticsExportRoute,
@@ -851,13 +944,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
