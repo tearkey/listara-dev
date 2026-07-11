@@ -82,6 +82,7 @@ export function SiteHeader() {
           <input
             type="search"
             placeholder="Search listings…"
+            aria-label="Search listings"
             className="w-full bg-transparent text-sm outline-none placeholder:text-muted-foreground"
             onKeyDown={(e) => {
               if (e.key === "Enter") {

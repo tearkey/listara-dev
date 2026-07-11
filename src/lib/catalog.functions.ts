@@ -39,6 +39,20 @@ export const listAllCitiesGrouped = createServerFn({ method: "GET" }).handler(as
   return Object.values(groups).sort((a, b) => a.name.localeCompare(b.name));
 });
 
+export const listCitiesByStateSlug = createServerFn({ method: "GET" })
+  .inputValidator((d) => z.object({ stateSlug: z.string().min(1) }).parse(d))
+  .handler(async ({ data }) => {
+    const sb = getPublicSupabase();
+    const { data: rows, error } = await sb
+      .from("cities")
+      .select("id,name,slug,population,states!inner(code,name,slug)")
+      .eq("states.slug", data.stateSlug)
+      .order("population", { ascending: false, nullsFirst: false })
+      .order("name");
+    if (error) throw new Error(error.message);
+    return rows ?? [];
+  });
+
 export const listCategories = createServerFn({ method: "GET" }).handler(async () => {
   const sb = getPublicSupabase();
   const { data, error } = await sb
