@@ -34,7 +34,7 @@ function CitiesPage() {
   return (
     <div className="min-h-screen bg-background">
       <SiteHeader />
-      <section className="mx-auto max-w-6xl px-4 py-10">
+      <main className="mx-auto max-w-6xl px-4 py-10">
         <header className="mb-8 max-w-2xl">
           <h1 className="font-display text-3xl font-bold md:text-4xl">All cities</h1>
           <p className="mt-2 text-sm text-muted-foreground">
@@ -70,7 +70,7 @@ function CitiesPage() {
             ))}
           </div>
         )}
-      </section>
+      </main>
       <SiteFooter />
     </div>
   );

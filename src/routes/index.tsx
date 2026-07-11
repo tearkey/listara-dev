@@ -151,7 +151,7 @@ function HomePage() {
             </form>
             <div className="mt-4 flex flex-wrap items-center justify-center gap-2 text-sm">
               <span className="text-muted-foreground">Or post your own —</span>
-              <Link to="/post" className="font-semibold text-brand hover:underline inline-flex items-center gap-1">
+              <Link to="/post" className="font-semibold text-brand-strong hover:underline inline-flex items-center gap-1">
                 Free to post <ArrowRight className="h-3 w-3" />
               </Link>
             </div>
@@ -166,7 +166,7 @@ function HomePage() {
             <h2 className="font-display text-2xl font-bold md:text-3xl">{sectionHeading}</h2>
             <p className="mt-1 text-sm text-muted-foreground">{sectionSubhead}</p>
           </div>
-          <Link to="/cities" className="text-sm font-medium text-brand hover:underline inline-flex items-center gap-1">
+          <Link to="/cities" className="text-sm font-medium text-brand-strong hover:underline inline-flex items-center gap-1">
             All cities <ArrowRight className="h-3.5 w-3.5" />
           </Link>
         </div>
@@ -212,7 +212,7 @@ function HomePage() {
                 </div>
                 <div className="mt-3 font-display text-lg font-semibold">{cat.name}</div>
                 <p className="mt-1 line-clamp-2 text-sm text-muted-foreground">{cat.description}</p>
-                <div className="mt-3 text-xs font-medium text-brand">
+                <div className="mt-3 text-xs font-medium text-brand-strong">
                   {cat.subcategories?.length ?? 0} subcategories
                 </div>
               </div>

@@ -69,7 +69,7 @@ function AuthPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-secondary via-background to-accent/30 flex items-center justify-center px-4 py-12">
+    <main className="min-h-screen bg-gradient-to-br from-secondary via-background to-accent/30 flex items-center justify-center px-4 py-12">
       <div className="w-full max-w-md">
         <Link to="/" className="flex items-center justify-center gap-2 mb-8">
           <span className="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-brand text-brand-foreground font-display font-bold text-xl shadow-sm">L</span>
@@ -106,13 +106,13 @@ function AuthPage() {
 
           <p className="mt-4 text-center text-sm text-muted-foreground">
             {mode === "signin" ? (
-              <>New to {BRAND.name}?{" "}<button onClick={() => setMode("signup")} className="text-brand font-medium hover:underline">Create an account</button></>
+              <>New to {BRAND.name}?{" "}<button onClick={() => setMode("signup")} className="text-brand-strong font-medium hover:underline">Create an account</button></>
             ) : (
-              <>Already have an account?{" "}<button onClick={() => setMode("signin")} className="text-brand font-medium hover:underline">Sign in</button></>
+              <>Already have an account?{" "}<button onClick={() => setMode("signin")} className="text-brand-strong font-medium hover:underline">Sign in</button></>
             )}
           </p>
         </div>
       </div>
-    </div>
+    </main>
   );
 }

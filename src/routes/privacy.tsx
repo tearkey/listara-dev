@@ -13,6 +13,7 @@ export const Route = createFileRoute("/privacy")({
   component: () => (
     <div className="min-h-screen bg-background">
       <SiteHeader />
+      <main>
       <article className="prose mx-auto max-w-3xl px-4 py-12 text-sm leading-relaxed text-foreground/90">
         <h1 className="font-display text-3xl font-bold">Privacy Policy</h1>
         <p className="mt-2 text-muted-foreground">Last updated: {new Date().toLocaleDateString()}</p>
@@ -36,7 +37,7 @@ export const Route = createFileRoute("/privacy")({
         <h2 className="mt-6 font-display text-xl font-semibold">2. How we use your information</h2>
         <ul className="list-disc pl-6">
           <li>Operate the Service: publish your listings, deliver your messages, process paid promotions.</li>
-          <li>Enforce our <Link to="/terms" className="text-brand font-medium">Terms</Link>: detect fraud, spam, prohibited content, and repeat abusers.</li>
+          <li>Enforce our <Link to="/terms" className="text-brand-strong font-medium">Terms</Link>: detect fraud, spam, prohibited content, and repeat abusers.</li>
           <li>Communicate with you: transactional emails (account, payment receipts, moderation actions). We don't send marketing without your opt-in.</li>
           <li>Improve the Service: aggregate, non-identifying metrics on traffic and usage.</li>
           <li>Comply with law: respond to valid legal requests and cooperate with law enforcement where required.</li>
@@ -99,6 +100,7 @@ export const Route = createFileRoute("/privacy")({
           before you rely on it for a live commercial service, especially if you serve users in the EU, UK, or California.
         </p>
       </article>
+      </main>
       <SiteFooter />
     </div>
   ),

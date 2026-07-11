@@ -13,6 +13,7 @@ export const Route = createFileRoute("/terms")({
   component: () => (
     <div className="min-h-screen bg-background">
       <SiteHeader />
+      <main>
       <article className="prose mx-auto max-w-3xl px-4 py-12 text-sm leading-relaxed text-foreground/90">
         <h1 className="font-display text-3xl font-bold">Terms of Service</h1>
         <p className="mt-2 text-muted-foreground">Last updated: {new Date().toLocaleDateString()}</p>
@@ -50,7 +51,7 @@ export const Route = createFileRoute("/terms")({
         <h2 className="mt-6 font-display text-xl font-semibold">4. Marketplace disclaimer</h2>
         <p>{BRAND.name} is a venue. We do not own, inspect, endorse, guarantee, or take part in any transaction between
         users. All meetings, inspections, negotiations, and payments happen between the parties directly. You use the
-        Service and interact with other users at your own risk. See our <Link to="/safety" className="text-brand font-medium">Safety tips</Link>.</p>
+        Service and interact with other users at your own risk. See our <Link to="/safety" className="text-brand-strong font-medium">Safety tips</Link>.</p>
 
         <h2 className="mt-6 font-display text-xl font-semibold">5. Paid promotions</h2>
         <p>You may pay to bump, feature, or sticky a listing. Fees are quoted at checkout and payable in the currencies
@@ -114,6 +115,7 @@ export const Route = createFileRoute("/terms")({
           you rely on them for a live commercial service.
         </p>
       </article>
+      </main>
       <SiteFooter />
     </div>
   ),

@@ -168,7 +168,10 @@ export const getMyAd = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .inputValidator((d) => z.object({ id: z.string().uuid() }).parse(d))
   .handler(async ({ data, context }) => {
-    const { data: ad, error } = await context.supabase
+    // contact_email / contact_phone are SELECT-revoked from anon+authenticated
+    // roles at the DB level; use the admin client after enforcing owner scope.
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { data: ad, error } = await supabaseAdmin
       .from("ads")
       .select("id,title,body,city_id,category_id,subcategory_id,price_cents,contact_email,contact_phone,allow_messages,status,tier,rejection_reason,cities(name,states(code))")
       .eq("id", data.id)

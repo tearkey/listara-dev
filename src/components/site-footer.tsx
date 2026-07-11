@@ -13,7 +13,7 @@ export function SiteFooter() {
           <p className="mt-3 max-w-sm text-sm text-muted-foreground">{BRAND.tagline}</p>
         </div>
         <div>
-          <h4 className="font-display text-sm font-semibold">Browse</h4>
+          <h2 className="font-display text-sm font-semibold">Browse</h2>
           <ul className="mt-3 space-y-2 text-sm text-muted-foreground">
             <li><Link to="/" className="hover:text-foreground">All cities</Link></li>
             <li><Link to="/post" className="hover:text-foreground">Post an ad</Link></li>
@@ -21,7 +21,7 @@ export function SiteFooter() {
           </ul>
         </div>
         <div>
-          <h4 className="font-display text-sm font-semibold">Trust & Safety</h4>
+          <h2 className="font-display text-sm font-semibold">Trust & Safety</h2>
           <ul className="mt-3 space-y-2 text-sm text-muted-foreground">
             <li><Link to="/safety" className="hover:text-foreground">Safety tips</Link></li>
             <li><Link to="/terms" className="hover:text-foreground">Terms</Link></li>

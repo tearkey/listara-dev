@@ -137,9 +137,12 @@ export const getAdByShortId = createServerFn({ method: "GET" })
 export const getAdContact = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((d) => z.object({ adId: z.string().uuid() }).parse(d))
-  .handler(async ({ data, context }) => {
-    const { supabase } = context;
-    const { data: ad, error } = await supabase
+  .handler(async ({ data }) => {
+    // Contact columns are SELECT-revoked from the anon+authenticated roles at
+    // the DB level, so this reveal path goes through the admin client after
+    // the auth middleware has verified the caller is signed in.
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { data: ad, error } = await supabaseAdmin
       .from("ads")
       .select("id,status,contact_email,contact_phone")
       .eq("id", data.adId)

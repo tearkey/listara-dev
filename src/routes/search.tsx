@@ -42,20 +42,20 @@ function SearchPage() {
   return (
     <div className="min-h-screen bg-background">
       <SiteHeader />
-      <div className="mx-auto max-w-5xl px-4 py-8">
+      <main id="main" className="mx-auto max-w-5xl px-4 py-8">
         <h1 className="font-display text-2xl font-bold">
-          {q ? <>Results for <span className="text-brand">"{q}"</span></> : "Search Listara"}
+          {q ? <>Results for <span className="text-brand-strong">"{q}"</span></> : "Search Listara"}
         </h1>
         <p className="mt-1 text-sm text-muted-foreground">{q ? `${results.length} matching listing${results.length === 1 ? "" : "s"}` : "Try the search box above."}</p>
         {results.length === 0 && q && (
           <div className="mt-6 rounded-2xl border border-dashed border-border p-12 text-center text-muted-foreground">
-            Nothing matches "{q}". Try a broader term or <Link to="/post" className="text-brand font-semibold">post one yourself</Link>.
+            Nothing matches "{q}". Try a broader term or <Link to="/post" className="text-brand-strong font-semibold">post one yourself</Link>.
           </div>
         )}
         <div className="mt-6 grid gap-3 md:grid-cols-2">
           {results.map((ad: any) => <AdCard key={ad.id} ad={ad} />)}
         </div>
-      </div>
+      </main>
       <SiteFooter />
     </div>
   );
