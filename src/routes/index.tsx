@@ -116,7 +116,7 @@ function HomePage() {
   return (
     <div className="min-h-screen bg-background">
       <SiteHeader />
-
+      <main id="main">
       {/* Hero */}
       <section className="relative overflow-hidden border-b border-border bg-gradient-to-br from-secondary via-background to-accent/30">
         <div className="absolute inset-0 -z-10 opacity-50 [mask-image:radial-gradient(60%_60%_at_50%_30%,black,transparent)]">
@@ -144,6 +144,7 @@ function HomePage() {
                 value={q}
                 onChange={(e) => setQ(e.target.value)}
                 placeholder="Search for anything in your city…"
+                aria-label="Search listings"
                 className="border-0 bg-transparent shadow-none focus-visible:ring-0"
               />
               <Button type="submit" className="rounded-full bg-brand text-brand-foreground hover:bg-brand/90">Search</Button>
