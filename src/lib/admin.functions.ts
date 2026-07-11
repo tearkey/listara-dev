@@ -34,36 +34,39 @@ export const getAdminStats = createServerFn({ method: "GET" })
   .handler(async ({ context }) => {
     await assertAdminWithMfa(context);
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    // Fail-fast schema validation: the admin views embed profiles into ads,
-    // invoices, audit_log, and payments. If any of those FKs disappear, refuse
-    // to render the admin panel instead of surfacing a cryptic PostgREST error.
-    const REQUIRED_FKS = [
-      "ads_user_id_profiles_fkey",
-      "invoices_user_id_profiles_fkey",
-      "audit_log_actor_id_profiles_fkey",
-      "payments_user_id_profiles_fkey",
-    ] as const;
-    const { data: fkRows, error: fkErr } = await supabaseAdmin
-      .from("pg_constraint" as any)
-      .select("conname")
-      .in("conname", REQUIRED_FKS as unknown as string[]);
-    if (!fkErr) {
-      const present = new Set((fkRows ?? []).map((r: any) => r.conname));
-      const missing = REQUIRED_FKS.filter((n) => !present.has(n));
-      if (missing.length) {
-        // Ask PostgREST to reload its schema cache in case a recent migration
-        // added these FKs but the cache is stale; then re-check.
-        await supabaseAdmin.rpc("pgrst_reload" as any).catch(() => {});
-        const { data: retry } = await supabaseAdmin
-          .from("pg_constraint" as any)
-          .select("conname")
-          .in("conname", missing as unknown as string[]);
-        const stillMissing = missing.filter((n) => !(retry ?? []).some((r: any) => r.conname === n));
-        if (stillMissing.length) {
-          throw new Error(
-            `Admin schema check failed: missing foreign key(s) ${stillMissing.join(", ")}. Run pending migrations.`,
-          );
-        }
+    // Fail-fast schema validation: admin views embed profiles into ads,
+    // invoices, audit_log, and payments. Probe each embed with a HEAD query;
+    // on a stale PostgREST schema cache (PGRST200) ask for a reload and retry.
+    const PROBES: Array<{ table: string; embed: string }> = [
+      { table: "ads", embed: "id, profiles(display_name)" },
+      { table: "invoices", embed: "id, profiles:user_id(display_name)" },
+      { table: "audit_log", embed: "id, profiles:actor_id(display_name)" },
+      { table: "payments", embed: "id, profiles:user_id(display_name)" },
+    ];
+    async function probe() {
+      const results = await Promise.all(
+        PROBES.map((p) =>
+          supabaseAdmin.from(p.table as any).select(p.embed, { head: true, count: "exact" }).limit(1),
+        ),
+      );
+      return results
+        .map((r, i) => ({ table: PROBES[i].table, error: r.error }))
+        .filter((r) => r.error);
+    }
+    let broken = await probe();
+    if (broken.length) {
+      try {
+        await (supabaseAdmin as any).rpc("pgrst_reload_schema");
+      } catch {
+        /* function is optional; retry regardless */
+      }
+      broken = await probe();
+      if (broken.length) {
+        throw new Error(
+          `Admin schema check failed: could not join ${broken
+            .map((b) => `${b.table}→profiles`)
+            .join(", ")}. ${broken[0].error?.message ?? ""}`.trim(),
+        );
       }
     }
     const [users, ads, pending, live, topups, credits] = await Promise.all([
