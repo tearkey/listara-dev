@@ -18,6 +18,7 @@ import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as DashboardIndexRouteImport } from './routes/dashboard.index'
 import { Route as AuthenticatedPostRouteImport } from './routes/_authenticated/post'
 import { Route as AuthenticatedMyAdsRouteImport } from './routes/_authenticated/my-ads'
 import { Route as AuthenticatedCreditsRouteImport } from './routes/_authenticated/credits'
@@ -91,6 +92,11 @@ const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
+} as any)
+const DashboardIndexRoute = DashboardIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => DashboardRoute,
 } as any)
 const AuthenticatedPostRoute = AuthenticatedPostRouteImport.update({
   id: '/post',
@@ -250,7 +256,7 @@ const StateCityCategorySlugRoute = StateCityCategorySlugRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
-  '/dashboard': typeof DashboardRoute
+  '/dashboard': typeof DashboardRouteWithChildren
   '/not-available': typeof NotAvailableRoute
   '/privacy': typeof PrivacyRoute
   '/safety': typeof SafetyRoute
@@ -261,6 +267,7 @@ export interface FileRoutesByFullPath {
   '/credits': typeof AuthenticatedCreditsRouteWithChildren
   '/my-ads': typeof AuthenticatedMyAdsRoute
   '/post': typeof AuthenticatedPostRouteWithChildren
+  '/dashboard/': typeof DashboardIndexRoute
   '/$state/$city/$category': typeof StateCityCategoryRouteWithChildren
   '/admin/ads': typeof AuthenticatedAdminAdsRoute
   '/admin/analytics': typeof AuthenticatedAdminAnalyticsRoute
@@ -289,7 +296,6 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
-  '/dashboard': typeof DashboardRoute
   '/not-available': typeof NotAvailableRoute
   '/privacy': typeof PrivacyRoute
   '/safety': typeof SafetyRoute
@@ -298,6 +304,7 @@ export interface FileRoutesByTo {
   '/$state/$city': typeof StateCityRouteWithChildren
   '/credits': typeof AuthenticatedCreditsRouteWithChildren
   '/my-ads': typeof AuthenticatedMyAdsRoute
+  '/dashboard': typeof DashboardIndexRoute
   '/$state/$city/$category': typeof StateCityCategoryRouteWithChildren
   '/admin/ads': typeof AuthenticatedAdminAdsRoute
   '/admin/analytics': typeof AuthenticatedAdminAnalyticsRoute
@@ -328,7 +335,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/auth': typeof AuthRoute
-  '/dashboard': typeof DashboardRoute
+  '/dashboard': typeof DashboardRouteWithChildren
   '/not-available': typeof NotAvailableRoute
   '/privacy': typeof PrivacyRoute
   '/safety': typeof SafetyRoute
@@ -339,6 +346,7 @@ export interface FileRoutesById {
   '/_authenticated/credits': typeof AuthenticatedCreditsRouteWithChildren
   '/_authenticated/my-ads': typeof AuthenticatedMyAdsRoute
   '/_authenticated/post': typeof AuthenticatedPostRouteWithChildren
+  '/dashboard/': typeof DashboardIndexRoute
   '/$state/$city/$category': typeof StateCityCategoryRouteWithChildren
   '/_authenticated/admin/ads': typeof AuthenticatedAdminAdsRoute
   '/_authenticated/admin/analytics': typeof AuthenticatedAdminAnalyticsRoute
@@ -380,6 +388,7 @@ export interface FileRouteTypes {
     | '/credits'
     | '/my-ads'
     | '/post'
+    | '/dashboard/'
     | '/$state/$city/$category'
     | '/admin/ads'
     | '/admin/analytics'
@@ -408,7 +417,6 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/auth'
-    | '/dashboard'
     | '/not-available'
     | '/privacy'
     | '/safety'
@@ -417,6 +425,7 @@ export interface FileRouteTypes {
     | '/$state/$city'
     | '/credits'
     | '/my-ads'
+    | '/dashboard'
     | '/$state/$city/$category'
     | '/admin/ads'
     | '/admin/analytics'
@@ -457,6 +466,7 @@ export interface FileRouteTypes {
     | '/_authenticated/credits'
     | '/_authenticated/my-ads'
     | '/_authenticated/post'
+    | '/dashboard/'
     | '/$state/$city/$category'
     | '/_authenticated/admin/ads'
     | '/_authenticated/admin/analytics'
@@ -487,7 +497,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   AuthRoute: typeof AuthRoute
-  DashboardRoute: typeof DashboardRoute
+  DashboardRoute: typeof DashboardRouteWithChildren
   NotAvailableRoute: typeof NotAvailableRoute
   PrivacyRoute: typeof PrivacyRoute
   SafetyRoute: typeof SafetyRoute
@@ -565,6 +575,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/dashboard/': {
+      id: '/dashboard/'
+      path: '/'
+      fullPath: '/dashboard/'
+      preLoaderRoute: typeof DashboardIndexRouteImport
+      parentRoute: typeof DashboardRoute
     }
     '/_authenticated/post': {
       id: '/_authenticated/post'
@@ -851,6 +868,18 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
 const AuthenticatedRouteRouteWithChildren =
   AuthenticatedRouteRoute._addFileChildren(AuthenticatedRouteRouteChildren)
 
+interface DashboardRouteChildren {
+  DashboardIndexRoute: typeof DashboardIndexRoute
+}
+
+const DashboardRouteChildren: DashboardRouteChildren = {
+  DashboardIndexRoute: DashboardIndexRoute,
+}
+
+const DashboardRouteWithChildren = DashboardRoute._addFileChildren(
+  DashboardRouteChildren,
+)
+
 interface StateCityCategoryRouteChildren {
   StateCityCategorySlugRoute: typeof StateCityCategorySlugRoute
 }
@@ -878,7 +907,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   AuthRoute: AuthRoute,
-  DashboardRoute: DashboardRoute,
+  DashboardRoute: DashboardRouteWithChildren,
   NotAvailableRoute: NotAvailableRoute,
   PrivacyRoute: PrivacyRoute,
   SafetyRoute: SafetyRoute,
