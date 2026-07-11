@@ -57,7 +57,7 @@ function DashboardSignIn() {
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center px-4 py-12">
+    <main className="flex min-h-screen items-center justify-center px-4 py-12">
       <div className="w-full max-w-md">
         <Link to="/" className="flex items-center justify-center gap-2 mb-8">
           <span className="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-brand text-brand-foreground font-display font-bold text-xl shadow-sm">
@@ -66,7 +66,7 @@ function DashboardSignIn() {
           <span className="font-display text-2xl font-bold">{BRAND.name}</span>
         </Link>
         <div className="rounded-2xl border border-border bg-card p-8 shadow-sm">
-          <div className="flex items-center gap-2 text-brand">
+          <div className="flex items-center gap-2 text-brand-foreground bg-brand rounded-md px-2 py-1 w-fit">
             <ShieldCheck className="h-5 w-5" />
             <span className="text-xs font-medium uppercase tracking-wider">Restricted area</span>
           </div>
@@ -116,6 +116,6 @@ function DashboardSignIn() {
           </p>
         </div>
       </div>
-    </div>
+    </main>
   );
 }
