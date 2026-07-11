@@ -92,6 +92,15 @@ export const createCreditTopupInvoice = createServerFn({ method: "POST" })
     const apiKey = process.env.NOWPAYMENTS_API_KEY;
     if (!apiKey) throw new Error("Payment provider is not configured");
 
+    // Abuse guard: cap top-up invoice creation per user (5 / 10 minutes).
+    const { data: allowed, error: rlErr } = await context.supabase.rpc("consume_rate_limit", {
+      _action: "credit_topup",
+      _max: 5,
+      _window_seconds: 600,
+    });
+    if (rlErr) throw new Error(rlErr.message);
+    if (!allowed) throw new Error("Too many top-up attempts. Please wait a few minutes and try again.");
+
     const orderId = `credits_${context.userId}_${Date.now()}`;
     const origin =
       process.env.PUBLIC_SITE_URL ??

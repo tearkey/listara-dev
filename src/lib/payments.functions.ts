@@ -17,6 +17,15 @@ export const createStickyInvoice = createServerFn({ method: "POST" })
     const apiKey = process.env.NOWPAYMENTS_API_KEY;
     if (!apiKey) throw new Error("Payment provider is not configured");
 
+    // Abuse guard: cap sticky invoice creation per user (10 / 10 minutes).
+    const { data: allowed, error: rlErr } = await context.supabase.rpc("consume_rate_limit", {
+      _action: "sticky_invoice",
+      _max: 10,
+      _window_seconds: 600,
+    });
+    if (rlErr) throw new Error(rlErr.message);
+    if (!allowed) throw new Error("Too many upgrade attempts. Please wait a few minutes and try again.");
+
     // Confirm caller owns the listing
     const { data: listing, error: listingErr } = await context.supabase
       .from("listings")
