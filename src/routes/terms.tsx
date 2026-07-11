@@ -51,7 +51,7 @@ export const Route = createFileRoute("/terms")({
         <h2 className="mt-6 font-display text-xl font-semibold">4. Marketplace disclaimer</h2>
         <p>{BRAND.name} is a venue. We do not own, inspect, endorse, guarantee, or take part in any transaction between
         users. All meetings, inspections, negotiations, and payments happen between the parties directly. You use the
-        Service and interact with other users at your own risk. See our <Link to="/safety" className="text-brand font-medium">Safety tips</Link>.</p>
+        Service and interact with other users at your own risk. See our <Link to="/safety" className="text-brand-strong font-medium">Safety tips</Link>.</p>
 
         <h2 className="mt-6 font-display text-xl font-semibold">5. Paid promotions</h2>
         <p>You may pay to bump, feature, or sticky a listing. Fees are quoted at checkout and payable in the currencies

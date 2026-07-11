@@ -37,7 +37,7 @@ export const Route = createFileRoute("/privacy")({
         <h2 className="mt-6 font-display text-xl font-semibold">2. How we use your information</h2>
         <ul className="list-disc pl-6">
           <li>Operate the Service: publish your listings, deliver your messages, process paid promotions.</li>
-          <li>Enforce our <Link to="/terms" className="text-brand font-medium">Terms</Link>: detect fraud, spam, prohibited content, and repeat abusers.</li>
+          <li>Enforce our <Link to="/terms" className="text-brand-strong font-medium">Terms</Link>: detect fraud, spam, prohibited content, and repeat abusers.</li>
           <li>Communicate with you: transactional emails (account, payment receipts, moderation actions). We don't send marketing without your opt-in.</li>
           <li>Improve the Service: aggregate, non-identifying metrics on traffic and usage.</li>
           <li>Comply with law: respond to valid legal requests and cooperate with law enforcement where required.</li>
