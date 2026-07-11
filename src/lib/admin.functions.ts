@@ -34,6 +34,38 @@ export const getAdminStats = createServerFn({ method: "GET" })
   .handler(async ({ context }) => {
     await assertAdminWithMfa(context);
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    // Fail-fast schema validation: the admin views embed profiles into ads,
+    // invoices, audit_log, and payments. If any of those FKs disappear, refuse
+    // to render the admin panel instead of surfacing a cryptic PostgREST error.
+    const REQUIRED_FKS = [
+      "ads_user_id_profiles_fkey",
+      "invoices_user_id_profiles_fkey",
+      "audit_log_actor_id_profiles_fkey",
+      "payments_user_id_profiles_fkey",
+    ] as const;
+    const { data: fkRows, error: fkErr } = await supabaseAdmin
+      .from("pg_constraint" as any)
+      .select("conname")
+      .in("conname", REQUIRED_FKS as unknown as string[]);
+    if (!fkErr) {
+      const present = new Set((fkRows ?? []).map((r: any) => r.conname));
+      const missing = REQUIRED_FKS.filter((n) => !present.has(n));
+      if (missing.length) {
+        // Ask PostgREST to reload its schema cache in case a recent migration
+        // added these FKs but the cache is stale; then re-check.
+        await supabaseAdmin.rpc("pgrst_reload" as any).catch(() => {});
+        const { data: retry } = await supabaseAdmin
+          .from("pg_constraint" as any)
+          .select("conname")
+          .in("conname", missing as unknown as string[]);
+        const stillMissing = missing.filter((n) => !(retry ?? []).some((r: any) => r.conname === n));
+        if (stillMissing.length) {
+          throw new Error(
+            `Admin schema check failed: missing foreign key(s) ${stillMissing.join(", ")}. Run pending migrations.`,
+          );
+        }
+      }
+    }
     const [users, ads, pending, live, topups, credits] = await Promise.all([
       supabaseAdmin.from("profiles").select("*", { count: "exact", head: true }),
       supabaseAdmin.from("ads").select("*", { count: "exact", head: true }),
