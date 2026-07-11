@@ -140,11 +140,14 @@ function HomePage() {
         <div className="flex items-end justify-between gap-4">
           <div>
             <h2 className="font-display text-2xl font-bold md:text-3xl">Pick your city</h2>
-            <p className="mt-1 text-sm text-muted-foreground">Browse listings tailored to where you are.</p>
+            <p className="mt-1 text-sm text-muted-foreground">A few popular spots — or browse the full list.</p>
           </div>
+          <Link to="/cities" className="text-sm font-medium text-brand hover:underline inline-flex items-center gap-1">
+            All cities <ArrowRight className="h-3.5 w-3.5" />
+          </Link>
         </div>
-        <div className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
-          {cities.map((c: any) => (
+        <div className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4">
+          {cities.slice(0, 8).map((c: any) => (
             <Link
               key={c.id}
               to="/$state/$city"
@@ -163,6 +166,11 @@ function HomePage() {
               )}
             </Link>
           ))}
+        </div>
+        <div className="mt-6 text-center">
+          <Link to="/cities" className="inline-flex items-center gap-1 rounded-full border border-border bg-card px-4 py-2 text-sm font-medium hover:border-brand hover:text-brand">
+            Browse all US cities <ArrowRight className="h-3.5 w-3.5" />
+          </Link>
         </div>
       </section>
 

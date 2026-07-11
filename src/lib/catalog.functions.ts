@@ -21,6 +21,24 @@ export const listFeaturedCities = createServerFn({ method: "GET" }).handler(asyn
   return data ?? [];
 });
 
+export const listAllCitiesGrouped = createServerFn({ method: "GET" }).handler(async () => {
+  const sb = getPublicSupabase();
+  const { data, error } = await sb
+    .from("cities")
+    .select("id,name,slug,population,states!inner(code,name,slug)")
+    .order("name");
+  if (error) throw new Error(error.message);
+  const groups: Record<string, { code: string; name: string; slug: string; cities: any[] }> = {};
+  for (const c of data ?? []) {
+    const s: any = (c as any).states;
+    if (!s) continue;
+    const key = s.slug as string;
+    if (!groups[key]) groups[key] = { code: s.code, name: s.name, slug: s.slug, cities: [] };
+    groups[key].cities.push({ id: c.id, name: c.name, slug: c.slug, population: (c as any).population });
+  }
+  return Object.values(groups).sort((a, b) => a.name.localeCompare(b.name));
+});
+
 export const listCategories = createServerFn({ method: "GET" }).handler(async () => {
   const sb = getPublicSupabase();
   const { data, error } = await sb
