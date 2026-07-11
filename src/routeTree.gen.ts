@@ -26,6 +26,7 @@ import { Route as AuthenticatedPostIndexRouteImport } from './routes/_authentica
 import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin.index'
 import { Route as ApiPublicSitemapDotxmlRouteImport } from './routes/api/public/sitemap[.]xml'
 import { Route as ApiPublicRobotsDottxtRouteImport } from './routes/api/public/robots[.]txt'
+import { Route as ApiPublicBootstrapSuperadminRouteImport } from './routes/api/public/bootstrap-superadmin'
 import { Route as AuthenticatedPromoteIdRouteImport } from './routes/_authenticated/promote.$id'
 import { Route as AuthenticatedPostMultiRouteImport } from './routes/_authenticated/post.multi'
 import { Route as AuthenticatedPostLocalRouteImport } from './routes/_authenticated/post.local'
@@ -130,6 +131,12 @@ const ApiPublicRobotsDottxtRoute = ApiPublicRobotsDottxtRouteImport.update({
   path: '/api/public/robots.txt',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiPublicBootstrapSuperadminRoute =
+  ApiPublicBootstrapSuperadminRouteImport.update({
+    id: '/api/public/bootstrap-superadmin',
+    path: '/api/public/bootstrap-superadmin',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const AuthenticatedPromoteIdRoute = AuthenticatedPromoteIdRouteImport.update({
   id: '/promote/$id',
   path: '/promote/$id',
@@ -261,6 +268,7 @@ export interface FileRoutesByFullPath {
   '/post/local': typeof AuthenticatedPostLocalRoute
   '/post/multi': typeof AuthenticatedPostMultiRoute
   '/promote/$id': typeof AuthenticatedPromoteIdRoute
+  '/api/public/bootstrap-superadmin': typeof ApiPublicBootstrapSuperadminRoute
   '/api/public/robots.txt': typeof ApiPublicRobotsDottxtRoute
   '/api/public/sitemap.xml': typeof ApiPublicSitemapDotxmlRoute
   '/admin/': typeof AuthenticatedAdminIndexRoute
@@ -296,6 +304,7 @@ export interface FileRoutesByTo {
   '/post/local': typeof AuthenticatedPostLocalRoute
   '/post/multi': typeof AuthenticatedPostMultiRoute
   '/promote/$id': typeof AuthenticatedPromoteIdRoute
+  '/api/public/bootstrap-superadmin': typeof ApiPublicBootstrapSuperadminRoute
   '/api/public/robots.txt': typeof ApiPublicRobotsDottxtRoute
   '/api/public/sitemap.xml': typeof ApiPublicSitemapDotxmlRoute
   '/admin': typeof AuthenticatedAdminIndexRoute
@@ -335,6 +344,7 @@ export interface FileRoutesById {
   '/_authenticated/post/local': typeof AuthenticatedPostLocalRoute
   '/_authenticated/post/multi': typeof AuthenticatedPostMultiRoute
   '/_authenticated/promote/$id': typeof AuthenticatedPromoteIdRoute
+  '/api/public/bootstrap-superadmin': typeof ApiPublicBootstrapSuperadminRoute
   '/api/public/robots.txt': typeof ApiPublicRobotsDottxtRoute
   '/api/public/sitemap.xml': typeof ApiPublicSitemapDotxmlRoute
   '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
@@ -374,6 +384,7 @@ export interface FileRouteTypes {
     | '/post/local'
     | '/post/multi'
     | '/promote/$id'
+    | '/api/public/bootstrap-superadmin'
     | '/api/public/robots.txt'
     | '/api/public/sitemap.xml'
     | '/admin/'
@@ -409,6 +420,7 @@ export interface FileRouteTypes {
     | '/post/local'
     | '/post/multi'
     | '/promote/$id'
+    | '/api/public/bootstrap-superadmin'
     | '/api/public/robots.txt'
     | '/api/public/sitemap.xml'
     | '/admin'
@@ -447,6 +459,7 @@ export interface FileRouteTypes {
     | '/_authenticated/post/local'
     | '/_authenticated/post/multi'
     | '/_authenticated/promote/$id'
+    | '/api/public/bootstrap-superadmin'
     | '/api/public/robots.txt'
     | '/api/public/sitemap.xml'
     | '/_authenticated/admin/'
@@ -468,6 +481,7 @@ export interface RootRouteChildren {
   SearchRoute: typeof SearchRoute
   TermsRoute: typeof TermsRoute
   StateCityRoute: typeof StateCityRouteWithChildren
+  ApiPublicBootstrapSuperadminRoute: typeof ApiPublicBootstrapSuperadminRoute
   ApiPublicRobotsDottxtRoute: typeof ApiPublicRobotsDottxtRoute
   ApiPublicSitemapDotxmlRoute: typeof ApiPublicSitemapDotxmlRoute
   ApiAdminAnalyticsExportRoute: typeof ApiAdminAnalyticsExportRoute
@@ -593,6 +607,13 @@ declare module '@tanstack/react-router' {
       path: '/api/public/robots.txt'
       fullPath: '/api/public/robots.txt'
       preLoaderRoute: typeof ApiPublicRobotsDottxtRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/bootstrap-superadmin': {
+      id: '/api/public/bootstrap-superadmin'
+      path: '/api/public/bootstrap-superadmin'
+      fullPath: '/api/public/bootstrap-superadmin'
+      preLoaderRoute: typeof ApiPublicBootstrapSuperadminRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_authenticated/promote/$id': {
@@ -843,6 +864,7 @@ const rootRouteChildren: RootRouteChildren = {
   SearchRoute: SearchRoute,
   TermsRoute: TermsRoute,
   StateCityRoute: StateCityRouteWithChildren,
+  ApiPublicBootstrapSuperadminRoute: ApiPublicBootstrapSuperadminRoute,
   ApiPublicRobotsDottxtRoute: ApiPublicRobotsDottxtRoute,
   ApiPublicSitemapDotxmlRoute: ApiPublicSitemapDotxmlRoute,
   ApiAdminAnalyticsExportRoute: ApiAdminAnalyticsExportRoute,
