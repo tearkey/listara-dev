@@ -109,7 +109,7 @@ export function SiteHeader() {
           {user ? (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="icon" className="rounded-full">
+                <Button variant="ghost" size="icon" className="rounded-full" aria-label="Account menu">
                   <User className="h-5 w-5" />
                 </Button>
               </DropdownMenuTrigger>
