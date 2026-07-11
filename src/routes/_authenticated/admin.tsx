@@ -1,4 +1,4 @@
-import { createFileRoute, Link, Outlet, useRouterState } from "@tanstack/react-router";
+import { createFileRoute, Link, Outlet, useRouterState, Navigate } from "@tanstack/react-router";
 import { queryOptions, useSuspenseQuery } from "@tanstack/react-query";
 import { ShieldCheck, Users, Newspaper, CreditCard, ToggleLeft, ScrollText, LayoutDashboard, Gavel, BarChart3, Settings, MapPin } from "lucide-react";
 import { SiteHeader } from "@/components/site-header";
@@ -22,14 +22,24 @@ export const Route = createFileRoute("/_authenticated/admin")({
   }),
   loader: ({ context }) => context.queryClient.ensureQueryData(gateOpts),
   errorComponent: ({ error }) => (
-    <div className="min-h-screen bg-background">
+    error.message === "MFA_REQUIRED" ? (
+      <Navigate to="/dashboard/mfa" replace />
+    ) : (
+      <div className="min-h-screen bg-background">
       <SiteHeader />
       <div className="mx-auto max-w-3xl px-4 py-20 text-center">
         <ShieldCheck className="mx-auto h-10 w-10 text-muted-foreground" />
         <h1 className="mt-3 font-display text-2xl font-bold">Admin access required</h1>
         <p className="mt-2 text-sm text-muted-foreground">{error.message}</p>
+        <Link
+          to="/dashboard"
+          className="mt-4 inline-flex items-center rounded-md bg-brand px-4 py-2 text-sm font-medium text-brand-foreground hover:bg-brand/90"
+        >
+          Go to admin sign in
+        </Link>
       </div>
-    </div>
+      </div>
+    )
   ),
   component: AdminLayout,
 });
