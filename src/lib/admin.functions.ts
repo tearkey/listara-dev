@@ -7,16 +7,32 @@ async function assertAdmin(ctx: { supabase: any; userId: string }) {
     .from("user_roles")
     .select("role")
     .eq("user_id", ctx.userId)
-    .eq("role", "admin")
-    .maybeSingle();
+    .in("role", ["admin", "superadmin"])
+    .limit(1);
   if (error) throw new Error(error.message);
-  if (!data) throw new Error("Forbidden: admin only");
+  if (!data || data.length === 0) throw new Error("Forbidden: admin only");
+}
+
+async function assertAdminWithMfa(ctx: { supabase: any; userId: string; claims: any }) {
+  const { data, error } = await ctx.supabase
+    .from("user_roles")
+    .select("role")
+    .eq("user_id", ctx.userId)
+    .in("role", ["admin", "superadmin"]);
+  if (error) throw new Error(error.message);
+  const roles = new Set((data ?? []).map((r: any) => r.role));
+  if (!roles.has("admin") && !roles.has("superadmin")) {
+    throw new Error("Forbidden: admin only");
+  }
+  if (roles.has("superadmin") && (ctx.claims?.aal ?? null) !== "aal2") {
+    throw new Error("MFA_REQUIRED");
+  }
 }
 
 export const getAdminStats = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
-    await assertAdmin(context);
+    await assertAdminWithMfa(context);
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const [users, ads, pending, live, topups, credits] = await Promise.all([
       supabaseAdmin.from("profiles").select("*", { count: "exact", head: true }),

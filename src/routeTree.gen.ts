@@ -19,6 +19,7 @@ import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as DashboardIndexRouteImport } from './routes/dashboard.index'
+import { Route as DashboardMfaRouteImport } from './routes/dashboard.mfa'
 import { Route as AuthenticatedPostRouteImport } from './routes/_authenticated/post'
 import { Route as AuthenticatedMyAdsRouteImport } from './routes/_authenticated/my-ads'
 import { Route as AuthenticatedCreditsRouteImport } from './routes/_authenticated/credits'
@@ -96,6 +97,11 @@ const IndexRoute = IndexRouteImport.update({
 const DashboardIndexRoute = DashboardIndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => DashboardRoute,
+} as any)
+const DashboardMfaRoute = DashboardMfaRouteImport.update({
+  id: '/mfa',
+  path: '/mfa',
   getParentRoute: () => DashboardRoute,
 } as any)
 const AuthenticatedPostRoute = AuthenticatedPostRouteImport.update({
@@ -267,6 +273,7 @@ export interface FileRoutesByFullPath {
   '/credits': typeof AuthenticatedCreditsRouteWithChildren
   '/my-ads': typeof AuthenticatedMyAdsRoute
   '/post': typeof AuthenticatedPostRouteWithChildren
+  '/dashboard/mfa': typeof DashboardMfaRoute
   '/dashboard/': typeof DashboardIndexRoute
   '/$state/$city/$category': typeof StateCityCategoryRouteWithChildren
   '/admin/ads': typeof AuthenticatedAdminAdsRoute
@@ -304,6 +311,7 @@ export interface FileRoutesByTo {
   '/$state/$city': typeof StateCityRouteWithChildren
   '/credits': typeof AuthenticatedCreditsRouteWithChildren
   '/my-ads': typeof AuthenticatedMyAdsRoute
+  '/dashboard/mfa': typeof DashboardMfaRoute
   '/dashboard': typeof DashboardIndexRoute
   '/$state/$city/$category': typeof StateCityCategoryRouteWithChildren
   '/admin/ads': typeof AuthenticatedAdminAdsRoute
@@ -346,6 +354,7 @@ export interface FileRoutesById {
   '/_authenticated/credits': typeof AuthenticatedCreditsRouteWithChildren
   '/_authenticated/my-ads': typeof AuthenticatedMyAdsRoute
   '/_authenticated/post': typeof AuthenticatedPostRouteWithChildren
+  '/dashboard/mfa': typeof DashboardMfaRoute
   '/dashboard/': typeof DashboardIndexRoute
   '/$state/$city/$category': typeof StateCityCategoryRouteWithChildren
   '/_authenticated/admin/ads': typeof AuthenticatedAdminAdsRoute
@@ -388,6 +397,7 @@ export interface FileRouteTypes {
     | '/credits'
     | '/my-ads'
     | '/post'
+    | '/dashboard/mfa'
     | '/dashboard/'
     | '/$state/$city/$category'
     | '/admin/ads'
@@ -425,6 +435,7 @@ export interface FileRouteTypes {
     | '/$state/$city'
     | '/credits'
     | '/my-ads'
+    | '/dashboard/mfa'
     | '/dashboard'
     | '/$state/$city/$category'
     | '/admin/ads'
@@ -466,6 +477,7 @@ export interface FileRouteTypes {
     | '/_authenticated/credits'
     | '/_authenticated/my-ads'
     | '/_authenticated/post'
+    | '/dashboard/mfa'
     | '/dashboard/'
     | '/$state/$city/$category'
     | '/_authenticated/admin/ads'
@@ -581,6 +593,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/dashboard/'
       preLoaderRoute: typeof DashboardIndexRouteImport
+      parentRoute: typeof DashboardRoute
+    }
+    '/dashboard/mfa': {
+      id: '/dashboard/mfa'
+      path: '/mfa'
+      fullPath: '/dashboard/mfa'
+      preLoaderRoute: typeof DashboardMfaRouteImport
       parentRoute: typeof DashboardRoute
     }
     '/_authenticated/post': {
@@ -869,10 +888,12 @@ const AuthenticatedRouteRouteWithChildren =
   AuthenticatedRouteRoute._addFileChildren(AuthenticatedRouteRouteChildren)
 
 interface DashboardRouteChildren {
+  DashboardMfaRoute: typeof DashboardMfaRoute
   DashboardIndexRoute: typeof DashboardIndexRoute
 }
 
 const DashboardRouteChildren: DashboardRouteChildren = {
+  DashboardMfaRoute: DashboardMfaRoute,
   DashboardIndexRoute: DashboardIndexRoute,
 }
 
