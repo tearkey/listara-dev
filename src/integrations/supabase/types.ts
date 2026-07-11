@@ -1089,7 +1089,7 @@ export type Database = {
         | "removed"
         | "rejected"
       ad_tier: "free" | "bumped" | "featured" | "sticky"
-      app_role: "admin" | "moderator" | "user"
+      app_role: "admin" | "moderator" | "user" | "superadmin"
       payment_status: "pending" | "paid" | "failed" | "refunded"
       post_status: "draft" | "published" | "archived"
       report_status: "open" | "reviewing" | "resolved" | "dismissed"
@@ -1222,7 +1222,7 @@ export const Constants = {
     Enums: {
       ad_status: ["draft", "pending", "live", "expired", "removed", "rejected"],
       ad_tier: ["free", "bumped", "featured", "sticky"],
-      app_role: ["admin", "moderator", "user"],
+      app_role: ["admin", "moderator", "user", "superadmin"],
       payment_status: ["pending", "paid", "failed", "refunded"],
       post_status: ["draft", "published", "archived"],
       report_status: ["open", "reviewing", "resolved", "dismissed"],
