@@ -42,7 +42,7 @@ function SearchPage() {
   return (
     <div className="min-h-screen bg-background">
       <SiteHeader />
-      <div className="mx-auto max-w-5xl px-4 py-8">
+      <main id="main" className="mx-auto max-w-5xl px-4 py-8">
         <h1 className="font-display text-2xl font-bold">
           {q ? <>Results for <span className="text-brand">"{q}"</span></> : "Search Listara"}
         </h1>
@@ -55,7 +55,7 @@ function SearchPage() {
         <div className="mt-6 grid gap-3 md:grid-cols-2">
           {results.map((ad: any) => <AdCard key={ad.id} ad={ad} />)}
         </div>
-      </div>
+      </main>
       <SiteFooter />
     </div>
   );
