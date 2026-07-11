@@ -1,6 +1,6 @@
 import { createFileRoute, Link, Outlet, useRouterState } from "@tanstack/react-router";
 import { queryOptions, useSuspenseQuery } from "@tanstack/react-query";
-import { ShieldCheck, Users, Newspaper, CreditCard, ToggleLeft, ScrollText, LayoutDashboard, Gavel, BarChart3, Settings } from "lucide-react";
+import { ShieldCheck, Users, Newspaper, CreditCard, ToggleLeft, ScrollText, LayoutDashboard, Gavel, BarChart3, Settings, MapPin } from "lucide-react";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { getAdminStats } from "@/lib/admin.functions";
@@ -41,6 +41,7 @@ const NAV: Array<{ to: string; label: string; icon: any; exact?: boolean }> = [
   { to: "/admin/users", label: "Users", icon: Users },
   { to: "/admin/ads", label: "Ads", icon: Newspaper },
   { to: "/admin/payments", label: "Payments", icon: CreditCard },
+  { to: "/admin/catalog", label: "Cities & Categories", icon: MapPin },
   { to: "/admin/flags", label: "Feature flags", icon: ToggleLeft },
   { to: "/admin/audit", label: "Audit log", icon: ScrollText },
   { to: "/admin/settings", label: "Settings", icon: Settings },
