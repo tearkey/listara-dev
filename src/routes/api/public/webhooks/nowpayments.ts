@@ -131,18 +131,18 @@ export const Route = createFileRoute("/api/public/webhooks/nowpayments")({
         try {
           await supabaseAdmin.from("audit_log").insert({
             actor_id: null,
-            action: `payment_webhook:${nextStatus}`,
-            target_type: "invoice",
-            target_id: invoice.id,
-            metadata: {
+            action: `payment_webhook:${nextStatus}` as never,
+            target_type: "invoice" as never,
+            target_id: invoice.id as never,
+            metadata: ({
               order_id: orderId,
               payment_id: paymentId,
               prev_status: invoice.status,
               next_status: nextStatus,
               kind: invoice.kind,
               pay_currency: payCurrency,
-            },
-          });
+            } as unknown) as never,
+          } as never);
         } catch (e) {
           console.error("audit_log insert failed", e);
         }
