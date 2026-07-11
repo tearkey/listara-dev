@@ -92,15 +92,17 @@ export function SiteHeader() {
           />
         </div>
 
-        <nav className="flex items-center gap-2">
-          <Button asChild size="sm" className="hidden sm:inline-flex bg-brand text-brand-foreground hover:bg-brand/90">
-            <Link to="/post">
-              <Plus className="h-4 w-4" /> Post Ad
+        <nav className="flex items-center gap-1.5 sm:gap-2">
+          <Button asChild size="sm" className="bg-brand text-brand-foreground hover:bg-brand/90 px-2.5 sm:px-3">
+            <Link to="/post" aria-label="Post an ad">
+              <Plus className="h-4 w-4" />
+              <span className="hidden sm:inline">Post Ad</span>
             </Link>
           </Button>
-          <Button asChild size="sm" variant="outline" className="hidden sm:inline-flex border-brand/40 text-brand hover:bg-brand/10 hover:text-brand">
-            <Link to="/credits">
-              <Wallet className="h-4 w-4" /> Buy Credits
+          <Button asChild size="sm" variant="outline" className="border-brand/40 text-brand hover:bg-brand/10 hover:text-brand px-2.5 sm:px-3">
+            <Link to="/credits" aria-label="Buy credits">
+              <Wallet className="h-4 w-4" />
+              <span className="hidden sm:inline">Buy Credits</span>
             </Link>
           </Button>
           {user ? (
