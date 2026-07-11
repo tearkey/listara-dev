@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { BRAND } from "@/lib/brand";
 import { toast } from "sonner";
-import { bootstrapSuperadmin, getMfaStatus } from "@/lib/dashboard.functions";
+import { getMfaStatus } from "@/lib/dashboard.functions";
 
 export const Route = createFileRoute("/dashboard/")({
   component: DashboardSignIn,
@@ -36,11 +36,6 @@ function DashboardSignIn() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
-
-  // Best-effort self-locking seed of the superadmin account.
-  useEffect(() => {
-    bootstrapSuperadmin().catch(() => {});
-  }, []);
 
   // If already signed in, route immediately.
   useEffect(() => {

@@ -42,8 +42,10 @@ export const createAd = createServerFn({ method: "POST" })
     if (rlErr) throw new Error(rlErr.message);
     if (!allowed) throw new Error("You're posting too quickly. Please try again later.");
 
-    // Reject banned profiles up-front so they can't continue to post.
-    const { data: profile } = await supabase
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+
+    // Reject banned profiles up-front (is_banned is not exposed via the user client).
+    const { data: profile } = await supabaseAdmin
       .from("profiles")
       .select("is_banned")
       .eq("id", userId)
@@ -51,7 +53,6 @@ export const createAd = createServerFn({ method: "POST" })
     if (profile?.is_banned) throw new Error("Your account is suspended.");
 
     // Banned-keyword scan via admin (read-only list, but RLS blocks anon)
-    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { data: banned } = await supabaseAdmin
       .from("banned_keywords")
       .select("keyword,severity");
@@ -303,8 +304,9 @@ export const sendMessage = createServerFn({ method: "POST" })
     if (rlErr) throw new Error(rlErr.message);
     if (!allowed) throw new Error("You're sending messages too quickly. Please slow down.");
 
-    // Reject banned senders.
-    const { data: senderProfile } = await context.supabase
+    // Reject banned senders (is_banned isn't exposed via the user client).
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { data: senderProfile } = await supabaseAdmin
       .from("profiles")
       .select("is_banned")
       .eq("id", context.userId)
