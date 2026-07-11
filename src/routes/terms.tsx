@@ -13,6 +13,7 @@ export const Route = createFileRoute("/terms")({
   component: () => (
     <div className="min-h-screen bg-background">
       <SiteHeader />
+      <main>
       <article className="prose mx-auto max-w-3xl px-4 py-12 text-sm leading-relaxed text-foreground/90">
         <h1 className="font-display text-3xl font-bold">Terms of Service</h1>
         <p className="mt-2 text-muted-foreground">Last updated: {new Date().toLocaleDateString()}</p>
@@ -114,6 +115,7 @@ export const Route = createFileRoute("/terms")({
           you rely on them for a live commercial service.
         </p>
       </article>
+      </main>
       <SiteFooter />
     </div>
   ),
