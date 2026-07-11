@@ -917,6 +917,45 @@ export type Database = {
           },
         ]
       }
+      security_scan_runs: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          critical: number
+          findings: Json
+          high: number
+          id: string
+          low: number
+          medium: number
+          notes: string | null
+          total: number
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          critical?: number
+          findings?: Json
+          high?: number
+          id?: string
+          low?: number
+          medium?: number
+          notes?: string | null
+          total?: number
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          critical?: number
+          findings?: Json
+          high?: number
+          id?: string
+          low?: number
+          medium?: number
+          notes?: string | null
+          total?: number
+        }
+        Relationships: []
+      }
       site_settings: {
         Row: {
           created_at: string

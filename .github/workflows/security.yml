@@ -41,3 +41,48 @@ jobs:
             p/sql-injection
             p/jwt
             p/secrets
+
+  e2e-and-a11y:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v2
+        with: { bun-version: latest }
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.11" }
+
+      - name: Install deps
+        run: bun install --frozen-lockfile
+
+      - name: Install Playwright
+        run: |
+          pip install playwright
+          python -m playwright install --with-deps chromium
+
+      - name: Build (production)
+        run: bun run build
+
+      - name: Start preview
+        run: |
+          bun run preview --port 8080 &
+          for i in $(seq 1 30); do
+            curl -sf http://localhost:8080/ >/dev/null && break || sleep 1
+          done
+
+      - name: Anonymous contact-field leak check
+        env:
+          BASE_URL: http://localhost:8080
+        run: python tests/contact-leak.spec.py
+
+      - name: axe-core accessibility regression (prod build)
+        env:
+          BASE_URL: http://localhost:8080
+        run: python tests/axe-a11y.spec.py
+
+      - name: Admin Global Settings save/persist (optional)
+        if: ${{ env.TEST_ADMIN_EMAIL != '' && env.TEST_ADMIN_PASSWORD != '' }}
+        env:
+          BASE_URL: http://localhost:8080
+          TEST_ADMIN_EMAIL: ${{ secrets.TEST_ADMIN_EMAIL }}
+          TEST_ADMIN_PASSWORD: ${{ secrets.TEST_ADMIN_PASSWORD }}
+        run: python tests/admin-settings.spec.py
