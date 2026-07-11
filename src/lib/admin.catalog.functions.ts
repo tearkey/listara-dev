@@ -82,9 +82,9 @@ export const adminUpsertCity = createServerFn({ method: "POST" })
     await supabaseAdmin.from("audit_log").insert({
       actor_id: context.userId,
       action: data.id ? "city_update" : "city_create",
-      target_type: "city",
+      target_table: "cities",
       target_id: res.id,
-      metadata: row,
+      detail: row,
     });
     return res;
   });
@@ -107,7 +107,7 @@ export const adminDeleteCity = createServerFn({ method: "POST" })
     await supabaseAdmin.from("audit_log").insert({
       actor_id: context.userId,
       action: "city_delete",
-      target_type: "city",
+      target_table: "cities",
       target_id: data.id,
     });
     return { ok: true };
@@ -166,9 +166,9 @@ export const adminUpsertCategory = createServerFn({ method: "POST" })
     await supabaseAdmin.from("audit_log").insert({
       actor_id: context.userId,
       action: data.id ? "category_update" : "category_create",
-      target_type: "category",
+      target_table: "categories",
       target_id: res.id,
-      metadata: row,
+      detail: row,
     });
     return res;
   });
@@ -192,7 +192,7 @@ export const adminDeleteCategory = createServerFn({ method: "POST" })
     await supabaseAdmin.from("audit_log").insert({
       actor_id: context.userId,
       action: "category_delete",
-      target_type: "category",
+      target_table: "categories",
       target_id: data.id,
     });
     return { ok: true };
