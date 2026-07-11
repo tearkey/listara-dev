@@ -114,6 +114,39 @@ export const Route = createFileRoute("/api/public/webhooks/nowpayments")({
           }
         }
 
+        // Structured production log for payment webhooks + audit trail.
+        console.log(
+          JSON.stringify({
+            evt: "payment_webhook",
+            invoice_id: invoice.id,
+            order_id: orderId,
+            payment_id: paymentId,
+            prev_status: invoice.status,
+            next_status: nextStatus,
+            kind: invoice.kind,
+            pay_currency: payCurrency,
+            at: new Date().toISOString(),
+          }),
+        );
+        try {
+          await supabaseAdmin.from("audit_log").insert({
+            actor_id: null,
+            action: `payment_webhook:${nextStatus}`,
+            target_type: "invoice",
+            target_id: invoice.id,
+            metadata: {
+              order_id: orderId,
+              payment_id: paymentId,
+              prev_status: invoice.status,
+              next_status: nextStatus,
+              kind: invoice.kind,
+              pay_currency: payCurrency,
+            },
+          });
+        } catch (e) {
+          console.error("audit_log insert failed", e);
+        }
+
         return new Response("ok", { status: 200 });
       },
     },
