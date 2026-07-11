@@ -100,7 +100,7 @@ export function SiteHeader() {
               <span className="hidden sm:inline">Post Ad</span>
             </Link>
           </Button>
-          <Button asChild size="sm" variant="outline" className="border-brand/40 text-brand hover:bg-brand/10 hover:text-brand px-2.5 sm:px-3">
+          <Button asChild size="sm" variant="outline" className="border-brand/40 text-brand-strong hover:bg-brand/10 hover:text-brand-strong px-2.5 sm:px-3">
             <Link to="/credits" aria-label="Buy credits">
               <Wallet className="h-4 w-4" />
               <span className="hidden sm:inline">Buy Credits</span>

@@ -106,9 +106,9 @@ function AuthPage() {
 
           <p className="mt-4 text-center text-sm text-muted-foreground">
             {mode === "signin" ? (
-              <>New to {BRAND.name}?{" "}<button onClick={() => setMode("signup")} className="text-brand font-medium hover:underline">Create an account</button></>
+              <>New to {BRAND.name}?{" "}<button onClick={() => setMode("signup")} className="text-brand-strong font-medium hover:underline">Create an account</button></>
             ) : (
-              <>Already have an account?{" "}<button onClick={() => setMode("signin")} className="text-brand font-medium hover:underline">Sign in</button></>
+              <>Already have an account?{" "}<button onClick={() => setMode("signin")} className="text-brand-strong font-medium hover:underline">Sign in</button></>
             )}
           </p>
         </div>
