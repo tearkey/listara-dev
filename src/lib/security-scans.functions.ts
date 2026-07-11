@@ -55,7 +55,7 @@ export const listSecurityRuns = createServerFn({ method: "GET" })
       .order("created_at", { ascending: false })
       .limit(20);
     if (error) throw new Error(error.message);
-    return (data ?? []) as ScanRun[];
+    return (data ?? []).map((r) => ({ ...r, findings: (r.findings ?? []) as unknown as Finding[] })) as ScanRun[];
   });
 
 const RecordInput = z.object({
@@ -117,7 +117,7 @@ export const getSecurityDiff = createServerFn({ method: "GET" })
       .order("created_at", { ascending: false })
       .limit(2);
     if (error) throw new Error(error.message);
-    const rows = (data ?? []) as ScanRun[];
+    const rows = (data ?? []).map((r) => ({ ...r, findings: (r.findings ?? []) as unknown as Finding[] })) as ScanRun[];
     const latest = rows[0] ?? null;
     const previous = rows[1] ?? null;
     const latestIds = new Set((latest?.findings ?? []).map((f) => f.internal_id));
