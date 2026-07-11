@@ -1103,6 +1103,7 @@ export type Database = {
         }
         Returns: boolean
       }
+      pgrst_reload_schema: { Args: never; Returns: undefined }
       purge_abandoned_drafts: { Args: never; Returns: undefined }
       spend_credits: {
         Args: { _ad_id?: string; _amount_cents: number; _reason: string }

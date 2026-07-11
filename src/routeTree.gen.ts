@@ -15,6 +15,7 @@ import { Route as SafetyRouteImport } from './routes/safety'
 import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as NotAvailableRouteImport } from './routes/not-available'
 import { Route as DashboardRouteImport } from './routes/dashboard'
+import { Route as CitiesRouteImport } from './routes/cities'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as IndexRouteImport } from './routes/index'
@@ -78,6 +79,11 @@ const NotAvailableRoute = NotAvailableRouteImport.update({
 const DashboardRoute = DashboardRouteImport.update({
   id: '/dashboard',
   path: '/dashboard',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CitiesRoute = CitiesRouteImport.update({
+  id: '/cities',
+  path: '/cities',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthRoute = AuthRouteImport.update({
@@ -262,6 +268,7 @@ const StateCityCategorySlugRoute = StateCityCategorySlugRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
+  '/cities': typeof CitiesRoute
   '/dashboard': typeof DashboardRouteWithChildren
   '/not-available': typeof NotAvailableRoute
   '/privacy': typeof PrivacyRoute
@@ -303,6 +310,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
+  '/cities': typeof CitiesRoute
   '/not-available': typeof NotAvailableRoute
   '/privacy': typeof PrivacyRoute
   '/safety': typeof SafetyRoute
@@ -343,6 +351,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/auth': typeof AuthRoute
+  '/cities': typeof CitiesRoute
   '/dashboard': typeof DashboardRouteWithChildren
   '/not-available': typeof NotAvailableRoute
   '/privacy': typeof PrivacyRoute
@@ -386,6 +395,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/auth'
+    | '/cities'
     | '/dashboard'
     | '/not-available'
     | '/privacy'
@@ -427,6 +437,7 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/auth'
+    | '/cities'
     | '/not-available'
     | '/privacy'
     | '/safety'
@@ -466,6 +477,7 @@ export interface FileRouteTypes {
     | '/'
     | '/_authenticated'
     | '/auth'
+    | '/cities'
     | '/dashboard'
     | '/not-available'
     | '/privacy'
@@ -509,6 +521,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   AuthRoute: typeof AuthRoute
+  CitiesRoute: typeof CitiesRoute
   DashboardRoute: typeof DashboardRouteWithChildren
   NotAvailableRoute: typeof NotAvailableRoute
   PrivacyRoute: typeof PrivacyRoute
@@ -565,6 +578,13 @@ declare module '@tanstack/react-router' {
       path: '/dashboard'
       fullPath: '/dashboard'
       preLoaderRoute: typeof DashboardRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/cities': {
+      id: '/cities'
+      path: '/cities'
+      fullPath: '/cities'
+      preLoaderRoute: typeof CitiesRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/auth': {
@@ -928,6 +948,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   AuthRoute: AuthRoute,
+  CitiesRoute: CitiesRoute,
   DashboardRoute: DashboardRouteWithChildren,
   NotAvailableRoute: NotAvailableRoute,
   PrivacyRoute: PrivacyRoute,

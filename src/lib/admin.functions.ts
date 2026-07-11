@@ -34,6 +34,41 @@ export const getAdminStats = createServerFn({ method: "GET" })
   .handler(async ({ context }) => {
     await assertAdminWithMfa(context);
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    // Fail-fast schema validation: admin views embed profiles into ads,
+    // invoices, audit_log, and payments. Probe each embed with a HEAD query;
+    // on a stale PostgREST schema cache (PGRST200) ask for a reload and retry.
+    const PROBES: Array<{ table: string; embed: string }> = [
+      { table: "ads", embed: "id, profiles(display_name)" },
+      { table: "invoices", embed: "id, profiles:user_id(display_name)" },
+      { table: "audit_log", embed: "id, profiles:actor_id(display_name)" },
+      { table: "payments", embed: "id, profiles:user_id(display_name)" },
+    ];
+    async function probe() {
+      const results = await Promise.all(
+        PROBES.map((p) =>
+          supabaseAdmin.from(p.table as any).select(p.embed, { head: true, count: "exact" }).limit(1),
+        ),
+      );
+      return results
+        .map((r, i) => ({ table: PROBES[i].table, error: r.error }))
+        .filter((r) => r.error);
+    }
+    let broken = await probe();
+    if (broken.length) {
+      try {
+        await (supabaseAdmin as any).rpc("pgrst_reload_schema");
+      } catch {
+        /* function is optional; retry regardless */
+      }
+      broken = await probe();
+      if (broken.length) {
+        throw new Error(
+          `Admin schema check failed: could not join ${broken
+            .map((b) => `${b.table}→profiles`)
+            .join(", ")}. ${broken[0].error?.message ?? ""}`.trim(),
+        );
+      }
+    }
     const [users, ads, pending, live, topups, credits] = await Promise.all([
       supabaseAdmin.from("profiles").select("*", { count: "exact", head: true }),
       supabaseAdmin.from("ads").select("*", { count: "exact", head: true }),
