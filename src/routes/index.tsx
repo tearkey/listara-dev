@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
-import { listFeaturedCities, listCategories, listStates } from "@/lib/catalog.functions";
+import { listFeaturedCities, listCategories, listStates, listCitiesByStateSlug } from "@/lib/catalog.functions";
 import { detectVisitorCity } from "@/lib/geo.functions";
 import { setCurrentCity, useCurrentCity } from "@/hooks/use-current-city";
 import { toast } from "sonner";
@@ -90,6 +90,29 @@ function HomePage() {
     toast.success(`Showing listings near ${geo.city.name}, ${geo.city.stateCode}`);
   }, [geo, currentCity, navigate]);
 
+  // Resolve the state slug we should show cities for: prefer stored current city,
+  // otherwise fall back to fresh geo detection.
+  const detectedStateSlug =
+    currentCity?.stateSlug ?? (geo && geo.ok ? geo.city.stateSlug : null);
+  const detectedStateCode =
+    currentCity?.stateCode ?? (geo && geo.ok ? geo.city.stateCode : null);
+
+  const { data: stateCities } = useQuery({
+    queryKey: ["cities-by-state", detectedStateSlug],
+    queryFn: () => listCitiesByStateSlug({ data: { stateSlug: detectedStateSlug! } }),
+    enabled: !!detectedStateSlug,
+    staleTime: 60 * 60 * 1000,
+  });
+
+  const showStateCities = !!detectedStateSlug && !!stateCities && stateCities.length > 0;
+  const displayCities = showStateCities ? stateCities! : cities;
+  const sectionHeading = showStateCities
+    ? `Cities in ${detectedStateCode ?? "your state"}`
+    : "Pick your city";
+  const sectionSubhead = showStateCities
+    ? "Based on your location — jump straight into a nearby city."
+    : "A few popular spots — or browse the full list.";
+
   return (
     <div className="min-h-screen bg-background">
       <SiteHeader />
@@ -139,15 +162,15 @@ function HomePage() {
       <section className="mx-auto max-w-7xl px-4 py-12">
         <div className="flex items-end justify-between gap-4">
           <div>
-            <h2 className="font-display text-2xl font-bold md:text-3xl">Pick your city</h2>
-            <p className="mt-1 text-sm text-muted-foreground">A few popular spots — or browse the full list.</p>
+            <h2 className="font-display text-2xl font-bold md:text-3xl">{sectionHeading}</h2>
+            <p className="mt-1 text-sm text-muted-foreground">{sectionSubhead}</p>
           </div>
           <Link to="/cities" className="text-sm font-medium text-brand hover:underline inline-flex items-center gap-1">
             All cities <ArrowRight className="h-3.5 w-3.5" />
           </Link>
         </div>
         <div className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4">
-          {cities.slice(0, 8).map((c: any) => (
+          {displayCities.slice(0, 12).map((c: any) => (
             <Link
               key={c.id}
               to="/$state/$city"
