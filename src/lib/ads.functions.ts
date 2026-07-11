@@ -304,8 +304,9 @@ export const sendMessage = createServerFn({ method: "POST" })
     if (rlErr) throw new Error(rlErr.message);
     if (!allowed) throw new Error("You're sending messages too quickly. Please slow down.");
 
-    // Reject banned senders.
-    const { data: senderProfile } = await context.supabase
+    // Reject banned senders (is_banned isn't exposed via the user client).
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { data: senderProfile } = await supabaseAdmin
       .from("profiles")
       .select("is_banned")
       .eq("id", context.userId)
