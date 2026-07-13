@@ -1,4 +1,4 @@
-import { createFileRoute, Link, useNavigate, useRouter } from "@tanstack/react-router";
+import { createFileRoute, Link, useRouter } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { lovable } from "@/integrations/lovable";
@@ -10,6 +10,9 @@ import { toast } from "sonner";
 
 export const Route = createFileRoute("/auth")({
   ssr: false,
+  validateSearch: (s: Record<string, unknown>) => ({
+    next: typeof s.next === "string" && s.next.startsWith("/") && !s.next.startsWith("//") ? s.next : "",
+  }),
   head: () => ({
     meta: [
       { title: `Sign in — ${BRAND.name}` },
@@ -21,8 +24,9 @@ export const Route = createFileRoute("/auth")({
 });
 
 function AuthPage() {
-  const navigate = useNavigate();
   const router = useRouter();
+  const { next } = Route.useSearch();
+  const dest = next || "/";
   const [mode, setMode] = useState<"signin" | "signup">("signin");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -30,13 +34,14 @@ function AuthPage() {
 
   useEffect(() => {
     supabase.auth.getUser().then(({ data }) => {
-      if (data.user) navigate({ to: "/", replace: true });
+      if (data.user) window.location.replace(dest);
     });
-  }, [navigate]);
+  }, [dest]);
 
   async function handleGoogle() {
     setLoading(true);
-    const result = await lovable.auth.signInWithOAuth("google", { redirect_uri: window.location.origin });
+    const redirect_uri = `${window.location.origin}${dest}`;
+    const result = await lovable.auth.signInWithOAuth("google", { redirect_uri });
     if (result.error) {
       toast.error(result.error.message ?? "Google sign-in failed");
       setLoading(false);
@@ -44,7 +49,7 @@ function AuthPage() {
     }
     if (result.redirected) return;
     router.invalidate();
-    navigate({ to: "/", replace: true });
+    window.location.replace(dest);
   }
 
   async function handleEmail(e: React.FormEvent) {
@@ -54,7 +59,7 @@ function AuthPage() {
       const { error } = await supabase.auth.signUp({
         email,
         password,
-        options: { emailRedirectTo: window.location.origin },
+        options: { emailRedirectTo: `${window.location.origin}${dest}` },
       });
       setLoading(false);
       if (error) return toast.error(error.message);
@@ -64,7 +69,7 @@ function AuthPage() {
       setLoading(false);
       if (error) return toast.error(error.message);
       router.invalidate();
-      navigate({ to: "/", replace: true });
+      window.location.replace(dest);
     }
   }
 
