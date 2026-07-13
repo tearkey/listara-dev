@@ -71,7 +71,11 @@ export const createAd = createServerFn({ method: "POST" })
     const cost = cityIds.length * POST_COST_CENTS;
 
     if (status !== "rejected") {
-      const { data: spent, error: spendErr } = await supabase.rpc("spend_credits", {
+      // spend_credits is SECURITY DEFINER and now only executable by service_role.
+      // Call it through the admin client with an explicit user id.
+      const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+      const { data: spent, error: spendErr } = await supabaseAdmin.rpc("spend_credits", {
+        _user_id: context.userId,
         _amount_cents: cost,
         _reason: cityIds.length > 1 ? `post_ad_multi_${cityIds.length}` : "post_ad_local",
       });
