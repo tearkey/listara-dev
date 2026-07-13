@@ -1145,7 +1145,12 @@ export type Database = {
       pgrst_reload_schema: { Args: never; Returns: undefined }
       purge_abandoned_drafts: { Args: never; Returns: undefined }
       spend_credits: {
-        Args: { _ad_id?: string; _amount_cents: number; _reason: string }
+        Args: {
+          _ad_id?: string
+          _amount_cents: number
+          _reason: string
+          _user_id: string
+        }
         Returns: boolean
       }
     }
