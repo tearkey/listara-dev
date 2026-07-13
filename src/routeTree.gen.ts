@@ -14,6 +14,7 @@ import { Route as SearchRouteImport } from './routes/search'
 import { Route as SafetyRouteImport } from './routes/safety'
 import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as NotAvailableRouteImport } from './routes/not-available'
+import { Route as McpRouteImport } from './routes/mcp'
 import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as CitiesRouteImport } from './routes/cities'
 import { Route as AuthRouteImport } from './routes/auth'
@@ -25,6 +26,8 @@ import { Route as AuthenticatedPostRouteImport } from './routes/_authenticated/p
 import { Route as AuthenticatedMyAdsRouteImport } from './routes/_authenticated/my-ads'
 import { Route as AuthenticatedCreditsRouteImport } from './routes/_authenticated/credits'
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
+import { Route as Char91DotwellKnownChar93OauthProtectedResourceRouteImport } from './routes/[.well-known]/oauth-protected-resource'
+import { Route as Char91DotmcpChar93ListToolsRouteImport } from './routes/[.mcp]/list-tools'
 import { Route as StateCityRouteImport } from './routes/$state.$city'
 import { Route as AuthenticatedPostIndexRouteImport } from './routes/_authenticated/post.index'
 import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin.index'
@@ -44,6 +47,7 @@ import { Route as AuthenticatedAdminCatalogRouteImport } from './routes/_authent
 import { Route as AuthenticatedAdminAuditRouteImport } from './routes/_authenticated/admin.audit'
 import { Route as AuthenticatedAdminAnalyticsRouteImport } from './routes/_authenticated/admin.analytics'
 import { Route as AuthenticatedAdminAdsRouteImport } from './routes/_authenticated/admin.ads'
+import { Route as Char91DotmcpChar93InvokeToolToolRouteImport } from './routes/[.mcp]/invoke-tool/$tool'
 import { Route as StateCityCategoryRouteImport } from './routes/$state.$city.$category'
 import { Route as ApiPublicWebhooksNowpaymentsRouteImport } from './routes/api/public/webhooks/nowpayments'
 import { Route as ApiAdminAnalyticsExportRouteImport } from './routes/api/admin/analytics.export'
@@ -74,6 +78,11 @@ const PrivacyRoute = PrivacyRouteImport.update({
 const NotAvailableRoute = NotAvailableRouteImport.update({
   id: '/not-available',
   path: '/not-available',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const McpRoute = McpRouteImport.update({
+  id: '/mcp',
+  path: '/mcp',
   getParentRoute: () => rootRouteImport,
 } as any)
 const DashboardRoute = DashboardRouteImport.update({
@@ -130,6 +139,18 @@ const AuthenticatedAdminRoute = AuthenticatedAdminRouteImport.update({
   path: '/admin',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const Char91DotwellKnownChar93OauthProtectedResourceRoute =
+  Char91DotwellKnownChar93OauthProtectedResourceRouteImport.update({
+    id: '/.well-known/oauth-protected-resource',
+    path: '/.well-known/oauth-protected-resource',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const Char91DotmcpChar93ListToolsRoute =
+  Char91DotmcpChar93ListToolsRouteImport.update({
+    id: '/.mcp/list-tools',
+    path: '/.mcp/list-tools',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const StateCityRoute = StateCityRouteImport.update({
   id: '/$state/$city',
   path: '/$state/$city',
@@ -232,6 +253,12 @@ const AuthenticatedAdminAdsRoute = AuthenticatedAdminAdsRouteImport.update({
   path: '/ads',
   getParentRoute: () => AuthenticatedAdminRoute,
 } as any)
+const Char91DotmcpChar93InvokeToolToolRoute =
+  Char91DotmcpChar93InvokeToolToolRouteImport.update({
+    id: '/.mcp/invoke-tool/$tool',
+    path: '/.mcp/invoke-tool/$tool',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const StateCityCategoryRoute = StateCityCategoryRouteImport.update({
   id: '/$category',
   path: '/$category',
@@ -270,12 +297,15 @@ export interface FileRoutesByFullPath {
   '/auth': typeof AuthRoute
   '/cities': typeof CitiesRoute
   '/dashboard': typeof DashboardRouteWithChildren
+  '/mcp': typeof McpRoute
   '/not-available': typeof NotAvailableRoute
   '/privacy': typeof PrivacyRoute
   '/safety': typeof SafetyRoute
   '/search': typeof SearchRoute
   '/terms': typeof TermsRoute
   '/$state/$city': typeof StateCityRouteWithChildren
+  '/.mcp/list-tools': typeof Char91DotmcpChar93ListToolsRoute
+  '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   '/admin': typeof AuthenticatedAdminRouteWithChildren
   '/credits': typeof AuthenticatedCreditsRouteWithChildren
   '/my-ads': typeof AuthenticatedMyAdsRoute
@@ -283,6 +313,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/mfa': typeof DashboardMfaRoute
   '/dashboard/': typeof DashboardIndexRoute
   '/$state/$city/$category': typeof StateCityCategoryRouteWithChildren
+  '/.mcp/invoke-tool/$tool': typeof Char91DotmcpChar93InvokeToolToolRoute
   '/admin/ads': typeof AuthenticatedAdminAdsRoute
   '/admin/analytics': typeof AuthenticatedAdminAnalyticsRoute
   '/admin/audit': typeof AuthenticatedAdminAuditRoute
@@ -311,17 +342,21 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/cities': typeof CitiesRoute
+  '/mcp': typeof McpRoute
   '/not-available': typeof NotAvailableRoute
   '/privacy': typeof PrivacyRoute
   '/safety': typeof SafetyRoute
   '/search': typeof SearchRoute
   '/terms': typeof TermsRoute
   '/$state/$city': typeof StateCityRouteWithChildren
+  '/.mcp/list-tools': typeof Char91DotmcpChar93ListToolsRoute
+  '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   '/credits': typeof AuthenticatedCreditsRouteWithChildren
   '/my-ads': typeof AuthenticatedMyAdsRoute
   '/dashboard/mfa': typeof DashboardMfaRoute
   '/dashboard': typeof DashboardIndexRoute
   '/$state/$city/$category': typeof StateCityCategoryRouteWithChildren
+  '/.mcp/invoke-tool/$tool': typeof Char91DotmcpChar93InvokeToolToolRoute
   '/admin/ads': typeof AuthenticatedAdminAdsRoute
   '/admin/analytics': typeof AuthenticatedAdminAnalyticsRoute
   '/admin/audit': typeof AuthenticatedAdminAuditRoute
@@ -353,12 +388,15 @@ export interface FileRoutesById {
   '/auth': typeof AuthRoute
   '/cities': typeof CitiesRoute
   '/dashboard': typeof DashboardRouteWithChildren
+  '/mcp': typeof McpRoute
   '/not-available': typeof NotAvailableRoute
   '/privacy': typeof PrivacyRoute
   '/safety': typeof SafetyRoute
   '/search': typeof SearchRoute
   '/terms': typeof TermsRoute
   '/$state/$city': typeof StateCityRouteWithChildren
+  '/.mcp/list-tools': typeof Char91DotmcpChar93ListToolsRoute
+  '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   '/_authenticated/admin': typeof AuthenticatedAdminRouteWithChildren
   '/_authenticated/credits': typeof AuthenticatedCreditsRouteWithChildren
   '/_authenticated/my-ads': typeof AuthenticatedMyAdsRoute
@@ -366,6 +404,7 @@ export interface FileRoutesById {
   '/dashboard/mfa': typeof DashboardMfaRoute
   '/dashboard/': typeof DashboardIndexRoute
   '/$state/$city/$category': typeof StateCityCategoryRouteWithChildren
+  '/.mcp/invoke-tool/$tool': typeof Char91DotmcpChar93InvokeToolToolRoute
   '/_authenticated/admin/ads': typeof AuthenticatedAdminAdsRoute
   '/_authenticated/admin/analytics': typeof AuthenticatedAdminAnalyticsRoute
   '/_authenticated/admin/audit': typeof AuthenticatedAdminAuditRoute
@@ -397,12 +436,15 @@ export interface FileRouteTypes {
     | '/auth'
     | '/cities'
     | '/dashboard'
+    | '/mcp'
     | '/not-available'
     | '/privacy'
     | '/safety'
     | '/search'
     | '/terms'
     | '/$state/$city'
+    | '/.mcp/list-tools'
+    | '/.well-known/oauth-protected-resource'
     | '/admin'
     | '/credits'
     | '/my-ads'
@@ -410,6 +452,7 @@ export interface FileRouteTypes {
     | '/dashboard/mfa'
     | '/dashboard/'
     | '/$state/$city/$category'
+    | '/.mcp/invoke-tool/$tool'
     | '/admin/ads'
     | '/admin/analytics'
     | '/admin/audit'
@@ -438,17 +481,21 @@ export interface FileRouteTypes {
     | '/'
     | '/auth'
     | '/cities'
+    | '/mcp'
     | '/not-available'
     | '/privacy'
     | '/safety'
     | '/search'
     | '/terms'
     | '/$state/$city'
+    | '/.mcp/list-tools'
+    | '/.well-known/oauth-protected-resource'
     | '/credits'
     | '/my-ads'
     | '/dashboard/mfa'
     | '/dashboard'
     | '/$state/$city/$category'
+    | '/.mcp/invoke-tool/$tool'
     | '/admin/ads'
     | '/admin/analytics'
     | '/admin/audit'
@@ -479,12 +526,15 @@ export interface FileRouteTypes {
     | '/auth'
     | '/cities'
     | '/dashboard'
+    | '/mcp'
     | '/not-available'
     | '/privacy'
     | '/safety'
     | '/search'
     | '/terms'
     | '/$state/$city'
+    | '/.mcp/list-tools'
+    | '/.well-known/oauth-protected-resource'
     | '/_authenticated/admin'
     | '/_authenticated/credits'
     | '/_authenticated/my-ads'
@@ -492,6 +542,7 @@ export interface FileRouteTypes {
     | '/dashboard/mfa'
     | '/dashboard/'
     | '/$state/$city/$category'
+    | '/.mcp/invoke-tool/$tool'
     | '/_authenticated/admin/ads'
     | '/_authenticated/admin/analytics'
     | '/_authenticated/admin/audit'
@@ -523,12 +574,16 @@ export interface RootRouteChildren {
   AuthRoute: typeof AuthRoute
   CitiesRoute: typeof CitiesRoute
   DashboardRoute: typeof DashboardRouteWithChildren
+  McpRoute: typeof McpRoute
   NotAvailableRoute: typeof NotAvailableRoute
   PrivacyRoute: typeof PrivacyRoute
   SafetyRoute: typeof SafetyRoute
   SearchRoute: typeof SearchRoute
   TermsRoute: typeof TermsRoute
   StateCityRoute: typeof StateCityRouteWithChildren
+  Char91DotmcpChar93ListToolsRoute: typeof Char91DotmcpChar93ListToolsRoute
+  Char91DotwellKnownChar93OauthProtectedResourceRoute: typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
+  Char91DotmcpChar93InvokeToolToolRoute: typeof Char91DotmcpChar93InvokeToolToolRoute
   ApiPublicRobotsDottxtRoute: typeof ApiPublicRobotsDottxtRoute
   ApiPublicSitemapDotxmlRoute: typeof ApiPublicSitemapDotxmlRoute
   ApiAdminAnalyticsExportRoute: typeof ApiAdminAnalyticsExportRoute
@@ -570,6 +625,13 @@ declare module '@tanstack/react-router' {
       path: '/not-available'
       fullPath: '/not-available'
       preLoaderRoute: typeof NotAvailableRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/mcp': {
+      id: '/mcp'
+      path: '/mcp'
+      fullPath: '/mcp'
+      preLoaderRoute: typeof McpRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/dashboard': {
@@ -648,6 +710,20 @@ declare module '@tanstack/react-router' {
       fullPath: '/admin'
       preLoaderRoute: typeof AuthenticatedAdminRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/.well-known/oauth-protected-resource': {
+      id: '/.well-known/oauth-protected-resource'
+      path: '/.well-known/oauth-protected-resource'
+      fullPath: '/.well-known/oauth-protected-resource'
+      preLoaderRoute: typeof Char91DotwellKnownChar93OauthProtectedResourceRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/.mcp/list-tools': {
+      id: '/.mcp/list-tools'
+      path: '/.mcp/list-tools'
+      fullPath: '/.mcp/list-tools'
+      preLoaderRoute: typeof Char91DotmcpChar93ListToolsRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/$state/$city': {
       id: '/$state/$city'
@@ -781,6 +857,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/admin/ads'
       preLoaderRoute: typeof AuthenticatedAdminAdsRouteImport
       parentRoute: typeof AuthenticatedAdminRoute
+    }
+    '/.mcp/invoke-tool/$tool': {
+      id: '/.mcp/invoke-tool/$tool'
+      path: '/.mcp/invoke-tool/$tool'
+      fullPath: '/.mcp/invoke-tool/$tool'
+      preLoaderRoute: typeof Char91DotmcpChar93InvokeToolToolRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/$state/$city/$category': {
       id: '/$state/$city/$category'
@@ -951,12 +1034,17 @@ const rootRouteChildren: RootRouteChildren = {
   AuthRoute: AuthRoute,
   CitiesRoute: CitiesRoute,
   DashboardRoute: DashboardRouteWithChildren,
+  McpRoute: McpRoute,
   NotAvailableRoute: NotAvailableRoute,
   PrivacyRoute: PrivacyRoute,
   SafetyRoute: SafetyRoute,
   SearchRoute: SearchRoute,
   TermsRoute: TermsRoute,
   StateCityRoute: StateCityRouteWithChildren,
+  Char91DotmcpChar93ListToolsRoute: Char91DotmcpChar93ListToolsRoute,
+  Char91DotwellKnownChar93OauthProtectedResourceRoute:
+    Char91DotwellKnownChar93OauthProtectedResourceRoute,
+  Char91DotmcpChar93InvokeToolToolRoute: Char91DotmcpChar93InvokeToolToolRoute,
   ApiPublicRobotsDottxtRoute: ApiPublicRobotsDottxtRoute,
   ApiPublicSitemapDotxmlRoute: ApiPublicSitemapDotxmlRoute,
   ApiAdminAnalyticsExportRoute: ApiAdminAnalyticsExportRoute,
