@@ -3,7 +3,7 @@ import { queryOptions, useSuspenseQuery, useQueryClient } from "@tanstack/react-
 import { useServerFn } from "@tanstack/react-start";
 import { useState } from "react";
 import { toast } from "sonner";
-import { ShieldAlert, RefreshCw, PlusCircle, Trash2, KeyRound } from "lucide-react";
+import { ShieldAlert, RefreshCw, PlusCircle, Trash2, KeyRound, Play } from "lucide-react";
 import {
   listSecurityRuns,
   recordSecurityRun,
@@ -55,12 +55,40 @@ function AdminSecurityPage() {
   const [notes, setNotes] = useState("");
   const [pasted, setPasted] = useState("");
   const [busy, setBusy] = useState(false);
+  const [scanning, setScanning] = useState(false);
 
   async function refresh() {
     await Promise.all([
       qc.invalidateQueries({ queryKey: ["admin", "security", "runs"] }),
       qc.invalidateQueries({ queryKey: ["admin", "security", "diff"] }),
     ]);
+  }
+
+  async function runScanNow() {
+    setScanning(true);
+    try {
+      let findings: Finding[] = [];
+      const trimmed = pasted.trim();
+      if (trimmed) {
+        const parsed = JSON.parse(trimmed);
+        const arr = Array.isArray(parsed) ? parsed : parsed.findings;
+        if (!Array.isArray(arr)) throw new Error("Expected an array or { findings: [...] }");
+        findings = arr as Finding[];
+      }
+      await record({
+        data: {
+          findings,
+          notes: (notes || "Manual scan run") + ` · ${new Date().toISOString()}`,
+        },
+      });
+      setNotes(""); setPasted("");
+      toast.success(`New scan run recorded (${findings.length} findings). Diff refreshed.`);
+      await refresh();
+    } catch (e: any) {
+      toast.error(e?.message ?? "Failed to run scan");
+    } finally {
+      setScanning(false);
+    }
   }
 
   async function saveSnapshot() {
@@ -102,12 +130,22 @@ function AdminSecurityPage() {
             intentional <code className="rounded bg-muted px-1">SECURITY DEFINER</code> permission.
           </p>
         </div>
-        <button
-          onClick={refresh}
-          className="inline-flex items-center gap-1 rounded-md border border-border px-3 py-1.5 text-xs"
-        >
-          <RefreshCw className="h-3.5 w-3.5" /> Refresh
-        </button>
+        <div className="flex items-center gap-2">
+          <button
+            onClick={runScanNow}
+            disabled={scanning}
+            aria-label="Run new scan and refresh diff"
+            className="inline-flex items-center gap-1 rounded-md bg-brand px-3 py-1.5 text-xs text-brand-foreground disabled:opacity-60"
+          >
+            <Play className="h-3.5 w-3.5" /> {scanning ? "Running…" : "Run scan now"}
+          </button>
+          <button
+            onClick={refresh}
+            className="inline-flex items-center gap-1 rounded-md border border-border px-3 py-1.5 text-xs"
+          >
+            <RefreshCw className="h-3.5 w-3.5" /> Refresh
+          </button>
+        </div>
       </header>
 
       <DiffPanel

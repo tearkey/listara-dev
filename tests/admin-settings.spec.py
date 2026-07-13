@@ -50,17 +50,34 @@ async def main():
         await page.wait_for_timeout(1500)
         await page.screenshot(path=str(SS / "settings_3_saved.png"))
 
-        # 5) Reload and confirm value persisted
+        # 5) Full page reload — server re-reads from the DB via getAllSettings.
         await page.reload(wait_until="networkidle")
         tagline = page.get_by_text("Tagline", exact=True).locator("..").locator("input")
         await tagline.wait_for(state="visible", timeout=8000)
-        current = await tagline.input_value()
+        after_reload = await tagline.input_value()
         await page.screenshot(path=str(SS / "settings_4_reload.png"))
+
+        # 6) Fresh browser context (no cached React state / no service worker) —
+        #    re-sign-in and confirm the same value comes back from the DB.
+        fresh_ctx = await browser.new_context(viewport={"width": 1280, "height": 1800})
+        fresh = await fresh_ctx.new_page()
+        await fresh.goto(f"{BASE}/dashboard", wait_until="domcontentloaded")
+        await fresh.locator('input[type="email"]').fill(EMAIL)
+        await fresh.locator('input[type="password"]').fill(PASSWORD)
+        await fresh.locator('button[type="submit"]').click()
+        await fresh.wait_for_url(lambda u: "/admin" in u or "/dashboard" in u, timeout=15_000)
+        await fresh.goto(f"{BASE}/admin/settings", wait_until="networkidle")
+        tagline2 = fresh.get_by_text("Tagline", exact=True).locator("..").locator("input")
+        await tagline2.wait_for(state="visible", timeout=8000)
+        fresh_value = await tagline2.input_value()
+        await fresh.screenshot(path=str(SS / "settings_5_fresh_context.png"))
 
         await browser.close()
 
-    if current != unique:
-        print(f"FAIL: expected tagline {unique!r}, got {current!r}"); sys.exit(1)
-    print(f"PASS: Global Settings persisted tagline = {unique!r}")
+    if after_reload != unique:
+        print(f"FAIL: after reload expected {unique!r}, got {after_reload!r}"); sys.exit(1)
+    if fresh_value != unique:
+        print(f"FAIL: fresh context expected {unique!r}, got {fresh_value!r}"); sys.exit(1)
+    print(f"PASS: Global Settings persisted (reload + fresh context) tagline = {unique!r}")
 
 asyncio.run(main())

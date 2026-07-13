@@ -13,7 +13,15 @@ from playwright.async_api import async_playwright
 BASE = os.environ.get("BASE_URL", "http://localhost:8080")
 FORBIDDEN = ("contact_email", "contact_phone")
 
-PUBLIC_PAGES = ["/", "/search", "/cities"]
+PUBLIC_PAGES = [
+    "/",
+    "/search",
+    "/search?q=a",
+    "/search?q=a&page=2",
+    "/search?q=service",
+    "/search?category=services",
+    "/cities",
+]
 
 async def main():
     leaks: list[str] = []
@@ -37,22 +45,31 @@ async def main():
 
         page.on("response", on_response)
 
-        # Exercise anon-visible pages: home, search results, city index.
         for path in PUBLIC_PAGES:
             await page.goto(f"{BASE}{path}", wait_until="networkidle")
             await page.wait_for_timeout(400)
 
-        # Perform a search that likely returns live ads.
-        await page.goto(f"{BASE}/search?q=a", wait_until="networkidle")
-        await page.wait_for_timeout(600)
-
-        # Follow the first ad detail link if present (also anon path).
+        # Walk into any city listing pages surfaced from /cities (state/city/category).
         try:
-            first = page.locator('a[href*="/"]:has-text("$"), a[href*="/"]').first
-            href = await first.get_attribute("href")
-            if href and href.startswith("/") and href.count("/") >= 4:
-                await page.goto(f"{BASE}{href}", wait_until="networkidle")
-                await page.wait_for_timeout(400)
+            await page.goto(f"{BASE}/cities", wait_until="networkidle")
+            hrefs = await page.eval_on_selector_all(
+                'a[href^="/"]',
+                "els => Array.from(new Set(els.map(e => e.getAttribute('href')))).filter(h => h && h.split('/').length >= 3).slice(0, 6)",
+            )
+            for href in hrefs:
+                try:
+                    await page.goto(f"{BASE}{href}", wait_until="networkidle")
+                    await page.wait_for_timeout(300)
+                    # Follow the first ad detail (deepest path) on that listing.
+                    ad = await page.eval_on_selector_all(
+                        'a[href^="/"]',
+                        "els => els.map(e => e.getAttribute('href')).find(h => h && h.split('/').length >= 5) || null",
+                    )
+                    if ad:
+                        await page.goto(f"{BASE}{ad}", wait_until="networkidle")
+                        await page.wait_for_timeout(300)
+                except Exception:
+                    continue
         except Exception:
             pass
 
