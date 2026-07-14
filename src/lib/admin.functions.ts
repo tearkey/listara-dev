@@ -328,19 +328,49 @@ export const listAutoTakedowns = createServerFn({ method: "GET" })
 
 // Admin's own notification inbox (populated by moderation_auto_takedown and
 // any future admin-facing event fan-outs). Read-only list + a mark-read mutation.
+// Server-side paginated/ordered/filterable list. Filters:
+//  - status: unread | read | all
+//  - kind:   free-text match on notification.kind (e.g. "auto_takedown")
+//  - q:      case-insensitive substring against title/body
+//  - order:  newest | oldest
+// Page indexed from 1. Returns `total` for pager UI.
 export const listAdminNotifications = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
-  .handler(async ({ context }) => {
+  .inputValidator((d) =>
+    z
+      .object({
+        page: z.number().int().min(1).max(10_000).optional(),
+        pageSize: z.number().int().min(1).max(200).optional(),
+        status: z.enum(["all", "unread", "read"]).optional(),
+        kind: z.string().trim().max(64).optional(),
+        q: z.string().trim().max(200).optional(),
+        order: z.enum(["newest", "oldest"]).optional(),
+      })
+      .parse(d ?? {}),
+  )
+  .handler(async ({ data, context }) => {
     await assertAdmin(context);
-    const { data, error } = await (context.supabase as any)
+    const page = data.page ?? 1;
+    const pageSize = data.pageSize ?? 25;
+    const from = (page - 1) * pageSize;
+    const to = from + pageSize - 1;
+    let q = (context.supabase as any)
       .from("admin_notifications")
-      .select("id, kind, title, body, target_table, target_id, detail, read_at, created_at")
-      .order("created_at", { ascending: false })
-      .limit(100);
+      .select(
+        "id, kind, title, body, target_table, target_id, detail, read_at, created_at",
+        { count: "exact" },
+      )
+      .order("created_at", { ascending: data.order === "oldest" })
+      .range(from, to);
+    if (data.status === "unread") q = q.is("read_at", null);
+    else if (data.status === "read") q = q.not("read_at", "is", null);
+    if (data.kind) q = q.eq("kind", data.kind);
+    if (data.q) {
+      const like = `%${data.q.replace(/[%_]/g, (m) => `\\${m}`)}%`;
+      q = q.or(`title.ilike.${like},body.ilike.${like}`);
+    }
+    const { data: rows, count, error } = await q;
     if (error) throw new Error(error.message);
-    // Typed as a JSON-serializable value so the TanStack server-fn RPC
-    // serializer accepts it — `any` produced a "Type ... is not
-    // serializable" complaint at build.
     type JsonValue =
       | string
       | number
@@ -348,12 +378,82 @@ export const listAdminNotifications = createServerFn({ method: "GET" })
       | null
       | { [k: string]: JsonValue }
       | JsonValue[];
-    return (data ?? []) as Array<{
-      id: string; kind: string; title: string; body: string | null;
-      target_table: string | null; target_id: string | null;
-      detail: { [k: string]: JsonValue } | null;
-      read_at: string | null; created_at: string;
-    }>;
+    return {
+      rows: (rows ?? []) as Array<{
+        id: string; kind: string; title: string; body: string | null;
+        target_table: string | null; target_id: string | null;
+        detail: { [k: string]: JsonValue } | null;
+        read_at: string | null; created_at: string;
+      }>,
+      total: (count as number | null) ?? 0,
+      page,
+      pageSize,
+    };
+  });
+
+// Distinct notification kinds — powers filter chips in the inbox UI.
+export const listAdminNotificationKinds = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    await assertAdmin(context);
+    const { data, error } = await (context.supabase as any)
+      .from("admin_notifications")
+      .select("kind")
+      .order("created_at", { ascending: false })
+      .limit(1000);
+    if (error) throw new Error(error.message);
+    const set = new Set<string>();
+    for (const r of (data ?? []) as Array<{ kind: string }>) set.add(r.kind);
+    return Array.from(set).sort();
+  });
+
+// CSV export of admin_notifications rows the current admin can read. Honors
+// the same filters as listAdminNotifications so operators can export exactly
+// what they're viewing (e.g. only moderation_auto_takedown alerts).
+export const exportAdminNotificationsCsv = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d) =>
+    z
+      .object({
+        status: z.enum(["all", "unread", "read"]).optional(),
+        kind: z.string().trim().max(64).optional(),
+        q: z.string().trim().max(200).optional(),
+        order: z.enum(["newest", "oldest"]).optional(),
+      })
+      .parse(d ?? {}),
+  )
+  .handler(async ({ data, context }) => {
+    await assertAdmin(context);
+    let q = (context.supabase as any)
+      .from("admin_notifications")
+      .select("id, kind, title, body, target_table, target_id, detail, read_at, created_at")
+      .order("created_at", { ascending: data.order === "oldest" })
+      .limit(10_000);
+    if (data.status === "unread") q = q.is("read_at", null);
+    else if (data.status === "read") q = q.not("read_at", "is", null);
+    if (data.kind) q = q.eq("kind", data.kind);
+    if (data.q) {
+      const like = `%${data.q.replace(/[%_]/g, (m) => `\\${m}`)}%`;
+      q = q.or(`title.ilike.${like},body.ilike.${like}`);
+    }
+    const { data: rows, error } = await q;
+    if (error) throw new Error(error.message);
+    const esc = (v: unknown) => {
+      if (v === null || v === undefined) return "";
+      const s = typeof v === "string" ? v : JSON.stringify(v);
+      return /[",\n\r]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s;
+    };
+    const header = ["id","created_at","read_at","kind","title","body","target_table","target_id","detail"];
+    const lines = [header.join(",")];
+    for (const r of (rows ?? []) as Array<any>) {
+      lines.push([
+        r.id, r.created_at, r.read_at ?? "",
+        r.kind, r.title, r.body ?? "",
+        r.target_table ?? "", r.target_id ?? "",
+        r.detail ?? "",
+      ].map(esc).join(","));
+    }
+    return { filename: `admin-notifications-${new Date().toISOString().slice(0,10)}.csv`, csv: lines.join("\n") };
   });
 
 // Unread notification count for the current admin — used by the sidebar
@@ -409,7 +509,13 @@ export const exportAutoTakedownsCsv = createServerFn({ method: "GET" })
 export const markAdminNotificationRead = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((d) =>
-    z.object({ id: z.string().uuid().optional(), all: z.boolean().optional() }).parse(d ?? {}),
+    z
+      .object({
+        id: z.string().uuid().optional(),
+        ids: z.array(z.string().uuid()).max(500).optional(),
+        all: z.boolean().optional(),
+      })
+      .parse(d ?? {}),
   )
   .handler(async ({ data, context }) => {
     await assertAdmin(context);
@@ -420,6 +526,7 @@ export const markAdminNotificationRead = createServerFn({ method: "POST" })
       .is("read_at", null)
       .eq("user_id", context.userId);
     if (data.id) q = q.eq("id", data.id);
+    else if (data.ids && data.ids.length) q = q.in("id", data.ids);
     const { error } = await q;
     if (error) throw new Error(error.message);
     return { ok: true };
