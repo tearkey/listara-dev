@@ -1095,6 +1095,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      ad_rank_breakdown: { Args: { _ad_id: string }; Returns: Json }
       ad_rank_score: {
         Args: {
           _bumped_at: string
