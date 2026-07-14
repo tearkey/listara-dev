@@ -531,3 +531,110 @@ export const markAdminNotificationRead = createServerFn({ method: "POST" })
     if (error) throw new Error(error.message);
     return { ok: true };
   });
+
+// Dry-run: returns the ads that WOULD be auto-removed at the given threshold
+// without changing state. Uses the SECURITY DEFINER helper installed in
+// migration 20260714_dry_run_and_cron_health.
+export const autoTakedownDryRun = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d) =>
+    z
+      .object({
+        threshold: z.number().int().min(1).max(100).optional(),
+        min_age_minutes: z.number().int().min(0).max(1440).optional(),
+      })
+      .parse(d ?? {}),
+  )
+  .handler(async ({ data, context }) => {
+    await assertAdmin(context);
+    const { data: rows, error } = await (context.supabase as any).rpc(
+      "moderation_auto_takedown_dry_run",
+      { _threshold: data.threshold ?? 5, _min_age_minutes: data.min_age_minutes ?? 10 },
+    );
+    if (error) throw new Error(error.message);
+    return (rows ?? []) as Array<{
+      ad_id: string; short_id: string; title: string;
+      open_reports: number; first_report_at: string;
+    }>;
+  });
+
+// Live-run: executes moderation_auto_takedown right now and returns the
+// number of ads removed. Writes an audit_log entry per removal (the DB
+// function does this itself).
+export const runAutoTakedownNow = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d) =>
+    z
+      .object({
+        threshold: z.number().int().min(1).max(100).optional(),
+        min_age_minutes: z.number().int().min(0).max(1440).optional(),
+      })
+      .parse(d ?? {}),
+  )
+  .handler(async ({ data, context }) => {
+    await assertAdmin(context);
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { data: removed, error } = await (supabaseAdmin as any).rpc("moderation_auto_takedown", {
+      _threshold: data.threshold ?? 5,
+      _min_age_minutes: data.min_age_minutes ?? 10,
+    });
+    if (error) throw new Error(error.message);
+    return { removed: (removed as number | null) ?? 0 };
+  });
+
+// Cron job health — list of every scheduled job with its most recent run.
+export const listCronStatus = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    await assertAdmin(context);
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { data, error } = await (supabaseAdmin as any).rpc("admin_cron_status");
+    if (error) throw new Error(error.message);
+    return (data ?? []) as Array<{
+      jobid: number; jobname: string; schedule: string; active: boolean;
+      last_start: string | null; last_end: string | null;
+      last_status: string | null; last_return_message: string | null;
+    }>;
+  });
+
+// NowPayments webhook health — last invoice touched by the IPN endpoint,
+// signing-secret presence, and current system-wide credit float.
+export const getNowpaymentsHealth = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    await assertAdmin(context);
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const [lastInvoice, recent, credits] = await Promise.all([
+      (supabaseAdmin as any)
+        .from("invoices")
+        .select("id, status, nowpayments_order_id, nowpayments_payment_id, credit_cents, pay_amount, pay_currency, updated_at, created_at")
+        .not("nowpayments_payment_id", "is", null)
+        .order("updated_at", { ascending: false })
+        .limit(1)
+        .maybeSingle(),
+      (supabaseAdmin as any)
+        .from("invoices")
+        .select("id, status, updated_at")
+        .not("nowpayments_payment_id", "is", null)
+        .order("updated_at", { ascending: false })
+        .limit(20),
+      (supabaseAdmin as any).from("user_credits").select("balance_cents"),
+    ]);
+    const creditFloat = (credits.data ?? []).reduce(
+      (s: number, r: any) => s + (r.balance_cents ?? 0),
+      0,
+    );
+    const rows = (recent.data ?? []) as Array<{ status: string; updated_at: string }>;
+    const counts = rows.reduce<Record<string, number>>((acc, r) => {
+      acc[r.status] = (acc[r.status] ?? 0) + 1; return acc;
+    }, {});
+    return {
+      signing_secret_configured: Boolean(process.env.NOWPAYMENTS_IPN_SECRET),
+      api_key_configured: Boolean(process.env.NOWPAYMENTS_API_KEY),
+      last_webhook: lastInvoice.data ?? null,
+      recent_counts: counts,
+      recent_sample: rows.slice(0, 10),
+      credit_float_cents: creditFloat,
+      checked_at: new Date().toISOString(),
+    };
+  });
