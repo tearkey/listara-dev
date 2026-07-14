@@ -1,9 +1,9 @@
 import { createFileRoute, Link, Outlet, useRouterState, Navigate } from "@tanstack/react-router";
-import { queryOptions, useSuspenseQuery } from "@tanstack/react-query";
-import { ShieldCheck, Users, Newspaper, CreditCard, ToggleLeft, ScrollText, LayoutDashboard, Gavel, BarChart3, Settings, MapPin, ShieldAlert } from "lucide-react";
+import { queryOptions, useSuspenseQuery, useQuery } from "@tanstack/react-query";
+import { ShieldCheck, Users, Newspaper, CreditCard, ToggleLeft, ScrollText, LayoutDashboard, Gavel, BarChart3, Settings, MapPin, ShieldAlert, Inbox } from "lucide-react";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
-import { getAdminStats } from "@/lib/admin.functions";
+import { getAdminStats, countUnreadAdminNotifications } from "@/lib/admin.functions";
 import { BRAND } from "@/lib/brand";
 
 // Gate the whole /admin/* subtree on admin role (via stats fetch — throws Forbidden otherwise).
@@ -49,6 +49,7 @@ const NAV: Array<{ to: string; label: string; icon: any; exact?: boolean }> = [
   { to: "/admin/analytics", label: "Analytics", icon: BarChart3 },
   { to: "/admin/moderation-dashboard", label: "Moderation", icon: Gavel },
   { to: "/admin/auto-takedowns", label: "Auto take-downs", icon: ShieldAlert },
+  { to: "/admin/inbox", label: "Inbox", icon: Inbox },
   { to: "/admin/users", label: "Users", icon: Users },
   { to: "/admin/ads", label: "Ads", icon: Newspaper },
   { to: "/admin/payments", label: "Payments", icon: CreditCard },
@@ -62,6 +63,13 @@ const NAV: Array<{ to: string; label: string; icon: any; exact?: boolean }> = [
 function AdminLayout() {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   useSuspenseQuery(gateOpts); // ensures forbidden throws render the errorComponent
+  const { data: unreadData } = useQuery({
+    queryKey: ["admin", "notifications", "unread-count"],
+    queryFn: () => countUnreadAdminNotifications(),
+    staleTime: 30_000,
+    refetchInterval: 60_000,
+  });
+  const unread = unreadData?.unread ?? 0;
   return (
     <div className="min-h-screen bg-background">
       <SiteHeader />
@@ -75,6 +83,7 @@ function AdminLayout() {
             <nav className="flex md:flex-col gap-1 overflow-x-auto">
               {NAV.map(({ to, label, icon: Icon, exact }) => {
                 const active = exact ? pathname === to : pathname.startsWith(to);
+                const showBadge = to === "/admin/inbox" && unread > 0;
                 return (
                   <Link
                     key={to}
@@ -85,7 +94,13 @@ function AdminLayout() {
                         : "text-muted-foreground hover:bg-secondary hover:text-foreground"
                     }`}
                   >
-                    <Icon className="h-4 w-4" /> {label}
+                    <Icon className="h-4 w-4" />
+                    <span className="flex-1">{label}</span>
+                    {showBadge && (
+                      <span className="ml-auto rounded-full bg-brand px-1.5 py-0.5 text-[10px] font-semibold text-brand-foreground">
+                        {unread > 99 ? "99+" : unread}
+                      </span>
+                    )}
                   </Link>
                 );
               })}
