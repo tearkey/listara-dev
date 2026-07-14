@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import { queryOptions, useSuspenseQuery, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { zodValidator, fallback } from "@tanstack/zod-adapter";
@@ -136,7 +136,7 @@ function InboxPage() {
   function setSearch(patch: Partial<SearchState>, resetPage = true) {
     navigate({
       to: ".",
-      search: (prev) => ({ ...prev, ...patch, ...(resetPage ? { page: 1 } : {}) }),
+      search: (prev: SearchState) => ({ ...prev, ...patch, ...(resetPage ? { page: 1 } : {}) }),
     });
   }
 
