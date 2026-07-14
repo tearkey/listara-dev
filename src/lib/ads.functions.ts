@@ -283,13 +283,30 @@ export const reportAd = createServerFn({ method: "POST" })
     }).parse(d),
   )
   .handler(async ({ data, context }) => {
+    // Rate limit: at most 5 reports per hour per user across all ads.
+    // Combined with the (ad_id, reporter_id) partial-unique index on open
+    // reports and DISTINCT-reporter counting in moderation_auto_takedown,
+    // this prevents a single account from forcing a takedown via spam.
+    const { data: allowed, error: rlErr } = await context.supabase.rpc("consume_rate_limit", {
+      _action: "report_ad",
+      _max: 5,
+      _window_seconds: 60 * 60,
+    });
+    if (rlErr) throw new Error(rlErr.message);
+    if (!allowed) throw new Error("You're reporting too quickly. Please try again later.");
+
     const { error } = await context.supabase.from("reports").insert({
       ad_id: data.ad_id,
       reporter_id: context.userId,
       reason: data.reason,
       detail: data.detail ?? null,
     });
-    if (error) throw new Error(error.message);
+    if (error) {
+      // Partial unique index on (ad_id, reporter_id) WHERE status='open'
+      // — swallow duplicate as a successful no-op so the UI stays idempotent.
+      if ((error as any).code === "23505") return { ok: true, duplicate: true };
+      throw new Error(error.message);
+    }
     return { ok: true };
   });
 
