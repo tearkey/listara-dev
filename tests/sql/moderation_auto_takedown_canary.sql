@@ -22,7 +22,7 @@ DECLARE
   _notifs int;
   _detail jsonb;
 BEGIN
-  SELECT id INTO _uid   FROM auth.users LIMIT 1;
+  SELECT id INTO _uid   FROM public.profiles LIMIT 1;
   IF _uid IS NULL THEN _uid := gen_random_uuid(); END IF;
   SELECT id INTO _city  FROM public.cities     LIMIT 1;
   SELECT id INTO _cat   FROM public.categories LIMIT 1;
