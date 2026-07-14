@@ -44,6 +44,7 @@ import { Route as AuthenticatedAdminPaymentsRouteImport } from './routes/_authen
 import { Route as AuthenticatedAdminModerationDashboardRouteImport } from './routes/_authenticated/admin.moderation-dashboard'
 import { Route as AuthenticatedAdminFlagsRouteImport } from './routes/_authenticated/admin.flags'
 import { Route as AuthenticatedAdminCatalogRouteImport } from './routes/_authenticated/admin.catalog'
+import { Route as AuthenticatedAdminAutoTakedownsRouteImport } from './routes/_authenticated/admin.auto-takedowns'
 import { Route as AuthenticatedAdminAuditRouteImport } from './routes/_authenticated/admin.audit'
 import { Route as AuthenticatedAdminAnalyticsRouteImport } from './routes/_authenticated/admin.analytics'
 import { Route as AuthenticatedAdminAdsRouteImport } from './routes/_authenticated/admin.ads'
@@ -238,6 +239,12 @@ const AuthenticatedAdminCatalogRoute =
     path: '/catalog',
     getParentRoute: () => AuthenticatedAdminRoute,
   } as any)
+const AuthenticatedAdminAutoTakedownsRoute =
+  AuthenticatedAdminAutoTakedownsRouteImport.update({
+    id: '/auto-takedowns',
+    path: '/auto-takedowns',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
 const AuthenticatedAdminAuditRoute = AuthenticatedAdminAuditRouteImport.update({
   id: '/audit',
   path: '/audit',
@@ -324,6 +331,7 @@ export interface FileRoutesByFullPath {
   '/admin/ads': typeof AuthenticatedAdminAdsRoute
   '/admin/analytics': typeof AuthenticatedAdminAnalyticsRoute
   '/admin/audit': typeof AuthenticatedAdminAuditRoute
+  '/admin/auto-takedowns': typeof AuthenticatedAdminAutoTakedownsRoute
   '/admin/catalog': typeof AuthenticatedAdminCatalogRoute
   '/admin/flags': typeof AuthenticatedAdminFlagsRoute
   '/admin/moderation-dashboard': typeof AuthenticatedAdminModerationDashboardRoute
@@ -368,6 +376,7 @@ export interface FileRoutesByTo {
   '/admin/ads': typeof AuthenticatedAdminAdsRoute
   '/admin/analytics': typeof AuthenticatedAdminAnalyticsRoute
   '/admin/audit': typeof AuthenticatedAdminAuditRoute
+  '/admin/auto-takedowns': typeof AuthenticatedAdminAutoTakedownsRoute
   '/admin/catalog': typeof AuthenticatedAdminCatalogRoute
   '/admin/flags': typeof AuthenticatedAdminFlagsRoute
   '/admin/moderation-dashboard': typeof AuthenticatedAdminModerationDashboardRoute
@@ -417,6 +426,7 @@ export interface FileRoutesById {
   '/_authenticated/admin/ads': typeof AuthenticatedAdminAdsRoute
   '/_authenticated/admin/analytics': typeof AuthenticatedAdminAnalyticsRoute
   '/_authenticated/admin/audit': typeof AuthenticatedAdminAuditRoute
+  '/_authenticated/admin/auto-takedowns': typeof AuthenticatedAdminAutoTakedownsRoute
   '/_authenticated/admin/catalog': typeof AuthenticatedAdminCatalogRoute
   '/_authenticated/admin/flags': typeof AuthenticatedAdminFlagsRoute
   '/_authenticated/admin/moderation-dashboard': typeof AuthenticatedAdminModerationDashboardRoute
@@ -466,6 +476,7 @@ export interface FileRouteTypes {
     | '/admin/ads'
     | '/admin/analytics'
     | '/admin/audit'
+    | '/admin/auto-takedowns'
     | '/admin/catalog'
     | '/admin/flags'
     | '/admin/moderation-dashboard'
@@ -510,6 +521,7 @@ export interface FileRouteTypes {
     | '/admin/ads'
     | '/admin/analytics'
     | '/admin/audit'
+    | '/admin/auto-takedowns'
     | '/admin/catalog'
     | '/admin/flags'
     | '/admin/moderation-dashboard'
@@ -558,6 +570,7 @@ export interface FileRouteTypes {
     | '/_authenticated/admin/ads'
     | '/_authenticated/admin/analytics'
     | '/_authenticated/admin/audit'
+    | '/_authenticated/admin/auto-takedowns'
     | '/_authenticated/admin/catalog'
     | '/_authenticated/admin/flags'
     | '/_authenticated/admin/moderation-dashboard'
@@ -850,6 +863,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminCatalogRouteImport
       parentRoute: typeof AuthenticatedAdminRoute
     }
+    '/_authenticated/admin/auto-takedowns': {
+      id: '/_authenticated/admin/auto-takedowns'
+      path: '/auto-takedowns'
+      fullPath: '/admin/auto-takedowns'
+      preLoaderRoute: typeof AuthenticatedAdminAutoTakedownsRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
     '/_authenticated/admin/audit': {
       id: '/_authenticated/admin/audit'
       path: '/audit'
@@ -934,6 +954,7 @@ interface AuthenticatedAdminRouteChildren {
   AuthenticatedAdminAdsRoute: typeof AuthenticatedAdminAdsRoute
   AuthenticatedAdminAnalyticsRoute: typeof AuthenticatedAdminAnalyticsRoute
   AuthenticatedAdminAuditRoute: typeof AuthenticatedAdminAuditRoute
+  AuthenticatedAdminAutoTakedownsRoute: typeof AuthenticatedAdminAutoTakedownsRoute
   AuthenticatedAdminCatalogRoute: typeof AuthenticatedAdminCatalogRoute
   AuthenticatedAdminFlagsRoute: typeof AuthenticatedAdminFlagsRoute
   AuthenticatedAdminModerationDashboardRoute: typeof AuthenticatedAdminModerationDashboardRoute
@@ -948,6 +969,7 @@ const AuthenticatedAdminRouteChildren: AuthenticatedAdminRouteChildren = {
   AuthenticatedAdminAdsRoute: AuthenticatedAdminAdsRoute,
   AuthenticatedAdminAnalyticsRoute: AuthenticatedAdminAnalyticsRoute,
   AuthenticatedAdminAuditRoute: AuthenticatedAdminAuditRoute,
+  AuthenticatedAdminAutoTakedownsRoute: AuthenticatedAdminAutoTakedownsRoute,
   AuthenticatedAdminCatalogRoute: AuthenticatedAdminCatalogRoute,
   AuthenticatedAdminFlagsRoute: AuthenticatedAdminFlagsRoute,
   AuthenticatedAdminModerationDashboardRoute:
