@@ -6,7 +6,6 @@
 -- Rolled back at the end — no persistent data.
 
 BEGIN;
-SET LOCAL role = 'postgres';
 
 DO $$
 DECLARE
