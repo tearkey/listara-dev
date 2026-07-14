@@ -327,7 +327,7 @@ export const listAdminNotifications = createServerFn({ method: "GET" })
     return (data ?? []) as Array<{
       id: string; kind: string; title: string; body: string | null;
       target_table: string | null; target_id: string | null;
-      detail: Record<string, unknown> | null;
+      detail: Record<string, any> | null;
       read_at: string | null; created_at: string;
     }>;
   });
