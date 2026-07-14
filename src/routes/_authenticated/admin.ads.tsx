@@ -3,9 +3,9 @@ import { queryOptions, useSuspenseQuery, useQueryClient } from "@tanstack/react-
 import { useServerFn } from "@tanstack/react-start";
 import { useState } from "react";
 import { toast } from "sonner";
-import { Trash2, Loader2 } from "lucide-react";
+import { Trash2, Loader2, Sparkles, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { listAllAds, removeAd } from "@/lib/admin.functions";
+import { listAllAds, removeAd, explainAdRank } from "@/lib/admin.functions";
 
 type Status = "pending" | "live" | "rejected" | "expired" | "removed" | "draft";
 
@@ -35,7 +35,19 @@ function AdminAds() {
   const { data: rows } = useSuspenseQuery(adsOpts(status));
   const qc = useQueryClient();
   const removeFn = useServerFn(removeAd);
+  const explainFn = useServerFn(explainAdRank);
   const [busy, setBusy] = useState<string | null>(null);
+  const [explaining, setExplaining] = useState<string | null>(null);
+  const [explanation, setExplanation] = useState<Awaited<ReturnType<typeof explainAdRank>> | null>(null);
+
+  async function doExplain(id: string) {
+    setExplaining(id);
+    try {
+      const r = await explainFn({ data: { id } });
+      setExplanation(r);
+    } catch (e: any) { toast.error(e.message); }
+    finally { setExplaining(null); }
+  }
 
   async function doRemove(id: string) {
     const reason = window.prompt("Reason for removal:", "Removed by admin");
@@ -87,11 +99,16 @@ function AdminAds() {
                 <td className="px-4 py-3 text-xs text-muted-foreground">{new Date(r.created_at).toLocaleString()}</td>
                 <td className="px-4 py-3">
                   <div className="flex justify-end">
-                    {r.status !== "removed" ? (
-                      <Button size="sm" variant="destructive" disabled={busy === r.id} onClick={() => doRemove(r.id)}>
-                        {busy === r.id ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Trash2 className="h-3.5 w-3.5" />} Remove
+                    <div className="flex gap-2">
+                      <Button size="sm" variant="outline" disabled={explaining === r.id} onClick={() => doExplain(r.id)} title="Explain ranking score">
+                        {explaining === r.id ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Sparkles className="h-3.5 w-3.5" />} Why?
                       </Button>
-                    ) : <span className="text-xs text-muted-foreground">—</span>}
+                      {r.status !== "removed" ? (
+                        <Button size="sm" variant="destructive" disabled={busy === r.id} onClick={() => doRemove(r.id)}>
+                          {busy === r.id ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Trash2 className="h-3.5 w-3.5" />} Remove
+                        </Button>
+                      ) : <span className="text-xs text-muted-foreground">—</span>}
+                    </div>
                   </div>
                 </td>
               </tr>
@@ -99,6 +116,39 @@ function AdminAds() {
           </tbody>
         </table>
       </div>
+      {explanation && (
+        <div role="dialog" aria-modal="true" className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4" onClick={() => setExplanation(null)}>
+          <div className="w-full max-w-lg rounded-2xl border border-border bg-card p-6 shadow-xl" onClick={(e) => e.stopPropagation()}>
+            <div className="flex items-start justify-between gap-4">
+              <div>
+                <h2 className="font-display text-lg font-bold">Ranking breakdown</h2>
+                <p className="mt-0.5 text-xs text-muted-foreground">#{explanation.short_id} · {explanation.title}</p>
+              </div>
+              <button aria-label="Close" onClick={() => setExplanation(null)} className="rounded-full p-1 hover:bg-secondary"><X className="h-4 w-4" /></button>
+            </div>
+            <div className="mt-4 grid grid-cols-3 gap-2 text-center text-xs">
+              <div className="rounded-lg bg-secondary/60 p-2"><div className="text-muted-foreground">Tier</div><div className="font-semibold">{explanation.tier}</div></div>
+              <div className="rounded-lg bg-secondary/60 p-2"><div className="text-muted-foreground">Age</div><div className="font-semibold">{explanation.age_days}d</div></div>
+              <div className="rounded-lg bg-secondary/60 p-2"><div className="text-muted-foreground">Views · Reports</div><div className="font-semibold">{explanation.views} · {explanation.reports}</div></div>
+            </div>
+            <ul className="mt-4 divide-y divide-border">
+              {explanation.components.map((c) => (
+                <li key={c.label} className="flex items-start justify-between gap-4 py-2 text-sm">
+                  <div>
+                    <div className="font-medium">{c.label}</div>
+                    <div className="text-xs text-muted-foreground">{c.explain}</div>
+                  </div>
+                  <div className={`font-mono text-sm tabular-nums ${c.value < 0 ? "text-destructive" : c.value > 0 ? "text-brand-strong" : "text-muted-foreground"}`}>{c.value >= 0 ? "+" : ""}{c.value}</div>
+                </li>
+              ))}
+            </ul>
+            <div className="mt-4 flex items-center justify-between rounded-lg border border-border bg-secondary/40 p-3">
+              <span className="text-sm font-semibold">Total score</span>
+              <span className="font-mono text-lg font-bold text-brand-strong">{explanation.score}</span>
+            </div>
+          </div>
+        </div>
+      )}
     </section>
   );
 }
