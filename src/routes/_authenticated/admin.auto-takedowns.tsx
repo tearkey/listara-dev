@@ -37,7 +37,8 @@ export const Route = createFileRoute("/_authenticated/admin/auto-takedowns")({
 
 function AutoTakedownsPage() {
   const { data: takedowns } = useSuspenseQuery(takedownOpts);
-  const { data: notifs } = useSuspenseQuery(notifOpts);
+  const { data: notifPage } = useSuspenseQuery(notifOpts);
+  const notifs = notifPage.rows;
   const qc = useQueryClient();
   const markRead = useServerFn(markAdminNotificationRead);
   const exportCsv = useServerFn(exportAutoTakedownsCsv);
