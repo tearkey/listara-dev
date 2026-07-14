@@ -55,6 +55,45 @@ export type Database = {
           },
         ]
       }
+      admin_notifications: {
+        Row: {
+          body: string | null
+          created_at: string
+          detail: Json
+          id: string
+          kind: string
+          read_at: string | null
+          target_id: string | null
+          target_table: string | null
+          title: string
+          user_id: string
+        }
+        Insert: {
+          body?: string | null
+          created_at?: string
+          detail?: Json
+          id?: string
+          kind: string
+          read_at?: string | null
+          target_id?: string | null
+          target_table?: string | null
+          title: string
+          user_id: string
+        }
+        Update: {
+          body?: string | null
+          created_at?: string
+          detail?: Json
+          id?: string
+          kind?: string
+          read_at?: string | null
+          target_id?: string | null
+          target_table?: string | null
+          title?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       ads: {
         Row: {
           allow_messages: boolean

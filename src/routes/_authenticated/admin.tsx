@@ -48,6 +48,7 @@ const NAV: Array<{ to: string; label: string; icon: any; exact?: boolean }> = [
   { to: "/admin", label: "Dashboard", icon: LayoutDashboard, exact: true },
   { to: "/admin/analytics", label: "Analytics", icon: BarChart3 },
   { to: "/admin/moderation-dashboard", label: "Moderation", icon: Gavel },
+  { to: "/admin/auto-takedowns", label: "Auto take-downs", icon: ShieldAlert },
   { to: "/admin/users", label: "Users", icon: Users },
   { to: "/admin/ads", label: "Ads", icon: Newspaper },
   { to: "/admin/payments", label: "Payments", icon: CreditCard },

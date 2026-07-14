@@ -287,3 +287,80 @@ export const listAuditLog = createServerFn({ method: "GET" })
     if (error) throw new Error(error.message);
     return data ?? [];
   });
+
+// Auto-takedown history — sourced from audit_log entries the scheduled
+// moderation_auto_takedown job writes. Joins to ads for a display link
+// even when the ad has been removed.
+export const listAutoTakedowns = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    await assertAdmin(context);
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { data, error } = await (supabaseAdmin as any)
+      .from("audit_log")
+      .select("id, created_at, target_id, detail")
+      .eq("action", "moderation_auto_takedown")
+      .order("created_at", { ascending: false })
+      .limit(200);
+    if (error) throw new Error(error.message);
+    const rows = (data ?? []) as Array<{
+      id: string; created_at: string; target_id: string | null;
+      detail: { short_id?: string; title?: string; open_reports?: number; threshold?: number; reason?: string } | null;
+    }>;
+    // audit_log.target_id isn't a declared FK to ads, so join in a second query.
+    const ids = Array.from(new Set(rows.map((r) => r.target_id).filter(Boolean))) as string[];
+    const adMap = new Map<string, { id: string; short_id: string; title: string; status: string; rejection_reason: string | null }>();
+    if (ids.length) {
+      const { data: ads } = await (supabaseAdmin as any)
+        .from("ads")
+        .select("id, short_id, title, status, rejection_reason")
+        .in("id", ids);
+      for (const a of (ads ?? [])) adMap.set(a.id, a);
+    }
+    return rows.map((r) => ({ ...r, ads: r.target_id ? adMap.get(r.target_id) ?? null : null })) as Array<{
+      id: string;
+      created_at: string;
+      target_id: string | null;
+      detail: { short_id?: string; title?: string; open_reports?: number; threshold?: number; reason?: string } | null;
+      ads: { id: string; short_id: string; title: string; status: string; rejection_reason: string | null } | null;
+    }>;
+  });
+
+// Admin's own notification inbox (populated by moderation_auto_takedown and
+// any future admin-facing event fan-outs). Read-only list + a mark-read mutation.
+export const listAdminNotifications = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    await assertAdmin(context);
+    const { data, error } = await (context.supabase as any)
+      .from("admin_notifications")
+      .select("id, kind, title, body, target_table, target_id, detail, read_at, created_at")
+      .order("created_at", { ascending: false })
+      .limit(100);
+    if (error) throw new Error(error.message);
+    return (data ?? []) as Array<{
+      id: string; kind: string; title: string; body: string | null;
+      target_table: string | null; target_id: string | null;
+      detail: Record<string, any> | null;
+      read_at: string | null; created_at: string;
+    }>;
+  });
+
+export const markAdminNotificationRead = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d) =>
+    z.object({ id: z.string().uuid().optional(), all: z.boolean().optional() }).parse(d ?? {}),
+  )
+  .handler(async ({ data, context }) => {
+    await assertAdmin(context);
+    const nowIso = new Date().toISOString();
+    let q = (context.supabase as any)
+      .from("admin_notifications")
+      .update({ read_at: nowIso })
+      .is("read_at", null)
+      .eq("user_id", context.userId);
+    if (data.id) q = q.eq("id", data.id);
+    const { error } = await q;
+    if (error) throw new Error(error.message);
+    return { ok: true };
+  });
