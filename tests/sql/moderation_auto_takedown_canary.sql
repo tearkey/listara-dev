@@ -60,9 +60,11 @@ BEGIN
     RAISE EXCEPTION 'canary FAIL: rejection_reason = %', _reason;
   END IF;
 
-  SELECT COUNT(*), MAX(detail) INTO _audits, _detail
-    FROM public.audit_log
+  SELECT COUNT(*) INTO _audits FROM public.audit_log
    WHERE action = 'moderation_auto_takedown' AND target_id = _ad;
+  SELECT detail INTO _detail FROM public.audit_log
+   WHERE action = 'moderation_auto_takedown' AND target_id = _ad
+   ORDER BY created_at DESC LIMIT 1;
   IF _audits < 1 THEN
     RAISE EXCEPTION 'canary FAIL: no audit_log row written';
   END IF;
