@@ -1167,8 +1167,22 @@ export type Database = {
         Args: { _from: string; _to: string }
         Returns: Json
       }
+      admin_cron_status: {
+        Args: never
+        Returns: {
+          active: boolean
+          jobid: number
+          jobname: string
+          last_end: string
+          last_return_message: string
+          last_start: string
+          last_status: string
+          schedule: string
+        }[]
+      }
       admin_export_snapshot: { Args: never; Returns: Json }
       admin_site_health: { Args: never; Returns: Json }
+      check_cron_health: { Args: never; Returns: number }
       consume_rate_limit: {
         Args: { _action: string; _max: number; _window_seconds: number }
         Returns: boolean
@@ -1185,6 +1199,16 @@ export type Database = {
       moderation_auto_takedown: {
         Args: { _min_age_minutes?: number; _threshold?: number }
         Returns: number
+      }
+      moderation_auto_takedown_dry_run: {
+        Args: { _min_age_minutes?: number; _threshold?: number }
+        Returns: {
+          ad_id: string
+          first_report_at: string
+          open_reports: number
+          short_id: string
+          title: string
+        }[]
       }
       pgrst_reload_schema: { Args: never; Returns: undefined }
       purge_abandoned_drafts: { Args: never; Returns: undefined }
