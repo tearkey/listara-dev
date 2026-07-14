@@ -13,6 +13,21 @@ async function assertAdmin(ctx: { supabase: any; userId: string }) {
   if (!data || data.length === 0) throw new Error("Forbidden: admin only");
 }
 
+export const explainAdRank = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d) => z.object({ id: z.string().uuid() }).parse(d))
+  .handler(async ({ data, context }) => {
+    await assertAdmin(context);
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { data: breakdown, error } = await supabaseAdmin.rpc("ad_rank_breakdown", { _ad_id: data.id });
+    if (error) throw new Error(error.message);
+    return breakdown as {
+      ad_id: string; short_id: string; title: string; status: string;
+      tier: string; age_days: number; views: number; reports: number; score: number;
+      components: { label: string; value: number; explain: string }[];
+    };
+  });
+
 async function assertAdminWithMfa(ctx: { supabase: any; userId: string; claims: any }) {
   const { data, error } = await ctx.supabase
     .from("user_roles")
