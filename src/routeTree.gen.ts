@@ -42,7 +42,6 @@ import { Route as AuthenticatedAdminSettingsRouteImport } from './routes/_authen
 import { Route as AuthenticatedAdminSecurityRouteImport } from './routes/_authenticated/admin.security'
 import { Route as AuthenticatedAdminPaymentsRouteImport } from './routes/_authenticated/admin.payments'
 import { Route as AuthenticatedAdminModerationDashboardRouteImport } from './routes/_authenticated/admin.moderation-dashboard'
-import { Route as AuthenticatedAdminInboxRouteImport } from './routes/_authenticated/admin.inbox'
 import { Route as AuthenticatedAdminFlagsRouteImport } from './routes/_authenticated/admin.flags'
 import { Route as AuthenticatedAdminCatalogRouteImport } from './routes/_authenticated/admin.catalog'
 import { Route as AuthenticatedAdminAutoTakedownsRouteImport } from './routes/_authenticated/admin.auto-takedowns'
@@ -229,11 +228,6 @@ const AuthenticatedAdminModerationDashboardRoute =
     path: '/moderation-dashboard',
     getParentRoute: () => AuthenticatedAdminRoute,
   } as any)
-const AuthenticatedAdminInboxRoute = AuthenticatedAdminInboxRouteImport.update({
-  id: '/inbox',
-  path: '/inbox',
-  getParentRoute: () => AuthenticatedAdminRoute,
-} as any)
 const AuthenticatedAdminFlagsRoute = AuthenticatedAdminFlagsRouteImport.update({
   id: '/flags',
   path: '/flags',
@@ -340,7 +334,6 @@ export interface FileRoutesByFullPath {
   '/admin/auto-takedowns': typeof AuthenticatedAdminAutoTakedownsRoute
   '/admin/catalog': typeof AuthenticatedAdminCatalogRoute
   '/admin/flags': typeof AuthenticatedAdminFlagsRoute
-  '/admin/inbox': typeof AuthenticatedAdminInboxRoute
   '/admin/moderation-dashboard': typeof AuthenticatedAdminModerationDashboardRoute
   '/admin/payments': typeof AuthenticatedAdminPaymentsRoute
   '/admin/security': typeof AuthenticatedAdminSecurityRoute
@@ -386,7 +379,6 @@ export interface FileRoutesByTo {
   '/admin/auto-takedowns': typeof AuthenticatedAdminAutoTakedownsRoute
   '/admin/catalog': typeof AuthenticatedAdminCatalogRoute
   '/admin/flags': typeof AuthenticatedAdminFlagsRoute
-  '/admin/inbox': typeof AuthenticatedAdminInboxRoute
   '/admin/moderation-dashboard': typeof AuthenticatedAdminModerationDashboardRoute
   '/admin/payments': typeof AuthenticatedAdminPaymentsRoute
   '/admin/security': typeof AuthenticatedAdminSecurityRoute
@@ -437,7 +429,6 @@ export interface FileRoutesById {
   '/_authenticated/admin/auto-takedowns': typeof AuthenticatedAdminAutoTakedownsRoute
   '/_authenticated/admin/catalog': typeof AuthenticatedAdminCatalogRoute
   '/_authenticated/admin/flags': typeof AuthenticatedAdminFlagsRoute
-  '/_authenticated/admin/inbox': typeof AuthenticatedAdminInboxRoute
   '/_authenticated/admin/moderation-dashboard': typeof AuthenticatedAdminModerationDashboardRoute
   '/_authenticated/admin/payments': typeof AuthenticatedAdminPaymentsRoute
   '/_authenticated/admin/security': typeof AuthenticatedAdminSecurityRoute
@@ -488,7 +479,6 @@ export interface FileRouteTypes {
     | '/admin/auto-takedowns'
     | '/admin/catalog'
     | '/admin/flags'
-    | '/admin/inbox'
     | '/admin/moderation-dashboard'
     | '/admin/payments'
     | '/admin/security'
@@ -534,7 +524,6 @@ export interface FileRouteTypes {
     | '/admin/auto-takedowns'
     | '/admin/catalog'
     | '/admin/flags'
-    | '/admin/inbox'
     | '/admin/moderation-dashboard'
     | '/admin/payments'
     | '/admin/security'
@@ -584,7 +573,6 @@ export interface FileRouteTypes {
     | '/_authenticated/admin/auto-takedowns'
     | '/_authenticated/admin/catalog'
     | '/_authenticated/admin/flags'
-    | '/_authenticated/admin/inbox'
     | '/_authenticated/admin/moderation-dashboard'
     | '/_authenticated/admin/payments'
     | '/_authenticated/admin/security'
@@ -861,13 +849,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminModerationDashboardRouteImport
       parentRoute: typeof AuthenticatedAdminRoute
     }
-    '/_authenticated/admin/inbox': {
-      id: '/_authenticated/admin/inbox'
-      path: '/inbox'
-      fullPath: '/admin/inbox'
-      preLoaderRoute: typeof AuthenticatedAdminInboxRouteImport
-      parentRoute: typeof AuthenticatedAdminRoute
-    }
     '/_authenticated/admin/flags': {
       id: '/_authenticated/admin/flags'
       path: '/flags'
@@ -976,7 +957,6 @@ interface AuthenticatedAdminRouteChildren {
   AuthenticatedAdminAutoTakedownsRoute: typeof AuthenticatedAdminAutoTakedownsRoute
   AuthenticatedAdminCatalogRoute: typeof AuthenticatedAdminCatalogRoute
   AuthenticatedAdminFlagsRoute: typeof AuthenticatedAdminFlagsRoute
-  AuthenticatedAdminInboxRoute: typeof AuthenticatedAdminInboxRoute
   AuthenticatedAdminModerationDashboardRoute: typeof AuthenticatedAdminModerationDashboardRoute
   AuthenticatedAdminPaymentsRoute: typeof AuthenticatedAdminPaymentsRoute
   AuthenticatedAdminSecurityRoute: typeof AuthenticatedAdminSecurityRoute
@@ -992,7 +972,6 @@ const AuthenticatedAdminRouteChildren: AuthenticatedAdminRouteChildren = {
   AuthenticatedAdminAutoTakedownsRoute: AuthenticatedAdminAutoTakedownsRoute,
   AuthenticatedAdminCatalogRoute: AuthenticatedAdminCatalogRoute,
   AuthenticatedAdminFlagsRoute: AuthenticatedAdminFlagsRoute,
-  AuthenticatedAdminInboxRoute: AuthenticatedAdminInboxRoute,
   AuthenticatedAdminModerationDashboardRoute:
     AuthenticatedAdminModerationDashboardRoute,
   AuthenticatedAdminPaymentsRoute: AuthenticatedAdminPaymentsRoute,
