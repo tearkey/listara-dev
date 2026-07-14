@@ -67,7 +67,7 @@ export const Route = createFileRoute("/_authenticated/admin/inbox")({
 
 function InboxPage() {
   const search = Route.useSearch();
-  const navigate = useNavigate({ from: Route.fullPath });
+  const navigate = Route.useNavigate();
   const { data: page } = useSuspenseQuery(notifsOpts(search));
   const { data: kinds } = useSuspenseQuery(kindsOpts);
   const qc = useQueryClient();
