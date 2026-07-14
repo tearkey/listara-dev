@@ -547,7 +547,8 @@ export const autoTakedownDryRun = createServerFn({ method: "GET" })
   )
   .handler(async ({ data, context }) => {
     await assertAdmin(context);
-    const { data: rows, error } = await (context.supabase as any).rpc(
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { data: rows, error } = await (supabaseAdmin as any).rpc(
       "moderation_auto_takedown_dry_run",
       { _threshold: data.threshold ?? 5, _min_age_minutes: data.min_age_minutes ?? 10 },
     );
