@@ -338,12 +338,72 @@ export const listAdminNotifications = createServerFn({ method: "GET" })
       .order("created_at", { ascending: false })
       .limit(100);
     if (error) throw new Error(error.message);
+    // Typed as a JSON-serializable value so the TanStack server-fn RPC
+    // serializer accepts it — `any` produced a "Type ... is not
+    // serializable" complaint at build.
+    type JsonValue =
+      | string
+      | number
+      | boolean
+      | null
+      | { [k: string]: JsonValue }
+      | JsonValue[];
     return (data ?? []) as Array<{
       id: string; kind: string; title: string; body: string | null;
       target_table: string | null; target_id: string | null;
-      detail: Record<string, any> | null;
+      detail: { [k: string]: JsonValue } | null;
       read_at: string | null; created_at: string;
     }>;
+  });
+
+// Unread notification count for the current admin — used by the sidebar
+// badge without loading the whole inbox on every navigation.
+export const countUnreadAdminNotifications = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    await assertAdmin(context);
+    const { count, error } = await (context.supabase as any)
+      .from("admin_notifications")
+      .select("id", { head: true, count: "exact" })
+      .is("read_at", null);
+    if (error) throw new Error(error.message);
+    return { unread: (count as number | null) ?? 0 };
+  });
+
+// CSV export of moderation_auto_takedown audit_log entries. Returned as
+// a plain string DTO so the client can wrap it in a Blob and download.
+export const exportAutoTakedownsCsv = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    await assertAdmin(context);
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { data, error } = await (supabaseAdmin as any)
+      .from("audit_log")
+      .select("id, created_at, target_id, detail")
+      .eq("action", "moderation_auto_takedown")
+      .order("created_at", { ascending: false })
+      .limit(5000);
+    if (error) throw new Error(error.message);
+    const rows = (data ?? []) as Array<{
+      id: string; created_at: string; target_id: string | null;
+      detail: { short_id?: string; title?: string; open_reports?: number; threshold?: number; reason?: string } | null;
+    }>;
+    const esc = (v: unknown) => {
+      if (v === null || v === undefined) return "";
+      const s = String(v);
+      return /[",\n\r]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s;
+    };
+    const header = ["audit_id","created_at","ad_id","short_id","title","open_reports","threshold","reason"];
+    const lines = [header.join(",")];
+    for (const r of rows) {
+      lines.push([
+        r.id, r.created_at, r.target_id ?? "",
+        r.detail?.short_id ?? "", r.detail?.title ?? "",
+        r.detail?.open_reports ?? "", r.detail?.threshold ?? "",
+        r.detail?.reason ?? "",
+      ].map(esc).join(","));
+    }
+    return { filename: `auto-takedowns-${new Date().toISOString().slice(0,10)}.csv`, csv: lines.join("\n") };
   });
 
 export const markAdminNotificationRead = createServerFn({ method: "POST" })
