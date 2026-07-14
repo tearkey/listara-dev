@@ -90,6 +90,14 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { name: "twitter:card", content: "summary_large_image" },
       { name: "twitter:site", content: BRAND.twitter },
       { name: "theme-color", content: "#F59E0B" },
+      { title: "Listara" },
+      { property: "og:title", content: "Listara" },
+      { name: "twitter:title", content: "Listara" },
+      { name: "description", content: "Star Classifieds Reimagined is a comprehensive online platform for posting and discovering classified advertisements." },
+      { property: "og:description", content: "Star Classifieds Reimagined is a comprehensive online platform for posting and discovering classified advertisements." },
+      { name: "twitter:description", content: "Star Classifieds Reimagined is a comprehensive online platform for posting and discovering classified advertisements." },
+      { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/77161100-81d7-4b82-b037-5eb1ee8be0b2/id-preview-3021ba5f--a379fb12-96bc-4fd6-9584-25c8d9e691be.lovable.app-1783979864684.png" },
+      { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/77161100-81d7-4b82-b037-5eb1ee8be0b2/id-preview-3021ba5f--a379fb12-96bc-4fd6-9584-25c8d9e691be.lovable.app-1783979864684.png" },
     ],
     links: [
       {
