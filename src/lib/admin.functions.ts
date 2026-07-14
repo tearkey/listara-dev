@@ -298,12 +298,26 @@ export const listAutoTakedowns = createServerFn({ method: "GET" })
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { data, error } = await (supabaseAdmin as any)
       .from("audit_log")
-      .select("id, created_at, target_id, detail, ads:target_id(id, short_id, title, status, rejection_reason)")
+      .select("id, created_at, target_id, detail")
       .eq("action", "moderation_auto_takedown")
       .order("created_at", { ascending: false })
       .limit(200);
     if (error) throw new Error(error.message);
-    return (data ?? []) as Array<{
+    const rows = (data ?? []) as Array<{
+      id: string; created_at: string; target_id: string | null;
+      detail: { short_id?: string; title?: string; open_reports?: number; threshold?: number; reason?: string } | null;
+    }>;
+    // audit_log.target_id isn't a declared FK to ads, so join in a second query.
+    const ids = Array.from(new Set(rows.map((r) => r.target_id).filter(Boolean))) as string[];
+    const adMap = new Map<string, { id: string; short_id: string; title: string; status: string; rejection_reason: string | null }>();
+    if (ids.length) {
+      const { data: ads } = await (supabaseAdmin as any)
+        .from("ads")
+        .select("id, short_id, title, status, rejection_reason")
+        .in("id", ids);
+      for (const a of (ads ?? [])) adMap.set(a.id, a);
+    }
+    return rows.map((r) => ({ ...r, ads: r.target_id ? adMap.get(r.target_id) ?? null : null })) as Array<{
       id: string;
       created_at: string;
       target_id: string | null;
