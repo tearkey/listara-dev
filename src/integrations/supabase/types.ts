@@ -1143,6 +1143,10 @@ export type Database = {
         }
         Returns: boolean
       }
+      moderation_auto_takedown: {
+        Args: { _min_age_minutes?: number; _threshold?: number }
+        Returns: number
+      }
       pgrst_reload_schema: { Args: never; Returns: undefined }
       purge_abandoned_drafts: { Args: never; Returns: undefined }
       spend_credits: {
