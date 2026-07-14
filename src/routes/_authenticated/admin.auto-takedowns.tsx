@@ -2,12 +2,13 @@ import { createFileRoute } from "@tanstack/react-router";
 import { queryOptions, useSuspenseQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
-import { Bell, ShieldOff, Check } from "lucide-react";
+import { Bell, ShieldOff, Check, Download } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   listAutoTakedowns,
   listAdminNotifications,
   markAdminNotificationRead,
+  exportAutoTakedownsCsv,
 } from "@/lib/admin.functions";
 
 const takedownOpts = queryOptions({
@@ -39,6 +40,7 @@ function AutoTakedownsPage() {
   const { data: notifs } = useSuspenseQuery(notifOpts);
   const qc = useQueryClient();
   const markRead = useServerFn(markAdminNotificationRead);
+  const exportCsv = useServerFn(exportAutoTakedownsCsv);
 
   const unread = notifs.filter((n) => !n.read_at);
 
@@ -51,14 +53,36 @@ function AutoTakedownsPage() {
     }
   }
 
+  async function downloadCsv() {
+    try {
+      const { csv, filename } = await exportCsv();
+      const blob = new Blob([csv], { type: "text/csv;charset=utf-8" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(url);
+    } catch (e: any) {
+      toast.error(e.message ?? "Export failed");
+    }
+  }
+
   return (
     <section className="space-y-8">
-      <header>
-        <h1 className="font-display text-xl font-bold">Automated take-downs</h1>
-        <p className="mt-1 text-sm text-muted-foreground">
-          Scheduled every 15 minutes. Ads with report counts above the threshold are
-          removed automatically and admins are notified in-app.
-        </p>
+      <header className="flex flex-wrap items-start justify-between gap-3">
+        <div>
+          <h1 className="font-display text-xl font-bold">Automated take-downs</h1>
+          <p className="mt-1 text-sm text-muted-foreground">
+            Scheduled every 15 minutes. Ads with report counts above the threshold are
+            removed automatically and admins are notified in-app.
+          </p>
+        </div>
+        <Button size="sm" variant="outline" onClick={downloadCsv}>
+          <Download className="mr-1 h-3.5 w-3.5" /> Export CSV
+        </Button>
       </header>
 
       <div className="rounded-2xl border border-border bg-card">
