@@ -3,7 +3,7 @@ import { queryOptions, useSuspenseQuery, useQueryClient } from "@tanstack/react-
 import { useServerFn } from "@tanstack/react-start";
 import { useState } from "react";
 import { toast } from "sonner";
-import { ArrowLeft, Save, Sparkles, Pin, Star, ArrowUp } from "lucide-react";
+import { ArrowLeft, Save, Sparkles } from "lucide-react";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { Input } from "@/components/ui/input";
@@ -19,13 +19,6 @@ export const Route = createFileRoute("/_authenticated/ads/$id/edit")({
   head: () => ({ meta: [{ title: `Edit pending ad — ${BRAND.name}` }, { name: "robots", content: "noindex" }] }),
   component: EditPendingAd,
 });
-
-const TIERS = [
-  { id: "free", label: "Standard", icon: null, desc: "No promotion — appears in normal rotation." },
-  { id: "bumped", label: "Bumped", icon: ArrowUp, desc: "Push to the top of the list once." },
-  { id: "featured", label: "Featured", icon: Star, desc: "Highlighted in the featured strip." },
-  { id: "sticky", label: "Sticky", icon: Pin, desc: "Stays pinned to the top of your category." },
-] as const;
 
 function EditPendingAd() {
   const { id } = Route.useParams();
@@ -48,7 +41,6 @@ function EditPendingAd() {
   );
   const [email, setEmail] = useState(ad.contact_email ?? "");
   const [phone, setPhone] = useState(ad.contact_phone ?? "");
-  const [tier, setTier] = useState<string>(ad.tier ?? "free");
   const [saving, setSaving] = useState(false);
 
   if (ad.status !== "pending") {
@@ -88,7 +80,6 @@ function EditPendingAd() {
           price_cents: price ? Math.round(parseFloat(price) * 100) : null,
           contact_email: email || null,
           contact_phone: phone || null,
-          tier: tier as any,
         },
       });
       toast.success("Changes saved — still awaiting moderator review.");
@@ -149,32 +140,15 @@ function EditPendingAd() {
             <Textarea id="body" rows={7} value={body} onChange={(e) => setBody(e.target.value)} className="mt-1" />
           </div>
 
-          <div>
-            <Label className="inline-flex items-center gap-1"><Sparkles className="h-4 w-4 text-brand" /> Promotion</Label>
-            <div className="mt-2 grid gap-2 sm:grid-cols-2">
-              {TIERS.map((t) => {
-                const Icon = t.icon;
-                const active = tier === t.id;
-                return (
-                  <button
-                    key={t.id}
-                    type="button"
-                    onClick={() => setTier(t.id)}
-                    className={`flex items-start gap-3 rounded-xl border p-3 text-left transition ${active ? "border-brand bg-brand/5" : "border-border hover:border-brand/50"}`}
-                  >
-                    <span className={`mt-0.5 inline-flex h-8 w-8 items-center justify-center rounded-lg ${active ? "bg-brand text-brand-foreground" : "bg-secondary text-brand"}`}>
-                      {Icon ? <Icon className="h-4 w-4" /> : "•"}
-                    </span>
-                    <span>
-                      <span className="block text-sm font-semibold">{t.label}</span>
-                      <span className="block text-[11px] text-muted-foreground">{t.desc}</span>
-                    </span>
-                  </button>
-                );
-              })}
+          <div className="rounded-xl border border-border bg-secondary/40 p-4">
+            <div className="inline-flex items-center gap-1 text-sm font-semibold">
+              <Sparkles className="h-4 w-4 text-brand" /> Promotion
             </div>
-            <p className="mt-2 text-[11px] text-muted-foreground">
-              Paid tiers are billed on the promote page after your ad is approved.
+            <p className="mt-1.5 text-xs text-muted-foreground">
+              Featured and Sticky placements are paid upgrades applied on the
+              promote page once your ad is approved — they can't be set here.
+              Your current placement is{" "}
+              <span className="font-medium text-foreground capitalize">{ad.tier ?? "free"}</span>.
             </p>
           </div>
         </div>
