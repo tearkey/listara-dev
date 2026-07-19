@@ -11,7 +11,8 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select";
-import { getMyAd, updatePendingAd, listFeaturedCities } from "@/lib/ads.functions";
+import { getMyAd, updatePendingAd } from "@/lib/ads.functions";
+import { listFeaturedCities } from "@/lib/catalog.functions";
 import { BRAND } from "@/lib/brand";
 
 function EditPendingAd() {

@@ -8,7 +8,7 @@ import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { EscrowDashboard } from "@/components/escrow/escrow-dashboard";
 import { getEscrowTransaction } from "@/lib/escrow.functions";
-import { useAuth } from "@/utils/auth.client";
+import { useAuth } from "@/hooks/use-auth";
 import { BRAND } from "@/lib/brand";
 
 function EscrowDetailPage() {
