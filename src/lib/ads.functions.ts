@@ -193,7 +193,7 @@ export const getMyAd = createServerFn({ method: "GET" })
     if (!ad) throw new Error("Ad not found");
     return ad;
   });
-
+Clarify the reason for the restriction in the comment.
 // Edit a pending ad — user may adjust content, city, and promotion tier before
 // it goes live. Only allowed while status='pending'.
 // NOTE: promotion tier is intentionally NOT editable here. Paid tiers
