@@ -91,7 +91,10 @@ export const createAd = createServerFn({ method: "POST" })
 
     if (status === "rejected") {
       // Insert a single rejected row for moderator audit; no city fanout, no charge.
-      const { data: ad, error } = await supabase
+      // Inserted via the service-role client: the DB insert guard restricts
+      // anon/authenticated Data API inserts to unpromoted pending/draft rows,
+      // so all server-created rows (live, rejected, promoted) go through admin.
+      const { data: ad, error } = await supabaseAdmin
         .from("ads")
         .insert({
           user_id: userId,
@@ -129,20 +132,25 @@ export const createAd = createServerFn({ method: "POST" })
       expires_at: status === "live" ? expiresAt : null,
     }));
 
-    const { data: ads, error } = await supabase
+    const { data: ads, error } = await supabaseAdmin
       .from("ads")
       .insert(rows)
       .select("id,short_id,slug,status");
     if (error) {
       // Refund credits on insert failure so users aren't charged for nothing.
-      await supabaseAdmin.from("user_credits").update({
-        balance_cents: (
-          await supabaseAdmin.from("user_credits").select("balance_cents").eq("user_id", userId).maybeSingle()
-        ).data?.balance_cents! + cost,
-      }).eq("user_id", userId);
-      await supabaseAdmin.from("credit_transactions").insert({
-        user_id: userId, delta_cents: cost, reason: "refund_post_failed",
-      });
+      // Done in a single SECURITY DEFINER call so the balance update and the
+      // ledger row are atomic — a read-modify-write here would race concurrent
+      // spends/refunds and corrupt the balance.
+      if (status !== "rejected" && cost > 0) {
+        // Cast: refund_credits is added in migration 20260718000000 and is not
+        // yet in the generated Database types, matching how other new RPCs are called.
+        const { error: refundErr } = await (supabaseAdmin as any).rpc("refund_credits", {
+          _user_id: userId,
+          _amount_cents: cost,
+          _reason: "refund_post_failed",
+        });
+        if (refundErr) console.error("Failed to refund credits after post failure", refundErr);
+      }
       throw new Error(error.message);
     }
     return {
@@ -188,6 +196,11 @@ export const getMyAd = createServerFn({ method: "GET" })
 
 // Edit a pending ad — user may adjust content, city, and promotion tier before
 // it goes live. Only allowed while status='pending'.
+// NOTE: promotion tier is intentionally NOT editable here. Paid tiers
+// (featured/sticky) are sold through the billed promote flow, and the free
+// bump goes through bumpMyAd with its own cooldown. Accepting `tier` on this
+// free edit path would let a user grant themselves paid placement for free,
+// so it is dropped from both the input and the write.
 const editPendingInput = z.object({
   id: z.string().uuid(),
   title: z.string().trim().min(4).max(120),
@@ -196,7 +209,6 @@ const editPendingInput = z.object({
   price_cents: z.number().int().min(0).max(100_000_000).optional().nullable(),
   contact_email: z.string().email().max(255).optional().nullable(),
   contact_phone: z.string().max(40).optional().nullable(),
-  tier: z.enum(["free", "bumped", "featured", "sticky"]).default("free"),
 });
 
 export const updatePendingAd = createServerFn({ method: "POST" })
@@ -225,7 +237,6 @@ export const updatePendingAd = createServerFn({ method: "POST" })
         price_cents: data.price_cents ?? null,
         contact_email: data.contact_email ?? null,
         contact_phone: data.contact_phone ?? null,
-        tier: data.tier,
       })
       .eq("id", data.id)
       .eq("user_id", userId);
