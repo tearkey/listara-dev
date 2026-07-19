@@ -191,7 +191,7 @@ export const getMyAd = createServerFn({ method: "GET" })
       .maybeSingle();
     if (error) throw new Error(error.message);
     if (!ad) throw new Error("Ad not found");
-    return ad;
+Consider adding a brief explanation about why the status must be 'pending'.
   });
 Clarify the reason for the restriction in the comment.
 // Edit a pending ad — user may adjust content, city, and promotion tier before
