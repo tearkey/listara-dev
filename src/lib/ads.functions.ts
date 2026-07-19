@@ -126,7 +126,7 @@ export const createAd = createServerFn({ method: "POST" })
       price_cents: data.price_cents ?? null,
       contact_email: data.contact_email ?? null,
       contact_phone: data.contact_phone ?? null,
-      allow_messages: data.allow_messages ?? true,
+Consider adding a notification function call here to handle the user notification.
       status,
       posted_at: status === "live" ? now : null,
 Add a user notification for insert failures.
