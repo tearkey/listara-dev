@@ -14,7 +14,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { getMyAd, updatePendingAd } from "@/lib/ads.functions";
 import { listFeaturedCities } from "@/lib/catalog.functions";
 import { BRAND } from "@/lib/brand";
-
+Implement a tooltip or message component that explains the removal of the tier selection.
 Add a tooltip component with a brief explanation.
   head: () => ({ meta: [{ title: `Edit pending ad — ${BRAND.name}` }, { name: "robots", content: "noindex" }] }),
 Consider adding a tooltip or message explaining the removal of the tier selection.
