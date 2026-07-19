@@ -12,10 +12,6 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { listUserEscrows, type EscrowStatus } from "@/lib/escrow.functions";
 import { BRAND } from "@/lib/brand";
 
-const Route = createFileRoute("/_authenticated/dashboard/escrow")({
-  head: () => ({ meta: [{ title: `My Escrows — ${BRAND.name}` }, { name: "robots", content: "noindex" }] }),
-});
-
 function EscrowDashboardPage() {
   const listEscrowsFn = useServerFn(listUserEscrows);
   const [selectedRole, setSelectedRole] = useState<"buyer" | "seller">("buyer");

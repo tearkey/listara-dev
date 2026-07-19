@@ -11,10 +11,6 @@ import { getEscrowTransaction } from "@/lib/escrow.functions";
 import { useAuth } from "@/utils/auth.client";
 import { BRAND } from "@/lib/brand";
 
-const Route = createFileRoute("/_authenticated/dashboard/escrow/$id")({
-  head: () => ({ meta: [{ title: `Escrow Transaction — ${BRAND.name}` }, { name: "robots", content: "noindex" }] }),
-});
-
 function EscrowDetailPage() {
   const { id } = Route.useParams();
   const { user } = useAuth();

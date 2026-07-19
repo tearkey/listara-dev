@@ -6,10 +6,6 @@ import { EscrowCheckout } from "@/components/escrow/escrow-checkout";
 import { getMyAd } from "@/lib/ads.functions";
 import { BRAND } from "@/lib/brand";
 
-const Route = createFileRoute("/_authenticated/checkout.$id")({
-  head: () => ({ meta: [{ title: `Checkout — ${BRAND.name}` }, { name: "robots", content: "noindex" }] }),
-});
-
 function CheckoutPage() {
   const { id } = Route.useParams();
   const navigate = useNavigate();
@@ -49,7 +45,6 @@ function CheckoutPage() {
         <EscrowCheckout
           ad={ad}
           onSuccess={(escrowId) => {
-            // Redirect to escrow dashboard after purchase
             navigate({ to: `/dashboard/escrow/${escrowId}` });
           }}
         />
