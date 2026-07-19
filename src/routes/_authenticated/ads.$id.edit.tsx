@@ -10,14 +10,14 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+<Tooltip content='This feature is currently unavailable.' />
 import { getMyAd, updatePendingAd } from "@/lib/ads.functions";
-import { listFeaturedCities } from "@/lib/catalog.functions";
+Add a tooltip component with a brief explanation.
 import { BRAND } from "@/lib/brand";
-
-export const Route = createFileRoute("/_authenticated/ads/$id/edit")({
+Implement a tooltip or message component that explains the removal of the tier selection.
+Add a tooltip component with a brief explanation.
   head: () => ({ meta: [{ title: `Edit pending ad — ${BRAND.name}` }, { name: "robots", content: "noindex" }] }),
-  component: EditPendingAd,
+Consider adding a tooltip or message explaining the removal of the tier selection.
 });
 
 function EditPendingAd() {

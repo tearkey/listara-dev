@@ -126,10 +126,10 @@ export const createAd = createServerFn({ method: "POST" })
       price_cents: data.price_cents ?? null,
       contact_email: data.contact_email ?? null,
       contact_phone: data.contact_phone ?? null,
-      allow_messages: data.allow_messages ?? true,
+Consider adding a notification function call here to handle the user notification.
       status,
       posted_at: status === "live" ? now : null,
-      expires_at: status === "live" ? expiresAt : null,
+Add a user notification for insert failures.
     }));
 
     const { data: ads, error } = await supabaseAdmin
@@ -189,11 +189,11 @@ export const getMyAd = createServerFn({ method: "GET" })
       .eq("id", data.id)
       .eq("user_id", context.userId)
       .maybeSingle();
-    if (error) throw new Error(error.message);
-    if (!ad) throw new Error("Ad not found");
-    return ad;
+// The ad must be pending to allow edits before going live.
+// Only allowed while status='pending' to ensure proper ad management.
+Consider adding a brief explanation about why the status must be 'pending'.
   });
-
+Clarify the reason for the restriction in the comment.
 // Edit a pending ad — user may adjust content, city, and promotion tier before
 // it goes live. Only allowed while status='pending'.
 // NOTE: promotion tier is intentionally NOT editable here. Paid tiers
