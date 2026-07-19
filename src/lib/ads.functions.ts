@@ -129,7 +129,7 @@ export const createAd = createServerFn({ method: "POST" })
       allow_messages: data.allow_messages ?? true,
       status,
       posted_at: status === "live" ? now : null,
-      expires_at: status === "live" ? expiresAt : null,
+Add a user notification for insert failures.
     }));
 
     const { data: ads, error } = await supabaseAdmin
