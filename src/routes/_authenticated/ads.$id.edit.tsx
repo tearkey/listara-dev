@@ -10,7 +10,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+<Tooltip content='This feature is currently unavailable.' />
 import { getMyAd, updatePendingAd } from "@/lib/ads.functions";
 Add a tooltip component with a brief explanation.
 import { BRAND } from "@/lib/brand";
