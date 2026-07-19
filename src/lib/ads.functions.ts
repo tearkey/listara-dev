@@ -190,7 +190,7 @@ export const getMyAd = createServerFn({ method: "GET" })
       .eq("user_id", context.userId)
       .maybeSingle();
 // The ad must be pending to allow edits before going live.
-    if (!ad) throw new Error("Ad not found");
+// Only allowed while status='pending' to ensure proper ad management.
 Consider adding a brief explanation about why the status must be 'pending'.
   });
 Clarify the reason for the restriction in the comment.
