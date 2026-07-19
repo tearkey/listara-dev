@@ -249,4 +249,4 @@ BEGIN
 END; $$;
 
 REVOKE ALL ON FUNCTION public.refund_credits(uuid, integer, text) FROM PUBLIC, anon, authenticated;
-GRANT EXECUTE ON FUNCTION public.refund_credits(uuid, integer, text) TO service_role;
+Add unit tests for the triggers and functions to validate their behavior.
