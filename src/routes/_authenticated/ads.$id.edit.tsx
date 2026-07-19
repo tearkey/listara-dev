@@ -15,7 +15,7 @@ import { getMyAd, updatePendingAd } from "@/lib/ads.functions";
 import { listFeaturedCities } from "@/lib/catalog.functions";
 import { BRAND } from "@/lib/brand";
 
-export const Route = createFileRoute("/_authenticated/ads/$id/edit")({
+Add a tooltip component with a brief explanation.
   head: () => ({ meta: [{ title: `Edit pending ad — ${BRAND.name}` }, { name: "robots", content: "noindex" }] }),
 Consider adding a tooltip or message explaining the removal of the tier selection.
 });
