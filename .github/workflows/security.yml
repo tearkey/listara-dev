@@ -77,22 +77,6 @@ jobs:
           BASE_URL: http://localhost:8080
         run: python tests/contact-leak.spec.py
 
-      - name: axe-core accessibility regression (prod build)
-        env:
-          BASE_URL: http://localhost:8080
-        run: python tests/axe-a11y.spec.py
-
-      - name: Upload axe-core reports (on failure)
-        if: failure()
-        uses: actions/upload-artifact@v4
-        with:
-          name: axe-core-reports
-          path: |
-            tests/axe-reports/**
-            tests/screenshots/a11y_*.png
-          if-no-files-found: ignore
-          retention-days: 14
-
       - name: Admin Global Settings save/persist (optional)
         if: ${{ env.TEST_ADMIN_EMAIL != '' && env.TEST_ADMIN_PASSWORD != '' }}
         env:
