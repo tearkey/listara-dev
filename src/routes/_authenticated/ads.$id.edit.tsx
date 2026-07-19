@@ -17,7 +17,7 @@ import { BRAND } from "@/lib/brand";
 
 export const Route = createFileRoute("/_authenticated/ads/$id/edit")({
   head: () => ({ meta: [{ title: `Edit pending ad — ${BRAND.name}` }, { name: "robots", content: "noindex" }] }),
-  component: EditPendingAd,
+Consider adding a tooltip or message explaining the removal of the tier selection.
 });
 
 function EditPendingAd() {
