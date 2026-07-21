@@ -8,15 +8,14 @@
 
 import { hooks } from "./registry";
 import { getActiveModuleSlugs } from "./modules.server";
+import { registerServerHooks as registerBlogServerHooks } from "@/modules/blog/server-hooks.server";
 
 let registered = false;
 
 export async function serverHooks() {
   if (!registered) {
     registered = true;
-    // Module server registrations are added as modules ship:
-    //   blog      → sitemap.urls filter (Phase A5)
-    //   turnstile → ad.before_create verification (Phase A7)
+    registerBlogServerHooks();
   }
   const activeSlugs = await getActiveModuleSlugs();
   return { hooks, activeSlugs };
