@@ -1,0 +1,17 @@
+{
+  "1123897": {
+    "active": true,
+    "notes": "brace-expansion DoS (GHSA-3jxr-9vmj-r5cp) — transitive dev dependency of typescript-eslint; lint tooling only, never runs in production. Remove once typescript-eslint ships a patched brace-expansion.",
+    "expiry": "2026-09-30"
+  },
+  "1123898": {
+    "active": true,
+    "notes": "Duplicate advisory for the same brace-expansion issue via the second dependency path. Same rationale as 1123897.",
+    "expiry": "2026-09-30"
+  },
+  "1123911": {
+    "active": true,
+    "notes": "js-yaml quadratic CPU (GHSA-52cp-r559-cp3m) — reached only via @eslint/eslintrc and xmlbuilder2; the app never parses untrusted YAML at runtime. Remove once upstreams bump js-yaml.",
+    "expiry": "2026-09-30"
+  }
+}

@@ -125,7 +125,7 @@ export const adminListCategories = createServerFn({ method: "GET" })
     const { data, error } = await supabaseAdmin
       .from("categories")
       .select(
-        "id,slug,name,description,icon,sort_order,is_paid_only,base_price_cents,subcategories(id,slug,name,sort_order)",
+        "id,slug,name,description,icon,sort_order,is_paid_only,base_price_cents,is_active,is_adult,subcategories(id,slug,name,sort_order)",
       )
       .order("sort_order");
     if (error) throw new Error(error.message);
@@ -141,6 +141,8 @@ const categoryUpsert = z.object({
   sort_order: z.number().int().min(0).max(9999).optional(),
   is_paid_only: z.boolean().optional(),
   base_price_cents: z.number().int().min(0).max(100_000_00).optional(),
+  is_active: z.boolean().optional(),
+  is_adult: z.boolean().optional(),
 });
 
 export const adminUpsertCategory = createServerFn({ method: "POST" })
@@ -157,6 +159,8 @@ export const adminUpsertCategory = createServerFn({ method: "POST" })
       sort_order: data.sort_order ?? 0,
       is_paid_only: data.is_paid_only ?? false,
       base_price_cents: data.base_price_cents ?? 0,
+      is_active: data.is_active ?? true,
+      is_adult: data.is_adult ?? false,
     };
     const q = data.id
       ? supabaseAdmin.from("categories").update(row).eq("id", data.id).select("id").single()

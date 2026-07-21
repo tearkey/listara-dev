@@ -40,6 +40,16 @@ export const setAdStatus = createServerFn({ method: "POST" })
   .inputValidator((d) => setStatusInput.parse(d))
   .handler(async ({ data, context }) => {
     await assertAdmin(context);
+    // Approved ads run on their category's clock (housing 30 days, default 24h).
+    let lifetimeHours = 24;
+    if (data.status === "live") {
+      const { data: ad } = await context.supabase
+        .from("ads")
+        .select("categories(ad_lifetime_hours)")
+        .eq("id", data.id)
+        .maybeSingle();
+      lifetimeHours = (ad as any)?.categories?.ad_lifetime_hours ?? 24;
+    }
     const { error } = await context.supabase
       .from("ads")
       .update(
@@ -47,7 +57,7 @@ export const setAdStatus = createServerFn({ method: "POST" })
           ? {
               status: "live" as const,
               posted_at: new Date().toISOString(),
-              expires_at: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
+              expires_at: new Date(Date.now() + lifetimeHours * 60 * 60 * 1000).toISOString(),
               rejection_reason: null,
             }
           : {

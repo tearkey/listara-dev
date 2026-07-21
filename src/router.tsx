@@ -1,8 +1,10 @@
 import { QueryClient } from "@tanstack/react-query";
 import { createRouter } from "@tanstack/react-router";
 import { routeTree } from "./routeTree.gen";
+import { bootstrapModules } from "./lib/hooks/bootstrap";
 
 export const getRouter = () => {
+  bootstrapModules();
   const queryClient = new QueryClient({
     defaultOptions: {
       queries: {

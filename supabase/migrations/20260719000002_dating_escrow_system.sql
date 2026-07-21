@@ -7,6 +7,10 @@
 -- Phase 3 of implementation (Weeks 5-6): Dating Escrow with ID verification
 -- Focus: "Date Verified, Not Fooled" - prevent catfishing and romance scams
 
+-- The base schema's subcategories table has no description column; the inserts
+-- below depend on it, so add it first (no-op where it already exists).
+ALTER TABLE public.subcategories ADD COLUMN IF NOT EXISTS description TEXT;
+
 -- ============================================================================
 -- ADD ID VERIFICATION FIELDS TO PROFILES
 -- ============================================================================

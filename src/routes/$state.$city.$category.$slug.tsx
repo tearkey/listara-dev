@@ -9,6 +9,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
 import { getAdByShortId, getAdContact } from "@/lib/catalog.functions";
 import { reportAd, sendMessage } from "@/lib/ads.functions";
+import { formatAttrs } from "@/lib/category-attrs";
 import { useServerFn } from "@tanstack/react-start";
 import { useAuth } from "@/hooks/use-auth";
 import { BRAND } from "@/lib/brand";
@@ -29,17 +30,23 @@ export const Route = createFileRoute("/$state/$city/$category/$slug")({
   head: ({ loaderData }) => {
     if (!loaderData) return { meta: [] };
     const { ad } = loaderData;
-    const img = (ad.ad_images ?? []).slice().sort((a: any, b: any) => a.sort_order - b.sort_order)[0]?.public_url;
-    const title = `${ad.title} — ${ad.cities?.name}, ${ad.cities?.states?.code} | ${BRAND.name}`;
-    const desc = (ad.body ?? "").slice(0, 160);
+    const adAny = ad as any;
+    const firstImg = (ad.ad_images ?? []).slice().sort((a: any, b: any) => a.sort_order - b.sort_order)[0]?.public_url;
+    // Per-ad SEO fields (RankMath-style, set by admins) win over derived values.
+    const img = adAny.og_image || firstImg;
+    const title = adAny.seo_title
+      ? `${adAny.seo_title} | ${BRAND.name}`
+      : `${ad.title} — ${ad.cities?.name}, ${ad.cities?.states?.code} | ${BRAND.name}`;
+    const desc = adAny.meta_description || (ad.body ?? "").slice(0, 160);
     return {
       meta: [
         { title }, { name: "description", content: desc },
-        { property: "og:title", content: ad.title }, { property: "og:description", content: desc },
+        { property: "og:title", content: adAny.seo_title || ad.title }, { property: "og:description", content: desc },
         { property: "og:type", content: "article" },
         ...(img ? [{ property: "og:image", content: img }, { name: "twitter:image", content: img }] : []),
         { name: "twitter:card", content: img ? "summary_large_image" : "summary" },
       ],
+      links: adAny.canonical_url ? [{ rel: "canonical", href: adAny.canonical_url }] : [],
       scripts: [{
         type: "application/ld+json",
         children: JSON.stringify({
@@ -202,6 +209,21 @@ function AdDetailPage() {
                 </span>
               )}
             </div>
+
+            {/* Category-specific specs (e.g. housing: bedrooms, sqft) */}
+            {formatAttrs(ad.categories?.slug, (ad as any).attrs).length > 0 && (
+              <div className="flex flex-wrap gap-2">
+                {formatAttrs(ad.categories?.slug, (ad as any).attrs).map((a) => (
+                  <span
+                    key={a.label}
+                    className="inline-flex items-center gap-1.5 rounded-full border border-border bg-secondary/50 px-3 py-1 text-sm"
+                  >
+                    <span className="text-muted-foreground">{a.label}:</span>
+                    <span className="font-medium">{a.value}</span>
+                  </span>
+                ))}
+              </div>
+            )}
 
             {/* Description */}
             <article className="rounded-2xl border border-border bg-card p-6">

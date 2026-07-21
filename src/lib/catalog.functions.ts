@@ -57,7 +57,8 @@ export const listCategories = createServerFn({ method: "GET" }).handler(async ()
   const sb = getPublicSupabase();
   const { data, error } = await sb
     .from("categories")
-    .select("id,slug,name,description,icon,sort_order,is_paid_only,base_price_cents,subcategories(id,slug,name,sort_order)")
+    .select("id,slug,name,description,icon,sort_order,is_paid_only,base_price_cents,is_adult,subcategories(id,slug,name,sort_order)")
+    .eq("is_active", true)
     .order("sort_order");
   if (error) throw new Error(error.message);
   return data ?? [];
@@ -83,8 +84,9 @@ export const getCategoryBySlug = createServerFn({ method: "GET" })
     const sb = getPublicSupabase();
     const { data: cat, error } = await sb
       .from("categories")
-      .select("id,slug,name,description,icon,subcategories(id,slug,name,sort_order)")
+      .select("id,slug,name,description,icon,is_adult,subcategories(id,slug,name,sort_order)")
       .eq("slug", data.slug)
+      .eq("is_active", true)
       .maybeSingle();
     if (error) throw new Error(error.message);
     return cat;
@@ -120,7 +122,7 @@ export const getAdByShortId = createServerFn({ method: "GET" })
       .from("ads")
       // contact_email & contact_phone are intentionally excluded from the public payload —
       // anonymous viewers never receive them. Authenticated viewers fetch via getAdContact.
-      .select("id,short_id,slug,title,body,price_cents,currency,tier,posted_at,view_count,user_id,allow_messages,city_id,category_id,subcategory_id,cities(name,slug,states(code,name,slug)),categories(slug,name),subcategories(slug,name),ad_images(public_url,sort_order),profiles(display_name,avatar_url,reputation)")
+      .select("id,short_id,slug,title,body,price_cents,currency,tier,posted_at,view_count,user_id,allow_messages,city_id,category_id,subcategory_id,attrs,seo_title,meta_description,og_image,canonical_url,cities(name,slug,states(code,name,slug)),categories(slug,name),subcategories(slug,name),ad_images(public_url,sort_order),profiles(display_name,avatar_url,reputation)")
       .eq("short_id", data.shortId)
       .eq("status", "live")
       .maybeSingle();

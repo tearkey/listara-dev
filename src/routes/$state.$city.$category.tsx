@@ -4,6 +4,7 @@ import { useMemo, useState } from "react";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { getCityBySlug, getCategoryBySlug, listAdsInCity } from "@/lib/catalog.functions";
+import { AgeGate } from "@/components/age-gate";
 import { BRAND } from "@/lib/brand";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -116,9 +117,8 @@ function BrowsePage() {
     setWithImagesOnly(false);
   };
 
-  return (
-    <div className="min-h-screen bg-background">
-      <SiteHeader />
+  const content = (
+    <>
       <section className="border-b border-border bg-secondary/40">
         <div className="mx-auto max-w-7xl px-4 py-5">
           <nav className="text-xs text-muted-foreground">
@@ -254,7 +254,13 @@ function BrowsePage() {
           </div>
         </div>
       </section>
+    </>
+  );
 
+  return (
+    <div className="min-h-screen bg-background">
+      <SiteHeader />
+      {(cat as any).is_adult ? <AgeGate>{content}</AgeGate> : content}
       <SiteFooter />
     </div>
   );

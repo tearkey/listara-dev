@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { BRAND } from "@/lib/brand";
 import { toast } from "sonner";
+import { TurnstileWidget } from "@/modules/turnstile/ui/turnstile-widget";
 
 export const Route = createFileRoute("/auth")({
   ssr: false,
@@ -31,6 +32,8 @@ function AuthPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
+  const [captchaToken, setCaptchaToken] = useState<string | null>(null);
+  const [website, setWebsite] = useState(""); // honeypot
 
   useEffect(() => {
     supabase.auth.getUser().then(({ data }) => {
@@ -54,18 +57,32 @@ function AuthPage() {
 
   async function handleEmail(e: React.FormEvent) {
     e.preventDefault();
+    // Honeypot: pretend everything worked so bots don't adapt.
+    if (website) {
+      toast.success("Account created. Check your email to confirm.");
+      return;
+    }
     setLoading(true);
+    // captchaToken is verified by Supabase Auth when Turnstile is enabled in
+    // its settings; harmless extra field otherwise.
     if (mode === "signup") {
       const { error } = await supabase.auth.signUp({
         email,
         password,
-        options: { emailRedirectTo: `${window.location.origin}${dest}` },
+        options: {
+          emailRedirectTo: `${window.location.origin}${dest}`,
+          captchaToken: captchaToken ?? undefined,
+        },
       });
       setLoading(false);
       if (error) return toast.error(error.message);
       toast.success("Account created. Check your email to confirm.");
     } else {
-      const { error } = await supabase.auth.signInWithPassword({ email, password });
+      const { error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+        options: { captchaToken: captchaToken ?? undefined },
+      });
       setLoading(false);
       if (error) return toast.error(error.message);
       router.invalidate();
@@ -104,6 +121,17 @@ function AuthPage() {
               <Label htmlFor="password">Password</Label>
               <Input id="password" type="password" required minLength={8} value={password} onChange={(e) => setPassword(e.target.value)} className="mt-1" />
             </div>
+            <input
+              type="text"
+              name="website"
+              value={website}
+              onChange={(e) => setWebsite(e.target.value)}
+              tabIndex={-1}
+              autoComplete="off"
+              aria-hidden="true"
+              className="absolute -left-[9999px] h-0 w-0 opacity-0"
+            />
+            <TurnstileWidget onToken={setCaptchaToken} />
             <Button type="submit" disabled={loading} className="w-full h-11 bg-brand text-brand-foreground hover:bg-brand/90">
               {mode === "signin" ? "Sign in" : "Create account"}
             </Button>
