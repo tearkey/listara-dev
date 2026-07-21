@@ -15,6 +15,8 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
+import { getModuleNavLinks } from "@/lib/hooks/registry";
+import { useActiveModules } from "@/lib/hooks/use-active-modules";
 
 export function SiteHeader() {
   const { user } = useAuth();
@@ -22,6 +24,8 @@ export function SiteHeader() {
   const queryClient = useQueryClient();
   const city = useCurrentCity();
   const [isAdmin, setIsAdmin] = useState(false);
+  const activeModules = useActiveModules();
+  const moduleLinks = getModuleNavLinks(activeModules);
 
   useEffect(() => {
     let cancelled = false;
@@ -94,6 +98,15 @@ export function SiteHeader() {
         </div>
 
         <nav className="flex items-center gap-1.5 sm:gap-2">
+          {moduleLinks.map((l) => (
+            <Link
+              key={l.to}
+              to={l.to as any}
+              className="hidden md:inline-block px-2 text-sm font-medium text-muted-foreground hover:text-foreground"
+            >
+              {l.label}
+            </Link>
+          ))}
           <Button asChild size="sm" className="bg-brand text-brand-foreground hover:bg-brand/90 px-2.5 sm:px-3">
             <Link to="/post" aria-label="Post an ad">
               <Plus className="h-4 w-4" />

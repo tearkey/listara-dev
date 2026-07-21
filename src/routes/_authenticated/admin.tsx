@@ -1,9 +1,11 @@
 import { createFileRoute, Link, Outlet, useRouterState, Navigate } from "@tanstack/react-router";
 import { queryOptions, useSuspenseQuery, useQuery } from "@tanstack/react-query";
-import { ShieldCheck, Users, Newspaper, CreditCard, ToggleLeft, ScrollText, LayoutDashboard, Gavel, BarChart3, Settings, MapPin, ShieldAlert, Inbox, Webhook } from "lucide-react";
+import { ShieldCheck, Users, Newspaper, CreditCard, ToggleLeft, ScrollText, LayoutDashboard, Gavel, BarChart3, Settings, MapPin, ShieldAlert, Inbox, Webhook, Puzzle, ChevronRight } from "lucide-react";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { getAdminStats, countUnreadAdminNotifications } from "@/lib/admin.functions";
+import { getModuleAdminNav } from "@/lib/hooks/registry";
+import { useActiveModules } from "@/lib/hooks/use-active-modules";
 import { BRAND } from "@/lib/brand";
 
 // Gate the whole /admin/* subtree on admin role (via stats fetch — throws Forbidden otherwise).
@@ -55,6 +57,7 @@ const NAV: Array<{ to: string; label: string; icon: any; exact?: boolean }> = [
   { to: "/admin/ads", label: "Ads", icon: Newspaper },
   { to: "/admin/payments", label: "Payments", icon: CreditCard },
   { to: "/admin/catalog", label: "Cities & Categories", icon: MapPin },
+  { to: "/admin/modules", label: "Plugins", icon: Puzzle },
   { to: "/admin/flags", label: "Feature flags", icon: ToggleLeft },
   { to: "/admin/audit", label: "Audit log", icon: ScrollText },
   { to: "/admin/settings", label: "Settings", icon: Settings },
@@ -71,6 +74,14 @@ function AdminLayout() {
     refetchInterval: 60_000,
   });
   const unread = unreadData?.unread ?? 0;
+  const activeModules = useActiveModules();
+  // Active plugins contribute their own sidebar entries (e.g. Blog).
+  const moduleNav = getModuleAdminNav(activeModules).map((l) => ({
+    to: l.to,
+    label: l.label,
+    icon: ChevronRight,
+  }));
+  const nav = [...NAV, ...moduleNav];
   return (
     <div className="min-h-screen bg-background">
       <SiteHeader />
@@ -82,7 +93,7 @@ function AdminLayout() {
         <div className="grid gap-6 md:grid-cols-[220px_1fr]">
           <aside className="rounded-2xl border border-border bg-card p-2 md:sticky md:top-20 h-max">
             <nav className="flex md:flex-col gap-1 overflow-x-auto">
-              {NAV.map(({ to, label, icon: Icon, exact }) => {
+              {nav.map(({ to, label, icon: Icon, exact }) => {
                 const active = exact ? pathname === to : pathname.startsWith(to);
                 const showBadge = to === "/admin/inbox" && unread > 0;
                 return (
