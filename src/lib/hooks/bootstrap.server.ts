@@ -9,6 +9,7 @@
 import { hooks } from "./registry";
 import { getActiveModuleSlugs } from "./modules.server";
 import { registerServerHooks as registerBlogServerHooks } from "@/modules/blog/server-hooks.server";
+import { registerServerHooks as registerTurnstileServerHooks } from "@/modules/turnstile/server-hooks.server";
 
 let registered = false;
 
@@ -16,6 +17,7 @@ export async function serverHooks() {
   if (!registered) {
     registered = true;
     registerBlogServerHooks();
+    registerTurnstileServerHooks();
   }
   const activeSlugs = await getActiveModuleSlugs();
   return { hooks, activeSlugs };

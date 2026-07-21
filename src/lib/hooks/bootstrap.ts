@@ -6,6 +6,7 @@
 // and import its register() here.
 
 import { register as registerBlog } from "@/modules/blog/register";
+import { register as registerTurnstile } from "@/modules/turnstile/register";
 
 let booted = false;
 
@@ -13,4 +14,5 @@ export function bootstrapModules() {
   if (booted) return;
   booted = true;
   registerBlog();
+  registerTurnstile();
 }

@@ -12,6 +12,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { listCategories, listFeaturedCities, listStates } from "@/lib/catalog.functions";
 import { createAd } from "@/lib/ads.functions";
 import { CategoryAttrFields, type AttrValues } from "@/components/category-attr-fields";
+import { TurnstileWidget } from "@/modules/turnstile/ui/turnstile-widget";
 import { getMyCredits } from "@/lib/credits.functions";
 import { useServerFn } from "@tanstack/react-start";
 import { BRAND } from "@/lib/brand";
@@ -59,6 +60,8 @@ function PostPage() {
   const [submitting, setSubmitting] = useState(false);
   const [attrs, setAttrs] = useState<AttrValues>({});
   const [adultConfirmed, setAdultConfirmed] = useState(false);
+  const [captchaToken, setCaptchaToken] = useState<string | null>(null);
+  const [website, setWebsite] = useState(""); // honeypot
 
   const subcats = useMemo(() => {
     return categories.find((c: any) => c.id === categoryId)?.subcategories ?? [];
@@ -136,6 +139,8 @@ function PostPage() {
           contact_email: email || undefined,
           contact_phone: phone || undefined,
           attrs: Object.keys(attrs).length ? attrs : undefined,
+          captcha_token: captchaToken ?? undefined,
+          website: website || undefined,
         },
       });
       if (result.status === "insufficient_credits") {
@@ -343,6 +348,22 @@ function PostPage() {
               balanceCents={credits.balance_cents}
               costCents={POST_COST_CENTS}
             />
+          )}
+
+          {step === 4 && (
+            <>
+              <input
+                type="text"
+                name="website"
+                value={website}
+                onChange={(e) => setWebsite(e.target.value)}
+                tabIndex={-1}
+                autoComplete="off"
+                aria-hidden="true"
+                className="absolute -left-[9999px] h-0 w-0 opacity-0"
+              />
+              <TurnstileWidget onToken={setCaptchaToken} />
+            </>
           )}
 
           {/* Wizard footer */}

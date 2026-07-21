@@ -21,6 +21,8 @@ const CSP = [
   "base-uri 'self'",
   "frame-ancestors 'none'",
   "form-action 'self' https://nowpayments.io https://*.nowpayments.io",
+  // Cloudflare Turnstile (anti-bot plugin) renders its challenge in an iframe.
+  "frame-src 'self' https://challenges.cloudflare.com",
   "img-src 'self' data: blob: https:",
   "font-src 'self' data: https:",
   "style-src 'self' 'unsafe-inline' https:",

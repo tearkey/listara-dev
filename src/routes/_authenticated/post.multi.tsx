@@ -18,6 +18,7 @@ import { listCategories } from "@/lib/catalog.functions";
 import { listStatesWithCities, getMyCredits } from "@/lib/credits.functions";
 import { createAd } from "@/lib/ads.functions";
 import { CategoryAttrFields, type AttrValues } from "@/components/category-attr-fields";
+import { TurnstileWidget } from "@/modules/turnstile/ui/turnstile-widget";
 import {
   ChevronDown, ChevronRight, MapPin, Wallet, Search as SearchIcon,
   ArrowLeft, ArrowRight, Check, Tag, FileText, Globe2,
@@ -78,6 +79,8 @@ function PostMultiPage() {
   const [submitting, setSubmitting] = useState(false);
   const [attrs, setAttrs] = useState<AttrValues>({});
   const [adultConfirmed, setAdultConfirmed] = useState(false);
+  const [captchaToken, setCaptchaToken] = useState<string | null>(null);
+  const [website, setWebsite] = useState(""); // honeypot
 
   const selectedCategory = (categories as any[]).find((c) => c.id === categoryId);
   const selectedCount = Object.keys(selected).length;
@@ -149,6 +152,8 @@ function PostMultiPage() {
           contact_email: email || undefined,
           contact_phone: phone || undefined,
           attrs: Object.keys(attrs).length ? attrs : undefined,
+          captcha_token: captchaToken ?? undefined,
+          website: website || undefined,
         },
       });
       if ((result as any).status === "insufficient_credits") {
@@ -418,6 +423,17 @@ function PostMultiPage() {
                   {selectedCount > 20 && <span className="text-xs text-muted-foreground">+{selectedCount - 20} more</span>}
                 </div>
               </div>
+              <input
+                type="text"
+                name="website"
+                value={website}
+                onChange={(e) => setWebsite(e.target.value)}
+                tabIndex={-1}
+                autoComplete="off"
+                aria-hidden="true"
+                className="absolute -left-[9999px] h-0 w-0 opacity-0"
+              />
+              <TurnstileWidget onToken={setCaptchaToken} />
               <div className="flex items-center justify-between rounded-xl border border-border bg-brand/5 p-4">
                 <div>
                   <div className="text-xs uppercase tracking-wide text-muted-foreground">You'll be charged</div>

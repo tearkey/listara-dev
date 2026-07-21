@@ -27,6 +27,10 @@ const adInput = z.object({
     .record(z.string().max(40), z.union([z.string().max(120), z.number(), z.boolean()]))
     .refine((r) => Object.keys(r).length <= 20, "Too many attributes")
     .optional(),
+  // Anti-bot plugin token; verified server-side when the plugin is active.
+  captcha_token: z.string().max(4000).optional(),
+  // Honeypot — hidden field real users never fill.
+  website: z.string().max(200).optional(),
 });
 
 const POST_COST_CENTS = 10; // $0.10 per city
@@ -37,6 +41,19 @@ export const createAd = createServerFn({ method: "POST" })
   .inputValidator((d) => adInput.parse(d))
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
+
+    // Honeypot: bots fill every field; humans never see this one. Report a
+    // fake success so scripts don't learn they were caught.
+    if (data.website) {
+      return { id: "", short_id: "", slug: "", status: "pending" as const, posted_count: 0 };
+    }
+
+    // Active anti-bot plugins verify the captcha token (no-op when inactive).
+    {
+      const { serverHooks } = await import("@/lib/hooks/bootstrap.server");
+      const { hooks, activeSlugs } = await serverHooks();
+      await hooks.applyFilters("ad.before_create", { captchaToken: data.captcha_token, userId }, {}, activeSlugs);
+    }
 
     // Rate limit: 5 posted ads per hour per user (best-effort, per-user DB counter).
     const { data: allowed, error: rlErr } = await supabase.rpc("consume_rate_limit", {
