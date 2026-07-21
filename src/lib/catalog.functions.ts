@@ -57,7 +57,8 @@ export const listCategories = createServerFn({ method: "GET" }).handler(async ()
   const sb = getPublicSupabase();
   const { data, error } = await sb
     .from("categories")
-    .select("id,slug,name,description,icon,sort_order,is_paid_only,base_price_cents,subcategories(id,slug,name,sort_order)")
+    .select("id,slug,name,description,icon,sort_order,is_paid_only,base_price_cents,is_adult,subcategories(id,slug,name,sort_order)")
+    .eq("is_active", true)
     .order("sort_order");
   if (error) throw new Error(error.message);
   return data ?? [];
@@ -83,8 +84,9 @@ export const getCategoryBySlug = createServerFn({ method: "GET" })
     const sb = getPublicSupabase();
     const { data: cat, error } = await sb
       .from("categories")
-      .select("id,slug,name,description,icon,subcategories(id,slug,name,sort_order)")
+      .select("id,slug,name,description,icon,is_adult,subcategories(id,slug,name,sort_order)")
       .eq("slug", data.slug)
+      .eq("is_active", true)
       .maybeSingle();
     if (error) throw new Error(error.message);
     return cat;

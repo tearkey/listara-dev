@@ -6,6 +6,10 @@
 --
 -- The category is marked as featured and optimized for condition-based listings.
 
+-- The base schema's subcategories table has no description column; the inserts
+-- below depend on it, so add it first (no-op where it already exists).
+ALTER TABLE public.subcategories ADD COLUMN IF NOT EXISTS description TEXT;
+
 -- Ensure the Electronics category exists with proper metadata
 INSERT INTO public.categories (slug, name, icon, description, sort_order)
 VALUES (

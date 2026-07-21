@@ -13,7 +13,7 @@ export const Route = createFileRoute("/api/public/sitemap.xml")({
         const sb = getPublicSupabase();
         const [{ data: cities }, { data: categories }, { data: ads }] = await Promise.all([
           sb.from("cities").select("slug,states(slug)").eq("is_featured", true),
-          sb.from("categories").select("slug"),
+          sb.from("categories").select("slug").eq("is_active", true),
           sb.from("ads").select("short_id,slug,cities(slug,states(slug)),categories(slug)").eq("status", "live").limit(5000),
         ]);
         const urls: string[] = [`${origin}/`];

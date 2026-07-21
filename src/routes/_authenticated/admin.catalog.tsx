@@ -343,6 +343,8 @@ function CategoriesPanel() {
           sort_order: c.sort_order,
           is_paid_only: c.is_paid_only,
           base_price_cents: c.base_price_cents,
+          is_active: c.is_active,
+          is_adult: c.is_adult,
         },
       });
       toast.success("Saved");
@@ -479,6 +481,22 @@ function CategoriesPanel() {
                   onCheckedChange={(v) => (c.is_paid_only = v)}
                 />
                 <span className="text-sm">Paid</span>
+              </div>
+              <div className="flex items-end gap-4">
+                <label className="flex items-center gap-2">
+                  <Switch
+                    defaultChecked={c.is_active ?? true}
+                    onCheckedChange={(v) => (c.is_active = v)}
+                  />
+                  <span className="text-sm">Visible</span>
+                </label>
+                <label className="flex items-center gap-2">
+                  <Switch
+                    defaultChecked={c.is_adult ?? false}
+                    onCheckedChange={(v) => (c.is_adult = v)}
+                  />
+                  <span className="text-sm">18+</span>
+                </label>
               </div>
             </div>
             <div className="mt-3 flex gap-2">
