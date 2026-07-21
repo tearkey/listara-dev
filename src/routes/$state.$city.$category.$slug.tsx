@@ -30,17 +30,23 @@ export const Route = createFileRoute("/$state/$city/$category/$slug")({
   head: ({ loaderData }) => {
     if (!loaderData) return { meta: [] };
     const { ad } = loaderData;
-    const img = (ad.ad_images ?? []).slice().sort((a: any, b: any) => a.sort_order - b.sort_order)[0]?.public_url;
-    const title = `${ad.title} — ${ad.cities?.name}, ${ad.cities?.states?.code} | ${BRAND.name}`;
-    const desc = (ad.body ?? "").slice(0, 160);
+    const adAny = ad as any;
+    const firstImg = (ad.ad_images ?? []).slice().sort((a: any, b: any) => a.sort_order - b.sort_order)[0]?.public_url;
+    // Per-ad SEO fields (RankMath-style, set by admins) win over derived values.
+    const img = adAny.og_image || firstImg;
+    const title = adAny.seo_title
+      ? `${adAny.seo_title} | ${BRAND.name}`
+      : `${ad.title} — ${ad.cities?.name}, ${ad.cities?.states?.code} | ${BRAND.name}`;
+    const desc = adAny.meta_description || (ad.body ?? "").slice(0, 160);
     return {
       meta: [
         { title }, { name: "description", content: desc },
-        { property: "og:title", content: ad.title }, { property: "og:description", content: desc },
+        { property: "og:title", content: adAny.seo_title || ad.title }, { property: "og:description", content: desc },
         { property: "og:type", content: "article" },
         ...(img ? [{ property: "og:image", content: img }, { name: "twitter:image", content: img }] : []),
         { name: "twitter:card", content: img ? "summary_large_image" : "summary" },
       ],
+      links: adAny.canonical_url ? [{ rel: "canonical", href: adAny.canonical_url }] : [],
       scripts: [{
         type: "application/ld+json",
         children: JSON.stringify({
