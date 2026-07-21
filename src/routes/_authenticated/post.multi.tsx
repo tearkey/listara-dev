@@ -17,6 +17,7 @@ import { BRAND } from "@/lib/brand";
 import { listCategories } from "@/lib/catalog.functions";
 import { listStatesWithCities, getMyCredits } from "@/lib/credits.functions";
 import { createAd } from "@/lib/ads.functions";
+import { CategoryAttrFields, type AttrValues } from "@/components/category-attr-fields";
 import {
   ChevronDown, ChevronRight, MapPin, Wallet, Search as SearchIcon,
   ArrowLeft, ArrowRight, Check, Tag, FileText, Globe2,
@@ -75,7 +76,10 @@ function PostMultiPage() {
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
   const [submitting, setSubmitting] = useState(false);
+  const [attrs, setAttrs] = useState<AttrValues>({});
+  const [adultConfirmed, setAdultConfirmed] = useState(false);
 
+  const selectedCategory = (categories as any[]).find((c) => c.id === categoryId);
   const selectedCount = Object.keys(selected).length;
   const totalCents = selectedCount * COST_CENTS;
   const affordable = credits.balance_cents >= totalCents;
@@ -127,6 +131,8 @@ function PostMultiPage() {
     if (step === 2 && !categoryId) return toast.error("Pick a category.");
     if (step === 3 && (title.trim().length < 4 || body.trim().length < 20))
       return toast.error("Title (4+ chars) and description (20+ chars) required.");
+    if (step === 3 && selectedCategory?.is_adult && !adultConfirmed)
+      return toast.error("You must confirm the 18+ statement to post in this category.");
     setStep((s) => Math.min(4, s + 1));
   }
 
@@ -142,6 +148,7 @@ function PostMultiPage() {
           price_cents: price ? Math.round(parseFloat(price) * 100) : undefined,
           contact_email: email || undefined,
           contact_phone: phone || undefined,
+          attrs: Object.keys(attrs).length ? attrs : undefined,
         },
       });
       if ((result as any).status === "insufficient_credits") {
@@ -327,7 +334,7 @@ function PostMultiPage() {
               <div className="grid gap-4 sm:grid-cols-2">
                 <div>
                   <Label>Category</Label>
-                  <Select value={categoryId} onValueChange={(v) => { setCategoryId(v); setSubcategoryId(""); }}>
+                  <Select value={categoryId} onValueChange={(v) => { setCategoryId(v); setSubcategoryId(""); setAttrs({}); setAdultConfirmed(false); }}>
                     <SelectTrigger className="mt-1"><SelectValue placeholder="Choose category" /></SelectTrigger>
                     <SelectContent>
                       {(categories as any[]).map((c) => (<SelectItem key={c.id} value={c.id}>{c.name}</SelectItem>))}
@@ -360,6 +367,11 @@ function PostMultiPage() {
                 <Label htmlFor="body">Description</Label>
                 <Textarea id="body" minLength={20} maxLength={8000} rows={7} value={body} onChange={(e) => setBody(e.target.value)} placeholder="Details, condition, meetup preference…" className="mt-1" />
               </div>
+              <CategoryAttrFields
+                categorySlug={selectedCategory?.slug}
+                values={attrs}
+                onChange={setAttrs}
+              />
               <div className="grid gap-4 sm:grid-cols-3">
                 <div>
                   <Label htmlFor="price">Price (USD, optional)</Label>
@@ -374,6 +386,20 @@ function PostMultiPage() {
                   <Input id="phone" type="tel" value={phone} onChange={(e) => setPhone(e.target.value)} className="mt-1" />
                 </div>
               </div>
+              {selectedCategory?.is_adult && (
+                <label className="flex items-start gap-2 rounded-xl border border-border bg-secondary/30 p-4 text-sm">
+                  <input
+                    type="checkbox"
+                    checked={adultConfirmed}
+                    onChange={(e) => setAdultConfirmed(e.target.checked)}
+                    className="mt-0.5 h-4 w-4"
+                  />
+                  <span>
+                    I confirm I am 18 or older, everyone referenced in this ad is 18 or older, and
+                    this post follows the site rules for this category.
+                  </span>
+                </label>
+              )}
             </div>
           )}
 

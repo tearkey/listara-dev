@@ -11,6 +11,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { listCategories, listFeaturedCities, listStates } from "@/lib/catalog.functions";
 import { createAd } from "@/lib/ads.functions";
+import { CategoryAttrFields, type AttrValues } from "@/components/category-attr-fields";
 import { getMyCredits } from "@/lib/credits.functions";
 import { useServerFn } from "@tanstack/react-start";
 import { BRAND } from "@/lib/brand";
@@ -56,6 +57,8 @@ function PostPage() {
   const [photos, setPhotos] = useState<Array<{ id: string; url: string; name: string; size: number }>>([]);
   const [upgrades, setUpgrades] = useState({ bumped: false, featured: false, sticky: false });
   const [submitting, setSubmitting] = useState(false);
+  const [attrs, setAttrs] = useState<AttrValues>({});
+  const [adultConfirmed, setAdultConfirmed] = useState(false);
 
   const subcats = useMemo(() => {
     return categories.find((c: any) => c.id === categoryId)?.subcategories ?? [];
@@ -93,13 +96,22 @@ function PostPage() {
 
   function canAdvance(from: number): boolean {
     if (from === 1) return Boolean(cityId && categoryId);
-    if (from === 2) return title.trim().length >= 4 && body.trim().length >= 20;
+    if (from === 2) {
+      if (selectedCategory?.is_adult && !adultConfirmed) return false;
+      return title.trim().length >= 4 && body.trim().length >= 20;
+    }
     return true;
   }
 
   function goNext() {
     if (!canAdvance(step)) {
-      toast.error(step === 1 ? "Pick a city and category to continue." : "Title (4+ chars) and description (20+ chars) are required.");
+      toast.error(
+        step === 1
+          ? "Pick a city and category to continue."
+          : selectedCategory?.is_adult && !adultConfirmed
+            ? "You must confirm the 18+ statement to post in this category."
+            : "Title (4+ chars) and description (20+ chars) are required.",
+      );
       return;
     }
     setStep((s) => Math.min(4, s + 1));
@@ -123,6 +135,7 @@ function PostPage() {
           price_cents: price ? Math.round(parseFloat(price) * 100) : undefined,
           contact_email: email || undefined,
           contact_phone: phone || undefined,
+          attrs: Object.keys(attrs).length ? attrs : undefined,
         },
       });
       if (result.status === "insufficient_credits") {
@@ -210,7 +223,7 @@ function PostPage() {
                 </div>
                 <div>
                   <Label className="inline-flex items-center gap-1"><Tag className="h-4 w-4 text-brand" /> Category</Label>
-                  <Select value={categoryId} onValueChange={(v) => { setCategoryId(v); setSubcategoryId(""); }}>
+                  <Select value={categoryId} onValueChange={(v) => { setCategoryId(v); setSubcategoryId(""); setAttrs({}); setAdultConfirmed(false); }}>
                     <SelectTrigger className="mt-1"><SelectValue placeholder="Choose category" /></SelectTrigger>
                     <SelectContent>
                       {categories.map((c: any) => (
@@ -272,6 +285,11 @@ function PostPage() {
                           placeholder="Condition, what's included, why you're selling, where to meet…" className="mt-1" />
                 <p className="mt-1 text-[11px] text-muted-foreground">{body.length}/8000</p>
               </div>
+              <CategoryAttrFields
+                categorySlug={selectedCategory?.slug}
+                values={attrs}
+                onChange={setAttrs}
+              />
               <div className="grid gap-4 sm:grid-cols-2">
                 <div>
                   <Label htmlFor="email">Contact email (optional)</Label>
@@ -282,6 +300,20 @@ function PostPage() {
                   <Input id="phone" type="tel" value={phone} onChange={(e) => setPhone(e.target.value)} className="mt-1" />
                 </div>
               </div>
+              {selectedCategory?.is_adult && (
+                <label className="flex items-start gap-2 rounded-xl border border-border bg-secondary/30 p-4 text-sm">
+                  <input
+                    type="checkbox"
+                    checked={adultConfirmed}
+                    onChange={(e) => setAdultConfirmed(e.target.checked)}
+                    className="mt-0.5 h-4 w-4"
+                  />
+                  <span>
+                    I confirm I am 18 or older, everyone referenced in this ad is 18 or older, and
+                    this post follows the site rules for this category.
+                  </span>
+                </label>
+              )}
             </div>
           )}
 

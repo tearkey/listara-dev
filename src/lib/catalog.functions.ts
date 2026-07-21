@@ -122,7 +122,7 @@ export const getAdByShortId = createServerFn({ method: "GET" })
       .from("ads")
       // contact_email & contact_phone are intentionally excluded from the public payload —
       // anonymous viewers never receive them. Authenticated viewers fetch via getAdContact.
-      .select("id,short_id,slug,title,body,price_cents,currency,tier,posted_at,view_count,user_id,allow_messages,city_id,category_id,subcategory_id,cities(name,slug,states(code,name,slug)),categories(slug,name),subcategories(slug,name),ad_images(public_url,sort_order),profiles(display_name,avatar_url,reputation)")
+      .select("id,short_id,slug,title,body,price_cents,currency,tier,posted_at,view_count,user_id,allow_messages,city_id,category_id,subcategory_id,attrs,cities(name,slug,states(code,name,slug)),categories(slug,name),subcategories(slug,name),ad_images(public_url,sort_order),profiles(display_name,avatar_url,reputation)")
       .eq("short_id", data.shortId)
       .eq("status", "live")
       .maybeSingle();

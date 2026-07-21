@@ -22,10 +22,15 @@ const adInput = z.object({
   contact_email: z.string().email().max(255).optional().nullable(),
   contact_phone: z.string().max(40).optional().nullable(),
   allow_messages: z.boolean().optional(),
+  // Category-specific structured fields (see src/lib/category-attrs.ts).
+  attrs: z
+    .record(z.string().max(40), z.union([z.string().max(120), z.number(), z.boolean()]))
+    .refine((r) => Object.keys(r).length <= 20, "Too many attributes")
+    .optional(),
 });
 
 const POST_COST_CENTS = 10; // $0.10 per city
-const AD_LIFETIME_MS = 24 * 60 * 60 * 1000; // 24 hours per requirement
+const DEFAULT_AD_LIFETIME_HOURS = 24; // fallback when the category row is missing
 
 export const createAd = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
@@ -87,7 +92,14 @@ export const createAd = createServerFn({ method: "POST" })
 
     const slug = slugify(data.title);
     const now = new Date().toISOString();
-    const expiresAt = new Date(Date.now() + AD_LIFETIME_MS).toISOString();
+    // Ad lifetime is per-category (housing runs 30 days, most categories 24h).
+    const { data: category } = await supabaseAdmin
+      .from("categories")
+      .select("ad_lifetime_hours")
+      .eq("id", data.category_id)
+      .maybeSingle();
+    const lifetimeHours = (category as any)?.ad_lifetime_hours ?? DEFAULT_AD_LIFETIME_HOURS;
+    const expiresAt = new Date(Date.now() + lifetimeHours * 60 * 60 * 1000).toISOString();
 
     if (status === "rejected") {
       // Insert a single rejected row for moderator audit; no city fanout, no charge.
@@ -106,6 +118,7 @@ export const createAd = createServerFn({ method: "POST" })
           contact_email: data.contact_email ?? null,
           contact_phone: data.contact_phone ?? null,
           allow_messages: data.allow_messages ?? true,
+          attrs: data.attrs ?? {},
           status: "rejected",
         })
         .select("id,short_id,slug,status")
@@ -126,8 +139,13 @@ export const createAd = createServerFn({ method: "POST" })
       price_cents: data.price_cents ?? null,
       contact_email: data.contact_email ?? null,
       contact_phone: data.contact_phone ?? null,
+      allow_messages: data.allow_messages ?? true,
+      attrs: data.attrs ?? {},
       status,
       posted_at: status === "live" ? now : null,
+      // Live ads expire on the category's schedule; pending ads get their
+      // window stamped on approval by moderation.
+      expires_at: status === "live" ? expiresAt : null,
     }));
 
     const { data: ads, error } = await supabaseAdmin

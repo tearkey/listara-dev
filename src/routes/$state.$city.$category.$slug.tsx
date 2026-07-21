@@ -9,6 +9,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
 import { getAdByShortId, getAdContact } from "@/lib/catalog.functions";
 import { reportAd, sendMessage } from "@/lib/ads.functions";
+import { formatAttrs } from "@/lib/category-attrs";
 import { useServerFn } from "@tanstack/react-start";
 import { useAuth } from "@/hooks/use-auth";
 import { BRAND } from "@/lib/brand";
@@ -202,6 +203,21 @@ function AdDetailPage() {
                 </span>
               )}
             </div>
+
+            {/* Category-specific specs (e.g. housing: bedrooms, sqft) */}
+            {formatAttrs(ad.categories?.slug, (ad as any).attrs).length > 0 && (
+              <div className="flex flex-wrap gap-2">
+                {formatAttrs(ad.categories?.slug, (ad as any).attrs).map((a) => (
+                  <span
+                    key={a.label}
+                    className="inline-flex items-center gap-1.5 rounded-full border border-border bg-secondary/50 px-3 py-1 text-sm"
+                  >
+                    <span className="text-muted-foreground">{a.label}:</span>
+                    <span className="font-medium">{a.value}</span>
+                  </span>
+                ))}
+              </div>
+            )}
 
             {/* Description */}
             <article className="rounded-2xl border border-border bg-card p-6">
