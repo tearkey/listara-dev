@@ -6,6 +6,7 @@ import { Send, AlertCircle, Flag, Lock, Shield } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
 import {
   threadDetailQueryOpts,
   threadMessagesQueryOpts,
@@ -80,6 +81,39 @@ function ThreadDetailPage() {
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
+
+  // Realtime message subscription
+  useEffect(() => {
+    const { data: { user } } = supabase.auth.onAuthStateChange(() => {
+      // Just trigger on auth state change
+    });
+
+    if (!threadId) return;
+
+    // Subscribe to new messages in this thread
+    const subscription = supabase
+      .channel(`messages_thread_${threadId}`)
+      .on(
+        "postgres_changes",
+        {
+          event: "INSERT",
+          schema: "public",
+          table: "messages",
+          filter: `thread_id=eq.${threadId}`,
+        },
+        (payload) => {
+          // Invalidate messages query to refetch with new message
+          qc.invalidateQueries({ queryKey: ["messages", threadId] });
+          // Update unread count
+          qc.invalidateQueries({ queryKey: ["messages", "unread-count"] });
+        }
+      )
+      .subscribe();
+
+    return () => {
+      subscription.unsubscribe();
+    };
+  }, [threadId, qc]);
 
   async function handleSendMessage() {
     if (!messageBody.trim()) return;

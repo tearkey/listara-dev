@@ -1,11 +1,12 @@
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect } from "react";
 import { createFileRoute, useSearch } from "@tanstack/react-router";
-import { useSuspenseQuery } from "@tanstack/react-query";
+import { useSuspenseQuery, useQueryClient } from "@tanstack/react-query";
 import { zodValidator } from "@tanstack/zod-adapter";
 import { z } from "zod";
 import { MessageCircle, ChevronLeft, ChevronRight, Search, Archive } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { supabase } from "@/integrations/supabase/client";
 import { messageThreadsQueryOpts, useGetOrCreateThread } from "@/lib/messages.hooks";
 import { formatDistanceToNow } from "date-fns";
 
@@ -33,12 +34,38 @@ function MessagesInboxPage() {
   const search = useSearch({ from: Route.id });
   const navigate = Route.useNavigate();
   const [query, setQuery] = useState(search.q);
+  const qc = useQueryClient();
   
   const { data: threadsPage } = useSuspenseQuery(messageThreadsQueryOpts(search.page, 20));
   const { threads = [], total = 0 } = threadsPage || {};
   
   const pageCount = Math.max(1, Math.ceil(total / 20));
   const currentPage = Math.min(search.page || 1, pageCount);
+
+  // Realtime subscription for new messages
+  useEffect(() => {
+    // Subscribe to new messages to refresh thread list
+    const subscription = supabase
+      .channel("messages_all_threads")
+      .on(
+        "postgres_changes",
+        {
+          event: "INSERT",
+          schema: "public",
+          table: "messages",
+        },
+        () => {
+          // Invalidate thread list and unread count on new message
+          qc.invalidateQueries({ queryKey: ["messages", "threads"] });
+          qc.invalidateQueries({ queryKey: ["messages", "unread-count"] });
+        }
+      )
+      .subscribe();
+
+    return () => {
+      subscription.unsubscribe();
+    };
+  }, [qc]);
 
   // Filter threads by search query
   const filteredThreads = useMemo(() => {
